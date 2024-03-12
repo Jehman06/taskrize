@@ -21,28 +21,41 @@ const LoginPage: React.FC = () => {
         'http://127.0.0.1:8000/api/login',
         formData,
       );
-      // Login successful
-      if (response.status == 200) {
+      if (response.status === 200) {
+        // Login successful
+        console.log('Login successful:', response.data);
         // Clear any previous error messages
         setErrorMessage('');
-        console.log('Login Successful! YAY!');
-        // TODO: Redirect to homepage
+        // Optionally, redirect to a new page or update state to reflect logged-in status
       } else {
         // Unexpected response status
         console.error('Unexpected response status:', response.status);
-        setErrorMessage('Email or password incorrect');
+        setErrorMessage(
+          'An unexpected error occurred. Please try again later.',
+        );
       }
     } catch (error: any) {
+      // Request failed or response status is not 200
       console.error('Error logging in:', error);
       if (error.response) {
-        setErrorMessage(
-          error.response.data.error ||
-            'An error occurred during login. Try again.',
-        );
-        console.log(errorMessage);
+        // Server responded with an error message
+        if (error.response.status === 401 || error.response.status === 400) {
+          // Incorrect email/password error
+          setErrorMessage('Invalid credentials. Please try again.');
+          console.log(errorMessage);
+        } else {
+          // Other error from the server
+          setErrorMessage(
+            error.response.data.error ||
+              'An error occurred during login. Please try again.',
+          );
+          console.log(errorMessage);
+        }
       } else {
         // Network error or other unexpected error
-        setErrorMessage('An unexpected error occurred. Try again later.');
+        setErrorMessage(
+          'An unexpected error occurred. Please try again later.',
+        );
         console.log(errorMessage);
       }
     }
