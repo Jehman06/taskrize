@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.exceptions import ValidationError
 from django.contrib.auth import authenticate, login, logout
 from .models import CustomUser
 
@@ -8,6 +9,10 @@ from .models import CustomUser
 def register_user(request):
     email = request.data.get('email')
     password = request.data.get('password')
+    password_confirmation = request.data.get('password_confirmation')
+
+    if password != password_confirmation:
+        raise ValidationError({'error': 'Passwords do not match'})
     
     if not email or not password:
         return Response({'error': 'Please provide email and password'}, status=status.HTTP_400_BAD_REQUEST)
