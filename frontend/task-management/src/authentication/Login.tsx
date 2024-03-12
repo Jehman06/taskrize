@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import axios, { Axios, AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const SignupPage: React.FC = () => {
+const LoginPage: React.FC = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    password_confirmation: '',
   });
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -17,29 +16,41 @@ const SignupPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (formData.password !== formData.password_confirmation) {
-      setErrorMessage("Passwords don't match");
-      return;
-    }
     try {
       const response = await axios.post(
-        'http://127.0.0.1:8000/api/register',
+        'http://127.0.0.1:8000/api/login',
         formData,
       );
-      console.log('User registered successfully:', response.data);
-      setErrorMessage('');
+      // Login successful
+      if (response.status == 200) {
+        // Clear any previous error messages
+        setErrorMessage('');
+        console.log('Login Successful! YAY!');
+        // TODO: Redirect to homepage
+      } else {
+        // Unexpected response status
+        console.error('Unexpected response status:', response.status);
+        setErrorMessage('Email or password incorrect');
+      }
     } catch (error: any) {
-      console.error('Error registering user:', error);
-      setErrorMessage(
-        (error as AxiosError<any>)?.response?.data?.error ||
-          'An error occurred during registration.',
-      );
+      console.error('Error logging in:', error);
+      if (error.response) {
+        setErrorMessage(
+          error.response.data.error ||
+            'An error occurred during login. Try again.',
+        );
+        console.log(errorMessage);
+      } else {
+        // Network error or other unexpected error
+        setErrorMessage('An unexpected error occurred. Try again later.');
+        console.log(errorMessage);
+      }
     }
   };
 
   return (
     <div className="container">
-      <h1 className="text-center mt-5 mb-4">Signup</h1>
+      <h1 className="text-center mt-5 mb-4">Login</h1>
       <form onSubmit={handleSubmit} className="col-md-6 mx-auto">
         <div className="mb-3">
           <label htmlFor="emailInput" className="form-label">
@@ -72,27 +83,12 @@ const SignupPage: React.FC = () => {
           />
         </div>
 
-        <div className="mb-3">
-          <label htmlFor="passwordConfirmationInput" className="form-label">
-            Confirm Password
-          </label>
-          <input
-            className="form-control"
-            type="password"
-            name="password_confirmation"
-            value={formData.password_confirmation}
-            onChange={handleChange}
-            aria-describedby="passwordHelpBlock"
-            required
-          />
-        </div>
-
         <button type="submit" className="btn btn-primary">
-          Signup
+          Login
         </button>
       </form>
     </div>
   );
 };
 
-export default SignupPage;
+export default LoginPage;

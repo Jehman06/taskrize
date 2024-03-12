@@ -1,5 +1,6 @@
 import './App.css';
-import SignupPage from './Signup';
+import SignupPage from './authentication/Signup';
+import LoginPage from './authentication/Login';
 
 function App() {
   return (
@@ -8,6 +9,7 @@ function App() {
         <p>Task-Management App</p>
       </header>
       <SignupPage />
+      <LoginPage />
     </div>
   );
 }
