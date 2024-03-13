@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios, { AxiosError } from 'axios';
+import { useNavigate, Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const LoginPage: React.FC = () => {
@@ -8,6 +9,8 @@ const LoginPage: React.FC = () => {
     password: '',
   });
   const [errorMessage, setErrorMessage] = useState('');
+
+  let navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -26,7 +29,7 @@ const LoginPage: React.FC = () => {
         console.log('Login successful:', response.data);
         // Clear any previous error messages
         setErrorMessage('');
-        // Optionally, redirect to a new page or update state to reflect logged-in status
+        navigate('/home');
       } else {
         // Unexpected response status
         console.error('Unexpected response status:', response.status);
@@ -62,13 +65,15 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="container">
-      <h1 className="text-center mt-5 mb-4">Login</h1>
+    <div className="container w-50">
+      <h1 className="text-center mt-5 mb-5">Login</h1>
       <form onSubmit={handleSubmit} className="col-md-6 mx-auto">
-        <div className="mb-3">
-          <label htmlFor="emailInput" className="form-label">
-            Email address
-          </label>
+        {errorMessage && (
+          <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100">
+            {errorMessage}
+          </div>
+        )}
+        <div className="mb-2">
           <input
             className="form-control"
             id="emailInput"
@@ -81,14 +86,12 @@ const LoginPage: React.FC = () => {
           />
         </div>
 
-        <div className="mb-3">
-          <label htmlFor="passwordInput" className="form-label">
-            Password
-          </label>
+        <div className="mb-2">
           <input
             className="form-control"
             type="password"
             name="password"
+            placeholder="Password"
             value={formData.password}
             onChange={handleChange}
             aria-describedby="passwordHelpBlock"
@@ -96,9 +99,17 @@ const LoginPage: React.FC = () => {
           />
         </div>
 
-        <button type="submit" className="btn btn-primary">
+        <button type="submit" className="btn btn-primary w-100">
           Login
         </button>
+        <div className="d-flex justify-content-center mt-3">
+          <div className="d-flex justify-content-between">
+            <Link to={'/signup'} className="me-3">
+              Create an account
+            </Link>
+            <Link to={'/resetpassword'}>Can't log in?</Link>
+          </div>
+        </div>
       </form>
     </div>
   );

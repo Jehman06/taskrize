@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios, { AxiosError } from 'axios';
+import { useNavigate, Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const SignupPage: React.FC = () => {
@@ -9,6 +10,8 @@ const SignupPage: React.FC = () => {
     password_confirmation: '',
   });
   const [errorMessage, setErrorMessage] = useState('');
+
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -28,7 +31,7 @@ const SignupPage: React.FC = () => {
       );
       console.log('User registered successfully:', response.data);
       setErrorMessage('');
-      // TODO: Redirect to Login Page
+      navigate('/login');
     } catch (error: any) {
       console.error('Error registering user:', error);
       setErrorMessage(
@@ -39,13 +42,15 @@ const SignupPage: React.FC = () => {
   };
 
   return (
-    <div className="container">
-      <h1 className="text-center mt-5 mb-4">Signup</h1>
+    <div className="container w-50">
+      <h1 className="text-center mt-5 mb-5">Signup</h1>
       <form onSubmit={handleSubmit} className="col-md-6 mx-auto">
-        <div className="mb-3">
-          <label htmlFor="emailInput" className="form-label">
-            Email address
-          </label>
+        {errorMessage && (
+          <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100">
+            {errorMessage}
+          </div>
+        )}
+        <div className="mb-2">
           <input
             className="form-control"
             id="emailInput"
@@ -58,14 +63,12 @@ const SignupPage: React.FC = () => {
           />
         </div>
 
-        <div className="mb-3">
-          <label htmlFor="passwordInput" className="form-label">
-            Password
-          </label>
+        <div className="mb-2">
           <input
             className="form-control"
             type="password"
             name="password"
+            placeholder="Password"
             value={formData.password}
             onChange={handleChange}
             aria-describedby="passwordHelpBlock"
@@ -73,14 +76,12 @@ const SignupPage: React.FC = () => {
           />
         </div>
 
-        <div className="mb-3">
-          <label htmlFor="passwordConfirmationInput" className="form-label">
-            Confirm Password
-          </label>
+        <div className="mb-2">
           <input
             className="form-control"
             type="password"
             name="password_confirmation"
+            placeholder="Confirm Password"
             value={formData.password_confirmation}
             onChange={handleChange}
             aria-describedby="passwordHelpBlock"
@@ -88,9 +89,10 @@ const SignupPage: React.FC = () => {
           />
         </div>
 
-        <button type="submit" className="btn btn-primary">
+        <button type="submit" className="btn btn-primary w-100 mb-1">
           Signup
         </button>
+        <Link to="/login">Already have an account? Login</Link>
       </form>
     </div>
   );
