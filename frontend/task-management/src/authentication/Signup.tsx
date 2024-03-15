@@ -21,7 +21,7 @@ const SignupPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (formData.password !== formData.password_confirmation) {
-      setErrorMessage("Passwords don't match");
+      setErrorMessage("Passwords don't match.");
       return;
     }
     try {
@@ -46,7 +46,7 @@ const SignupPage: React.FC = () => {
       <h1 className="text-center mt-5 mb-5">Signup</h1>
       <form onSubmit={handleSubmit} className="col-md-6 mx-auto">
         {errorMessage && (
-          <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100">
+          <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
             {errorMessage}
           </div>
         )}
@@ -92,7 +92,9 @@ const SignupPage: React.FC = () => {
         <button type="submit" className="btn btn-primary w-100 mb-1">
           Signup
         </button>
-        <Link to="/login">Already have an account? Login</Link>
+        <div className="d-flex justify-content-center mt-1">
+          <Link to="/login">Already have an account? Login</Link>
+        </div>
       </form>
     </div>
   );

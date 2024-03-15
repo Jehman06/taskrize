@@ -69,7 +69,7 @@ const LoginPage: React.FC = () => {
       <h1 className="text-center mt-5 mb-5">Login</h1>
       <form onSubmit={handleSubmit} className="col-md-6 mx-auto">
         {errorMessage && (
-          <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100">
+          <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
             {errorMessage}
           </div>
         )}
@@ -102,12 +102,12 @@ const LoginPage: React.FC = () => {
         <button type="submit" className="btn btn-primary w-100">
           Login
         </button>
-        <div className="d-flex justify-content-center mt-3">
+        <div className="d-flex justify-content-center mt-1">
           <div className="d-flex justify-content-between">
             <Link to={'/signup'} className="me-3">
               Create an account
             </Link>
-            <Link to={'/resetpassword'}>Can't log in?</Link>
+            <Link to={'/forgotpassword'}>Can't log in?</Link>
           </div>
         </div>
       </form>
