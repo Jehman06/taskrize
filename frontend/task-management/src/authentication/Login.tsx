@@ -1,24 +1,34 @@
+// React
 import React, { useState } from 'react';
-import axios, { AxiosError } from 'axios';
+// Axios
+import axios from 'axios';
+// Redux Toolkit
 import { useNavigate, Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser, updateFormData, updateLoading } from '../redux/reducers/authSlice';
+import {RootState} from '../redux/store';
+// Bootstrap
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const LoginPage: React.FC = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
+  // State management
+  const dispatch = useDispatch();
+  const formData = useSelector((state: RootState) => state.auth.formData);
+  const loading = useSelector((state: RootState) => state.auth.loading);
+
   const [errorMessage, setErrorMessage] = useState('');
 
   let navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const updatedFormData = { ...formData, [name]: value};
+    dispatch(updateFormData(updatedFormData));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    dispatch(updateLoading(true));
     try {
       const response = await axios.post(
         'http://127.0.0.1:8000/api/login',
@@ -26,9 +36,8 @@ const LoginPage: React.FC = () => {
       );
       if (response.status === 200) {
         // Login successful
-        console.log('Login successful:', response.data);
-        // Clear any previous error messages
-        setErrorMessage('');
+        setErrorMessage(''); // Clear any previous error messages
+        dispatch(loginUser({user: formData}));
         navigate('/home');
       } else {
         // Unexpected response status
@@ -39,27 +48,24 @@ const LoginPage: React.FC = () => {
       }
     } catch (error: any) {
       // Request failed or response status is not 200
-      console.error('Error logging in:', error);
       if (error.response) {
         // Server responded with an error message
         if (error.response.status === 401 || error.response.status === 400) {
           // Incorrect email/password error
           setErrorMessage('Invalid credentials. Please try again.');
-          console.log(errorMessage);
+          dispatch(updateLoading(false));
         } else {
           // Other error from the server
           setErrorMessage(
             error.response.data.error ||
               'An error occurred during login. Please try again.',
           );
-          console.log(errorMessage);
         }
       } else {
         // Network error or other unexpected error
         setErrorMessage(
           'An unexpected error occurred. Please try again later.',
         );
-        console.log(errorMessage);
       }
     }
   };
@@ -67,6 +73,7 @@ const LoginPage: React.FC = () => {
   return (
     <div className="container w-50">
       <h1 className="text-center mt-5 mb-5">Login</h1>
+      {loading ? 'LOADING' : ''} 
       <form onSubmit={handleSubmit} className="col-md-6 mx-auto">
         {errorMessage && (
           <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
