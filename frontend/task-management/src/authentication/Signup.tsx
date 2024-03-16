@@ -1,42 +1,59 @@
-import React, { useState } from 'react';
+import React from 'react';
 import axios, { AxiosError } from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  updateConfirmPassword,
+  updateFormData,
+} from '../redux/reducers/authSlice';
+import { updateErrorMessage, updateLoading } from '../redux/reducers/appSlice';
+import { RootState } from '../redux/store';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const SignupPage: React.FC = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    password_confirmation: '',
-  });
-  const [errorMessage, setErrorMessage] = useState('');
+  const dispatch = useDispatch();
+  const formData = useSelector((state: RootState) => state.auth.formData);
+  const confirmPassword = useSelector(
+    (state: RootState) => state.auth.formData.password_confirmation,
+  );
+  const errorMessage = useSelector(
+    (state: RootState) => state.app.errorMessage,
+  );
+  const loading = useSelector((state: RootState) => state.app.loading);
 
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const updatedFormData = { ...formData, [name]: value };
+    dispatch(updateFormData(updatedFormData));
+  };
+
+  const handleConfirmPasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    dispatch(updateConfirmPassword(e.target.value));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (formData.password !== formData.password_confirmation) {
-      setErrorMessage("Passwords don't match.");
+    console.log('Password:', formData.password);
+    console.log('Confirm Password:', confirmPassword);
+    if (formData.password !== confirmPassword) {
+      dispatch(updateErrorMessage("Passwords don't match."));
       return;
     }
     try {
-      const response = await axios.post(
-        'http://127.0.0.1:8000/api/register',
-        formData,
-      );
-      console.log('User registered successfully:', response.data);
-      setErrorMessage('');
+      await axios.post('http://127.0.0.1:8000/api/register', formData);
+      dispatch(updateErrorMessage(''));
       navigate('/login');
     } catch (error: any) {
       console.error('Error registering user:', error);
-      setErrorMessage(
-        (error as AxiosError<any>)?.response?.data?.error ||
-          'An error occurred during registration.',
+      dispatch(
+        updateErrorMessage(
+          (error as AxiosError<any>)?.response?.data?.error ||
+            'An error occurred during registration.',
+        ),
       );
     }
   };
@@ -80,10 +97,10 @@ const SignupPage: React.FC = () => {
           <input
             className="form-control"
             type="password"
-            name="password_confirmation"
+            name="confirmPassword"
             placeholder="Confirm Password"
-            value={formData.password_confirmation}
-            onChange={handleChange}
+            value={confirmPassword}
+            onChange={handleConfirmPasswordChange}
             aria-describedby="passwordHelpBlock"
             required
           />

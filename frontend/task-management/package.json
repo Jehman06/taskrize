@@ -13,6 +13,7 @@
     "@types/react-dom": "^18.2.19",
     "axios": "^1.6.7",
     "bootstrap": "^5.3.3",
+    "ldrs": "^1.0.1",
     "prettier": "^3.2.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
