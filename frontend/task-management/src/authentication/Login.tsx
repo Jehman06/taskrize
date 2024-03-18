@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginUser, updateFormData } from '../redux/reducers/authSlice';
-import { updateLoading, updateErrorMessage } from '../redux/reducers/appSlice';
+import {
+  loginUser,
+  resetAuthStates,
+  updateFormData,
+} from '../redux/reducers/authSlice';
+import {
+  updateLoading,
+  updateErrorMessage,
+  resetAppStates,
+} from '../redux/reducers/appSlice';
 import { RootState } from '../redux/store';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { spiral } from 'ldrs';
@@ -20,6 +28,12 @@ const LoginPage: React.FC = () => {
   let navigate = useNavigate();
 
   spiral.register();
+
+  // Set initial state
+  useEffect(() => {
+    dispatch(resetAppStates());
+    dispatch(resetAuthStates());
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

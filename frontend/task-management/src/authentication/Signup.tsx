@@ -1,12 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import axios, { AxiosError } from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   updateConfirmPassword,
   updateFormData,
+  resetAuthStates,
 } from '../redux/reducers/authSlice';
-import { updateErrorMessage, updateLoading } from '../redux/reducers/appSlice';
+import {
+  updateErrorMessage,
+  updateLoading,
+  resetAppStates,
+} from '../redux/reducers/appSlice';
 import { RootState } from '../redux/store';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -23,6 +28,12 @@ const SignupPage: React.FC = () => {
 
   const navigate = useNavigate();
 
+  // Reset initial state
+  useEffect(() => {
+    dispatch(resetAppStates());
+    dispatch(resetAuthStates());
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const updatedFormData = { ...formData, [name]: value };
@@ -37,15 +48,18 @@ const SignupPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Password:', formData.password);
-    console.log('Confirm Password:', confirmPassword);
     if (formData.password !== confirmPassword) {
       dispatch(updateErrorMessage("Passwords don't match."));
       return;
     }
+
+    // Set loading state to true when making API call
+    dispatch(updateLoading(true));
+
     try {
       await axios.post('http://127.0.0.1:8000/api/register', formData);
       dispatch(updateErrorMessage(''));
+      dispatch(updateLoading(false));
       navigate('/login');
     } catch (error: any) {
       console.error('Error registering user:', error);
@@ -54,6 +68,7 @@ const SignupPage: React.FC = () => {
           (error as AxiosError<any>)?.response?.data?.error ||
             'An error occurred during registration.',
         ),
+        dispatch(updateLoading(false)),
       );
     }
   };
@@ -61,6 +76,13 @@ const SignupPage: React.FC = () => {
   return (
     <div className="container w-50">
       <h1 className="text-center mt-5 mb-5">Signup</h1>
+      {loading ? (
+        <div className="text-center mt-5 mb-5">
+          <l-spiral size="30" color="teal"></l-spiral>
+        </div>
+      ) : (
+        ''
+      )}
       <form onSubmit={handleSubmit} className="col-md-6 mx-auto">
         {errorMessage && (
           <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">

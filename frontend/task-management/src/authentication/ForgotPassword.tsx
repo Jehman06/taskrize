@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { updateFormData, updateResetCode } from '../redux/reducers/authSlice';
-import { updateLoading, updateErrorMessage } from '../redux/reducers/appSlice';
+import {
+  resetAuthStates,
+  updateFormData,
+  updateResetCode,
+} from '../redux/reducers/authSlice';
+import {
+  updateLoading,
+  updateErrorMessage,
+  resetAppStates,
+} from '../redux/reducers/appSlice';
 import { RootState } from '../redux/store';
 
 import { spiral } from 'ldrs';
@@ -18,6 +26,12 @@ const ForgotPassword: React.FC = () => {
   const errorMessage = useSelector(
     (state: RootState) => state.app.errorMessage,
   );
+
+  // Reset states
+  useEffect(() => {
+    dispatch(resetAppStates());
+    dispatch(resetAuthStates());
+  }, []);
 
   const navigate = useNavigate();
 
@@ -36,7 +50,7 @@ const ForgotPassword: React.FC = () => {
     try {
       const response = await axios.post(
         'http://127.0.0.1:8000/api/reset-password',
-        { formData },
+        { email: formData.email },
       );
       const { user_id, reset_code } = response.data;
       // Update resetCode state

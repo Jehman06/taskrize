@@ -48,6 +48,13 @@ const authSlice = createSlice({
     updateConfirmPassword(state, action: PayloadAction<string>) {
       state.formData.password_confirmation = action.payload;
     },
+    resetAuthStates(state) {
+      state.formData = {
+        email: '',
+        password: '',
+        password_confirmation: '',
+      };
+    },
   },
 });
 
@@ -57,5 +64,6 @@ export const {
   updateResetCode,
   updateStage,
   updateConfirmPassword,
+  resetAuthStates,
 } = authSlice.actions;
 export default authSlice.reducer;

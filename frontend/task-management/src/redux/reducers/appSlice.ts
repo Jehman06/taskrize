@@ -25,9 +25,18 @@ const appSlice = createSlice({
     updateErrorMessage(state, action: PayloadAction<string>) {
       state.errorMessage = action.payload;
     },
+    resetAppStates(state) {
+      state.loading = false;
+      state.message = '';
+      state.errorMessage = '';
+    },
   },
 });
 
-export const { updateLoading, updateMessage, updateErrorMessage } =
-  appSlice.actions;
+export const {
+  updateLoading,
+  updateMessage,
+  updateErrorMessage,
+  resetAppStates,
+} = appSlice.actions;
 export default appSlice.reducer;

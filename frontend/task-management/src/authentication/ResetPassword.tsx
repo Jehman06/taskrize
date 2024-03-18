@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+  resetAuthStates,
   updateFormData,
   updateResetCode,
   updateStage,
@@ -11,20 +12,17 @@ import {
   updateLoading,
   updateMessage,
   updateErrorMessage,
+  resetAppStates,
 } from '../redux/reducers/appSlice';
 import { RootState } from '../redux/store';
 import { spiral } from 'ldrs';
 
 const ResetPassword: React.FC = () => {
-  // const [stage, setStage] = useState<'resetCode' | 'reset' | 'complete'>(
-  //   'resetCode',
-  // );
-
-  const dispatch = useDispatch();
   // Loader
   spiral.register();
 
   // State management
+  const dispatch = useDispatch();
   const formData = useSelector((state: RootState) => state.auth.formData);
   const confirmPassword = useSelector(
     (state: RootState) => state.auth.formData.password_confirmation,
@@ -39,6 +37,13 @@ const ResetPassword: React.FC = () => {
     (state: RootState) => state.app.errorMessage,
   );
 
+  // Set initial state
+  useEffect(() => {
+    dispatch(resetAppStates());
+    dispatch(resetAuthStates());
+    dispatch(updateResetCode(''));
+  }, []);
+
   // Params
   const { user_id, reset_code } = useParams<{
     user_id: string;
@@ -49,12 +54,17 @@ const ResetPassword: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const updatedFormData = { ...formData, [name]: value };
-    dispatch(updateFormData(updatedFormData));
+    if (name == 'password') {
+      dispatch(updateFormData({ ...formData, password: value }));
+    } else if (name == 'password_confirmation') {
+      dispatch(updateFormData({ ...formData, password_confirmation: value }));
+    }
   };
 
   const handleResetCodeSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log('resetCode', resetCode);
+    console.log('reset_code', reset_code);
     try {
       if (resetCode !== reset_code) {
         // If reset codes don't match, set error message and prevent further action
@@ -63,6 +73,7 @@ const ResetPassword: React.FC = () => {
       }
       // If reset codes match, proceed to the password reset stage
       dispatch(updateStage('reset'));
+      dispatch(updateErrorMessage(''));
     } catch (error: any) {
       dispatch(
         updateErrorMessage('An error occurred. Please try again later.'),
@@ -72,11 +83,14 @@ const ResetPassword: React.FC = () => {
 
   const handlePasswordSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    dispatch(updateErrorMessage(''));
 
     // Check if passwords match
     if (formData.password !== confirmPassword) {
       dispatch(updateErrorMessage("Passwords don't match."));
       return;
+    } else if (formData.password == confirmPassword) {
+      dispatch(updateErrorMessage(''));
     }
 
     dispatch(updateLoading(true));
@@ -161,6 +175,7 @@ const ResetPassword: React.FC = () => {
                 <input
                   className="form-control"
                   type="password"
+                  name="password"
                   value={formData.password}
                   onChange={handleChange}
                   required
@@ -171,7 +186,8 @@ const ResetPassword: React.FC = () => {
                 <input
                   className="form-control"
                   type="password"
-                  value={confirmPassword}
+                  name="password_confirmation" // Set name attribute to identify the field
+                  value={formData.password_confirmation}
                   onChange={handleChange}
                   required
                   placeholder="Confirm new password"
