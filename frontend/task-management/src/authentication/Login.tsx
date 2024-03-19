@@ -6,6 +6,7 @@ import {
   loginUser,
   resetAuthStates,
   updateFormData,
+  updateShowPassword,
 } from '../redux/reducers/authSlice';
 import {
   updateLoading,
@@ -14,6 +15,8 @@ import {
 } from '../redux/reducers/appSlice';
 import { RootState } from '../redux/store';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { Form } from 'react-bootstrap';
+import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
 import { spiral } from 'ldrs';
 
 const LoginPage: React.FC = () => {
@@ -23,6 +26,9 @@ const LoginPage: React.FC = () => {
   const loading = useSelector((state: RootState) => state.app.loading);
   const errorMessage = useSelector(
     (state: RootState) => state.app.errorMessage,
+  );
+  const showPassword = useSelector(
+    (state: RootState) => state.auth.showPassword,
   );
 
   let navigate = useNavigate();
@@ -39,6 +45,10 @@ const LoginPage: React.FC = () => {
     const { name, value } = e.target;
     const updatedFormData = { ...formData, [name]: value };
     dispatch(updateFormData(updatedFormData));
+  };
+
+  const togglePasswordVisibility = () => {
+    dispatch(updateShowPassword());
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -119,18 +129,24 @@ const LoginPage: React.FC = () => {
           />
         </div>
 
-        <div className="mb-2">
-          <input
-            className="form-control"
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            aria-describedby="passwordHelpBlock"
-            required
-          />
-        </div>
+        <Form.Group>
+          <div className="position-relative mb-2">
+            <Form.Control
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+            />
+            <div
+              className="position-absolute top-50 translate-middle-y"
+              style={{ cursor: 'pointer', right: '15px', fontSize: '1.5em' }}
+              onClick={togglePasswordVisibility}
+            >
+              {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+            </div>
+          </div>
+        </Form.Group>
 
         <button type="submit" className="btn btn-primary w-100">
           Login

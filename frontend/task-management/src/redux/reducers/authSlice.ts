@@ -5,6 +5,7 @@ interface AuthState {
   isAuthenticated: boolean;
   resetCode: string | null;
   stage: string | null;
+  showPassword: boolean;
   formData: {
     email: string;
     password: string;
@@ -17,6 +18,7 @@ const initialState: AuthState = {
   isAuthenticated: false,
   resetCode: '',
   stage: 'resetCode',
+  showPassword: false,
   formData: {
     email: '',
     password: '',
@@ -54,6 +56,10 @@ const authSlice = createSlice({
         password: '',
         password_confirmation: '',
       };
+      state.showPassword = false;
+    },
+    updateShowPassword(state) {
+      state.showPassword = !state.showPassword;
     },
   },
 });
@@ -65,5 +71,6 @@ export const {
   updateStage,
   updateConfirmPassword,
   resetAuthStates,
+  updateShowPassword,
 } = authSlice.actions;
 export default authSlice.reducer;

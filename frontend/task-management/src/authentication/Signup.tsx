@@ -6,6 +6,7 @@ import {
   updateConfirmPassword,
   updateFormData,
   resetAuthStates,
+  updateShowPassword,
 } from '../redux/reducers/authSlice';
 import {
   updateErrorMessage,
@@ -14,6 +15,8 @@ import {
 } from '../redux/reducers/appSlice';
 import { RootState } from '../redux/store';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { Form } from 'react-bootstrap';
+import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
 
 const SignupPage: React.FC = () => {
   const dispatch = useDispatch();
@@ -25,6 +28,9 @@ const SignupPage: React.FC = () => {
     (state: RootState) => state.app.errorMessage,
   );
   const loading = useSelector((state: RootState) => state.app.loading);
+  const showPassword = useSelector(
+    (state: RootState) => state.auth.showPassword,
+  );
 
   const navigate = useNavigate();
 
@@ -44,6 +50,10 @@ const SignupPage: React.FC = () => {
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     dispatch(updateConfirmPassword(e.target.value));
+  };
+
+  const togglePasswordVisibility = () => {
+    dispatch(updateShowPassword());
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -102,23 +112,29 @@ const SignupPage: React.FC = () => {
           />
         </div>
 
-        <div className="mb-2">
-          <input
-            className="form-control"
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            aria-describedby="passwordHelpBlock"
-            required
-          />
-        </div>
+        <Form.Group>
+          <div className="position-relative mb-2">
+            <Form.Control
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+            />
+            <div
+              className="position-absolute top-50 translate-middle-y"
+              style={{ cursor: 'pointer', right: '15px', fontSize: '1.5em' }}
+              onClick={togglePasswordVisibility}
+            >
+              {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+            </div>
+          </div>
+        </Form.Group>
 
         <div className="mb-2">
           <input
             className="form-control"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             name="confirmPassword"
             placeholder="Confirm Password"
             value={confirmPassword}

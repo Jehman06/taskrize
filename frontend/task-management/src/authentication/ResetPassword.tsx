@@ -6,6 +6,7 @@ import {
   resetAuthStates,
   updateFormData,
   updateResetCode,
+  updateShowPassword,
   updateStage,
 } from '../redux/reducers/authSlice';
 import {
@@ -15,6 +16,8 @@ import {
   resetAppStates,
 } from '../redux/reducers/appSlice';
 import { RootState } from '../redux/store';
+import { Form } from 'react-bootstrap';
+import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
 import { spiral } from 'ldrs';
 
 const ResetPassword: React.FC = () => {
@@ -35,6 +38,9 @@ const ResetPassword: React.FC = () => {
   const stage = useSelector((state: RootState) => state.auth.stage);
   const errorMessage = useSelector(
     (state: RootState) => state.app.errorMessage,
+  );
+  const showPassword = useSelector(
+    (state: RootState) => state.auth.showPassword,
   );
 
   // Set initial state
@@ -79,6 +85,10 @@ const ResetPassword: React.FC = () => {
         updateErrorMessage('An error occurred. Please try again later.'),
       );
     }
+  };
+
+  const togglePasswordVisibility = () => {
+    dispatch(updateShowPassword());
   };
 
   const handlePasswordSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -171,22 +181,33 @@ const ResetPassword: React.FC = () => {
                   {message}
                 </div>
               )}
+              <Form.Group>
+                <div className="position-relative mb-2">
+                  <Form.Control
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                  />
+                  <div
+                    className="position-absolute top-50 translate-middle-y"
+                    style={{
+                      cursor: 'pointer',
+                      right: '15px',
+                      fontSize: '1.5em',
+                    }}
+                    onClick={togglePasswordVisibility}
+                  >
+                    {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+                  </div>
+                </div>
+              </Form.Group>
               <div className="mb-2">
                 <input
                   className="form-control"
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter new password"
-                />
-              </div>
-              <div className="mb-2">
-                <input
-                  className="form-control"
-                  type="password"
-                  name="password_confirmation" // Set name attribute to identify the field
+                  type={showPassword ? 'text' : 'password'}
+                  name="password_confirmation"
                   value={formData.password_confirmation}
                   onChange={handleChange}
                   required

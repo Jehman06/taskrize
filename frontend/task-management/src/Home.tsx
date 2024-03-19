@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { UseSelector, useDispatch } from 'react-redux';
+import { RootState } from './redux/store';
 
 const Home: React.FC = () => {
   return (
