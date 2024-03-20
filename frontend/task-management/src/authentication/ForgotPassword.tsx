@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -16,7 +16,6 @@ import {
 import { RootState } from '../redux/store';
 
 import { spiral } from 'ldrs';
-import { Root } from 'react-dom/client';
 
 const ForgotPassword: React.FC = () => {
   // State management

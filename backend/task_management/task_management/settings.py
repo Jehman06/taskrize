@@ -43,6 +43,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'authentication.apps.AuthenticationConfig',
+    'boards.apps.BoardsConfig',
+    'lists.apps.ListsConfig',
+    'cards.apps.CardsConfig',
+    'comments.apps.CommentsConfig',
+    'attachments.apps.AttachmentsConfig',
     'rest_framework',
     'corsheaders'
 ]
