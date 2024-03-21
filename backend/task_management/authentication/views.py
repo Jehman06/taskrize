@@ -38,7 +38,7 @@ def login_user(request):
 
     if user is not None:
         login(request, user)
-        return Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
+        return Response({'email': email, 'password': password, 'message': 'Login successful'}, status=status.HTTP_200_OK)
     else:
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
     
