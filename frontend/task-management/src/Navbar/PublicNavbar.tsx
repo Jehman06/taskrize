@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import taskrize from '../images/taskrize.png';
-import './Navbar.css';
+import './PublicNavbar.css';
 
-const Navbar: React.FC = () => {
+const PublicNavbar: React.FC = () => {
   return (
     <nav
       className="navbar navbar-expand-lg navbar-light justify-content-between align-items-center"
@@ -36,4 +36,4 @@ const Navbar: React.FC = () => {
   );
 };
 
-export default Navbar;
+export default PublicNavbar;

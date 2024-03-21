@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Navbar from '../Navbar/Navbar';
+import PublicNavbar from '../Navbar/PublicNavbar';
 import './Homepage.css';
 
 const HomePage: React.FC = () => {
@@ -13,7 +13,7 @@ const HomePage: React.FC = () => {
   return (
     <div className="homepage-container">
       {/* Navbar */}
-      <Navbar />
+      <PublicNavbar />
       {/* Main content */}
       <div className="main-content">
         <div className="content">

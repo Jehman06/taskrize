@@ -64,7 +64,9 @@ const LoginPage: React.FC = () => {
       if (response.status === 200) {
         // Login successful
         dispatch(updateErrorMessage('')); // Clear any previous error messages
-        dispatch(loginUser({ user: formData }));
+        const userData = response.data;
+        console.log(userData);
+        dispatch(loginUser({ user: userData }));
         navigate('/home');
       } else {
         dispatch(
