@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap');
+
 .auth-shadow {
   background: white !important;
   box-shadow:
@@ -11,4 +13,34 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
+  background: linear-gradient(
+    -45deg,
+    #ffffff,
+    #ffe4e9,
+    #fcc8e2,
+    #f6baed,
+    #efb0ff,
+    #d3a2ff,
+    #8eb8ff,
+    #91efff,
+    #d5f9ff
+  );
+  background-size: 400% 400%;
+  animation: gradient 9s ease infinite;
+  height: auto; /* Set to auto */
+  min-height: 100vh; /* Ensure the content stretches to at least the full viewport height */
+  overflow: hidden; /* Hide overflowing content below the bottom shape */
+  position: relative; /* Set to relative */
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }

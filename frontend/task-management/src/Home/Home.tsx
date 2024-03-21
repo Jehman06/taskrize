@@ -21,7 +21,7 @@ const Home: React.FC = () => {
   return (
     <div>
       <PrivateNavbar />
-      <h1>Welcome, {user.email}! Welcome to your dashboard!</h1>
+      <h1>Hey, {user.email}! Welcome to your dashboard!</h1>
     </div>
   );
 };
