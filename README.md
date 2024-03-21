@@ -1,7 +1,7 @@
-# Task Management App
+# TaskRize
 
 ## Summary
-This is a task-management app inspired by Trello. It is currently under development and I haven't found a name for it yet 😅
+TaskRize is a robust task-management application, drawing inspiration from the renowned Trello platform. Offering a streamlined user experience, TaskRize empowers individuals and teams to efficiently organize tasks, collaborate seamlessly, and enhance productivity. With intuitive features and customizable boards, users can easily visualize workflows, assign tasks, track progress, and prioritize activities. TaskRize facilitates effective project management, fostering teamwork and enabling users to achieve their goals with ease.
 
 ## Technologies and Tools
 ### Frontend
