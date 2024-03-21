@@ -1,7 +1,7 @@
 import './App.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import HomePage from './Homepage'; // Logged off Home Page
-import Home from './Home'; // Logged on Home Page
+import HomePage from './Home/Homepage'; // Logged off Home Page
+import Home from './Home/Home'; // Logged on Home Page
 import SignupPage from './authentication/Signup';
 import LoginPage from './authentication/Login';
 import ForgotPassword from './authentication/ForgotPassword';
