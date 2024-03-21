@@ -6,8 +6,8 @@ import './Homepage.css';
 const HomePage: React.FC = () => {
   let navigate = useNavigate();
 
-  const handleLoginRedirect = () => {
-    navigate('/login');
+  const handleSignupRedirect = () => {
+    navigate('/signup');
   };
 
   return (
@@ -19,7 +19,7 @@ const HomePage: React.FC = () => {
         <div className="content">
           <h1>TaskRize brings together your tasks, teammates, and tools</h1>
           <p>With TaskRize, collaborating is easy.</p>
-          <button onClick={handleLoginRedirect} className="btn" type="button">
+          <button onClick={handleSignupRedirect} className="btn" type="button">
             Sign up - it's free!
           </button>
         </div>
