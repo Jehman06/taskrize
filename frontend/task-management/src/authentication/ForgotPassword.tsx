@@ -14,6 +14,7 @@ import {
   resetAppStates,
 } from '../redux/reducers/appSlice';
 import { RootState } from '../redux/store';
+import taskrize from '../images/taskrize.png';
 
 import { spiral } from 'ldrs';
 
@@ -65,45 +66,56 @@ const ForgotPassword: React.FC = () => {
   };
 
   return (
-    <div className="container w-50">
-      <h1 className="text-center mt-5 mb-5">Reset Password</h1>
-      {loading ? (
-        <div className="text-center mt-5 mb-5">
-          <l-spiral size="30" color="coral"></l-spiral>
-        </div>
-      ) : (
-        ''
-      )}
-      <form onSubmit={handleEmailSubmit} className="col-md-6 mx-auto">
-        {errorMessage && (
-          <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
-            {errorMessage}
+    <div className="viewport-centered">
+      <div className="container w-50 auth-shadow px-0 m-0">
+        <img
+          className="d-block mx-auto mb-3 mt-3"
+          src={taskrize}
+          alt="TaskRize logo"
+          style={{ height: '60px', width: '150px' }}
+        />
+        <p
+          className="text-center mt-3 mb-4"
+          style={{ fontSize: '1.5rem', fontWeight: 'bold' }}
+        >
+          Reset your password
+        </p>
+        {loading ? (
+          <div className="text-center mt-5 mb-5">
+            <l-spiral size="30" color="coral"></l-spiral>
           </div>
+        ) : (
+          ''
         )}
-        <div className="mb-2">
-          <input
-            className="form-control"
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            placeholder="name@example.com"
-          />
-        </div>
-        <button type="submit" className="btn btn-primary w-100">
-          Submit
-        </button>
-        <div className="d-flex justify-content-center mt-1">
-          <div className="d-flex justify-content-between">
+        <form onSubmit={handleEmailSubmit} className="col-md-6 mx-auto">
+          {errorMessage && (
+            <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
+              {errorMessage}
+            </div>
+          )}
+          <div className="mb-2">
+            <input
+              className="form-control"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              placeholder="name@example.com"
+            />
+          </div>
+          <button type="submit" className="btn btn-primary w-100">
+            Submit
+          </button>
+          <div className="d-flex justify-content-center mt-1 mb-5">
             <Link to={'/'} className="me-3">
               Home
             </Link>
 
             <Link to={'/login'}>Login</Link>
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };

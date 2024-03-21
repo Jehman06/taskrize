@@ -15,6 +15,8 @@ import {
 } from '../redux/reducers/appSlice';
 import { RootState } from '../redux/store';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './Auth.css';
+import taskrize from '../images/taskrize.png';
 import { Form } from 'react-bootstrap';
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
 import { spiral } from 'ldrs';
@@ -101,65 +103,78 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="container w-50">
-      <h1 className="text-center mt-5 mb-5">Login</h1>
-      {loading ? (
-        <div className="text-center mt-5 mb-5">
-          <l-spiral size="30" color="teal"></l-spiral>
-        </div>
-      ) : (
-        ''
-      )}
-      <form onSubmit={handleSubmit} className="col-md-6 mx-auto">
-        {errorMessage && (
-          <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
-            {errorMessage}
+    <div className="viewport-centered">
+      <div className="container w-50 auth-shadow px-0 m-0">
+        <img
+          className="d-block mx-auto mb-3 mt-3"
+          src={taskrize}
+          alt="TaskRize logo"
+          style={{ height: '60px', width: '150px' }}
+        />
+        <p
+          className="text-center mt-3 mb-4"
+          style={{ fontSize: '1.5rem', fontWeight: 'bold' }}
+        >
+          Log in to continue
+        </p>
+        {loading ? (
+          <div className="text-center mt-5 mb-5">
+            <l-spiral size="30" color="teal"></l-spiral>
           </div>
+        ) : (
+          ''
         )}
-        <div className="mb-2">
-          <input
-            className="form-control"
-            id="emailInput"
-            type="email"
-            name="email"
-            placeholder="name@example.com"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <Form.Group>
-          <div className="position-relative mb-2">
-            <Form.Control
-              type={showPassword ? 'text' : 'password'}
-              placeholder="Password"
-              name="password"
-              value={formData.password}
+        <form onSubmit={handleSubmit} className="col-md-6 mx-auto">
+          {errorMessage && (
+            <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
+              {errorMessage}
+            </div>
+          )}
+          <div className="mb-2">
+            <input
+              className="form-control"
+              id="emailInput"
+              type="email"
+              name="email"
+              placeholder="name@example.com"
+              value={formData.email}
               onChange={handleChange}
+              required
             />
-            <div
-              className="position-absolute top-50 translate-middle-y"
-              style={{ cursor: 'pointer', right: '15px', fontSize: '1.5em' }}
-              onClick={togglePasswordVisibility}
-            >
-              {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+          </div>
+
+          <Form.Group>
+            <div className="position-relative mb-2">
+              <Form.Control
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+              />
+              <div
+                className="position-absolute top-50 translate-middle-y"
+                style={{ cursor: 'pointer', right: '15px', fontSize: '1.5em' }}
+                onClick={togglePasswordVisibility}
+              >
+                {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+              </div>
+            </div>
+          </Form.Group>
+
+          <button type="submit" className="btn btn-primary w-100">
+            Login
+          </button>
+          <div className="d-flex justify-content-center mt-1 mb-5">
+            <div className="d-flex justify-content">
+              <Link to={'/signup'} className="me-3">
+                Create an account
+              </Link>
+              <Link to={'/forgotpassword'}>Can't log in?</Link>
             </div>
           </div>
-        </Form.Group>
-
-        <button type="submit" className="btn btn-primary w-100">
-          Login
-        </button>
-        <div className="d-flex justify-content-center mt-1">
-          <div className="d-flex justify-content-between">
-            <Link to={'/signup'} className="me-3">
-              Create an account
-            </Link>
-            <Link to={'/forgotpassword'}>Can't log in?</Link>
-          </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };

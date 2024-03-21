@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   resetAuthStates,
@@ -17,6 +17,9 @@ import {
 } from '../redux/reducers/appSlice';
 import { RootState } from '../redux/store';
 import { Form } from 'react-bootstrap';
+import taskrize from '../images/taskrize.png';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './Auth.css';
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
 import { spiral } from 'ldrs';
 
@@ -132,99 +135,155 @@ const ResetPassword: React.FC = () => {
     switch (stage) {
       case 'resetCode':
         return (
-          <div className="container w-50">
-            <form onSubmit={handleResetCodeSubmit} className="col-md-6 mx-auto">
-              {errorMessage && (
-                <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
-                  {errorMessage}
+          <div className="viewport-centered">
+            <div className="container w-50 auth-shadow p-0 m-0">
+              <img
+                className="d-block mx-auto mb-3 mt-3"
+                src={taskrize}
+                alt="TaskRize logo"
+                style={{ height: '60px', width: '150px' }}
+              />
+              <p
+                className="text-center mt-3 mb-4"
+                style={{ fontSize: '1.5rem', fontWeight: 'bold' }}
+              >
+                Enter the verification code
+              </p>
+              <form
+                onSubmit={handleResetCodeSubmit}
+                className="col-md-6 mx-auto"
+              >
+                {errorMessage && (
+                  <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
+                    {errorMessage}
+                  </div>
+                )}
+                {message && (
+                  <div className="p-1 text-success bg-success-subtle border border-success rounded-3 w-100 mb-2">
+                    {message}
+                  </div>
+                )}
+                <div className="mb-2">
+                  <input
+                    className="form-control"
+                    type="text"
+                    value={resetCode}
+                    onChange={(e) => dispatch(updateResetCode(e.target.value))}
+                    required
+                    placeholder="Reset Code"
+                  />
                 </div>
-              )}
-              {message && (
-                <div className="p-1 text-success bg-success-subtle border border-success rounded-3 w-100 mb-2">
-                  {message}
+                <button type="submit" className="btn btn-primary w-100 mb-1">
+                  Submit
+                </button>
+                <div className="d-flex justify-content-center mt-1 mb-5">
+                  <Link to={'/'} className="me-3">
+                    Home
+                  </Link>
+
+                  <Link to={'/login'}>Login</Link>
                 </div>
-              )}
-              <div className="mb-2">
-                <input
-                  className="form-control"
-                  type="text"
-                  value={resetCode}
-                  onChange={(e) => dispatch(updateResetCode(e.target.value))}
-                  required
-                  placeholder="Reset Code"
-                />
-              </div>
-              <button type="submit" className="btn btn-primary w-100">
-                Submit
-              </button>
-            </form>
+              </form>
+            </div>
           </div>
         );
       case 'reset':
         return (
-          <div className="container w-50">
-            {loading ? (
-              <div className="text-center mt-5 mb-5">
-                <l-spiral size="30" color="teal"></l-spiral>
-              </div>
-            ) : (
-              ''
-            )}
-            <form onSubmit={handlePasswordSubmit} className="col-md-6 mx-auto">
-              {errorMessage && (
-                <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
-                  {errorMessage}
+          <div className="viewport-centered">
+            <div className="container w-50 auth-shadow p-0 m-0">
+              <img
+                className="d-block mx-auto mb-3 mt-3"
+                src={taskrize}
+                alt="TaskRize logo"
+                style={{ height: '60px', width: '150px' }}
+              />
+              <p
+                className="text-center mt-3 mb-4"
+                style={{ fontSize: '1.5rem', fontWeight: 'bold' }}
+              >
+                Reset your password
+              </p>
+              {loading ? (
+                <div className="text-center mt-5 mb-5">
+                  <l-spiral size="30" color="teal"></l-spiral>
                 </div>
+              ) : (
+                ''
               )}
-              {message && (
-                <div className="p-1 text-success bg-success-subtle border border-success rounded-3 w-100 mb-2">
-                  {message}
-                </div>
-              )}
-              <Form.Group>
-                <div className="position-relative mb-2">
-                  <Form.Control
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                  />
-                  <div
-                    className="position-absolute top-50 translate-middle-y"
-                    style={{
-                      cursor: 'pointer',
-                      right: '15px',
-                      fontSize: '1.5em',
-                    }}
-                    onClick={togglePasswordVisibility}
-                  >
-                    {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+              <form
+                onSubmit={handlePasswordSubmit}
+                className="col-md-6 mx-auto"
+              >
+                {errorMessage && (
+                  <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
+                    {errorMessage}
                   </div>
+                )}
+                {message && (
+                  <div className="p-1 text-success bg-success-subtle border border-success rounded-3 w-100 mb-2">
+                    {message}
+                  </div>
+                )}
+                <Form.Group>
+                  <div className="position-relative mb-2">
+                    <Form.Control
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                    />
+                    <div
+                      className="position-absolute top-50 translate-middle-y"
+                      style={{
+                        cursor: 'pointer',
+                        right: '15px',
+                        fontSize: '1.5em',
+                      }}
+                      onClick={togglePasswordVisibility}
+                    >
+                      {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+                    </div>
+                  </div>
+                </Form.Group>
+                <div className="mb-2">
+                  <input
+                    className="form-control"
+                    type={showPassword ? 'text' : 'password'}
+                    name="password_confirmation"
+                    value={formData.password_confirmation}
+                    onChange={handleChange}
+                    required
+                    placeholder="Confirm new password"
+                  />
                 </div>
-              </Form.Group>
-              <div className="mb-2">
-                <input
-                  className="form-control"
-                  type={showPassword ? 'text' : 'password'}
-                  name="password_confirmation"
-                  value={formData.password_confirmation}
-                  onChange={handleChange}
-                  required
-                  placeholder="Confirm new password"
-                />
-              </div>
-              <button type="submit" className="btn btn-primary w-100">
-                Submit
-              </button>
-            </form>
+                <button type="submit" className="btn btn-primary w-100">
+                  Submit
+                </button>
+                <div className="d-flex justify-content-center mt-1 mb-5">
+                  <Link to={'/'} className="me-3">
+                    Home
+                  </Link>
+
+                  <Link to={'/login'}>Login</Link>
+                </div>
+              </form>
+            </div>
           </div>
         );
       case 'complete':
         return (
-          <div className="container w-50">
-            <div className="p-1 text-success bg-success-subtle border border-success rounded-3 w-100 mb-2">
-              {message}
+          <div className="viewport-centered">
+            <div className="container w-50 auth-shadow p-0 m-0">
+              <img
+                className="d-block mx-auto mb-3 mt-3"
+                src={taskrize}
+                alt="TaskRize logo"
+                style={{ height: '60px', width: '150px' }}
+              />
+              <div className="p-1 text-success bg-success-subtle border border-success rounded-3 w-100 mb-2">
+                {message}
+              </div>
             </div>
           </div>
         );
@@ -233,12 +292,7 @@ const ResetPassword: React.FC = () => {
     }
   };
 
-  return (
-    <div>
-      <h1 className="text-center mt-5 mb-5">Reset Password</h1>
-      {renderForm()}
-    </div>
-  );
+  return <div>{renderForm()}</div>;
 };
 
 export default ResetPassword;
