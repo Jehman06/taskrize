@@ -9,8 +9,23 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import authenticate, login, logout
 from .models import CustomUser
 
+# Signup function
 @api_view(['POST'])
 def register_user(request):
+    """
+    Registers a new user.
+
+    Checks if the provided password matches the confirmation.
+    Verifies if the email is not already in use.
+    Creates a new user with the provided email and password.
+
+    Args:
+        request: HTTP request containing user data (email, password, password_confirmation).
+
+    Returns:
+        HTTP response with a success message if the user is created successfully,
+        otherwise returns an error response.
+    """
     email = request.data.get('email')
     password = request.data.get('password')
     password_confirmation = request.data.get('password_confirmation')
@@ -26,24 +41,53 @@ def register_user(request):
         return Response({'error': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
     
     # Create the user
-    user = CustomUser.objects.create_user(email=email, password=password)
+    CustomUser.objects.create_user(email=email, password=password)
     return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
 
+# Login function
 @api_view(['POST'])
 def login_user(request):
+    """
+    Logs in a user.
+
+    Authenticates the user with provided email and password.
+    If authentication is successful, creates a session for the user.
+
+    Args:
+        request: HTTP request containing user credentials (email, password).
+
+    Returns:
+        HTTP response with user data and a success message if login is successful,
+        otherwise returns an error response.
+    """
     email = request.data.get('email')
     password = request.data.get('password')
 
     user = authenticate(request, email=email, password=password)
 
     if user is not None:
+        # Log the user in
         login(request, user)
         return Response({'email': email, 'password': password, 'message': 'Login successful'}, status=status.HTTP_200_OK)
     else:
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-    
+
+# Forgot Password function  
 @api_view(['POST'])
 def reset_password_request(request):
+    """
+    Initiates the process of resetting the user's password.
+
+    Generates a reset code and sends it to the user's email address.
+    Stores the reset code along with the user for verification.
+
+    Args:
+        request: HTTP request containing user email.
+
+    Returns:
+        HTTP response with user ID, reset code, and a success message if email is sent successfully,
+        otherwise returns an error response.
+    """
     email = request.data.get('email')
     user = CustomUser.objects.filter(email=email).first()
     if user:
@@ -64,10 +108,23 @@ def reset_password_request(request):
     else:
         return Response({'error': 'User with the provided email does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
+# Reset Password function
 @api_view(['POST'])
 def reset_password_confirm(request, user_id, reset_code=None):
-    print("User ID:", user_id)
-    print("Reset Code:", reset_code)
+    """
+    Resets the user's password using the provided reset code.
+
+    Verifies the reset code and updates the user's password.
+
+    Args:
+        request: HTTP request containing user ID and new password.
+        user_id: ID of the user whose password needs to be reset.
+        reset_code: Optional reset code for verification.
+
+    Returns:
+        HTTP response with a success message if password is reset successfully,
+        otherwise returns an error response.
+    """
     try:
         if reset_code is not None:
             # Check if the reset_code matches the one stored in the database
@@ -85,6 +142,7 @@ def reset_password_confirm(request, user_id, reset_code=None):
     except CustomUser.DoesNotExist:
         return Response({'error': 'User not found or invalid reset code.'}, status=status.HTTP_404_NOT_FOUND)
 
+# Logout function
 @api_view(['POST'])
 def logout_user(request):
     logout(request)
