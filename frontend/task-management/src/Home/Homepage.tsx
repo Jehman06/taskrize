@@ -23,10 +23,9 @@ const HomePage: React.FC = () => {
             Sign up - it's free!
           </button>
         </div>
-        {/* Add your image here */}
         <div className="right-content">
           {/* Placeholder for image */}
-          <img src="your-image-path.jpg" alt="Your image" />
+          <img src="image-path.jpg" alt="image" />
         </div>
       </div>
       {/* Bottom shape */}

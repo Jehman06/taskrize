@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+
+// Redux
 import { useDispatch, useSelector } from 'react-redux';
 import {
   resetAuthStates,
@@ -16,6 +18,8 @@ import {
   resetAppStates,
 } from '../redux/reducers/appSlice';
 import { RootState } from '../redux/store';
+
+// Styling
 import { Form } from 'react-bootstrap';
 import taskrize from '../images/taskrize.png';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -24,9 +28,6 @@ import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
 import { spiral } from 'ldrs';
 
 const ResetPassword: React.FC = () => {
-  // Loader
-  spiral.register();
-
   // State management
   const dispatch = useDispatch();
   const formData = useSelector((state: RootState) => state.auth.formData);
@@ -46,14 +47,17 @@ const ResetPassword: React.FC = () => {
     (state: RootState) => state.auth.showPassword,
   );
 
-  // Set initial state
+  // Loading icon
+  spiral.register();
+
+  // Reset Auth, App and resetCode states to ensure a clean state on component mount
   useEffect(() => {
     dispatch(resetAppStates());
     dispatch(resetAuthStates());
     dispatch(updateResetCode(''));
   }, []);
 
-  // Params
+  // Extract params from the api endpoint
   const { user_id, reset_code } = useParams<{
     user_id: string;
     reset_code: string;
@@ -61,6 +65,7 @@ const ResetPassword: React.FC = () => {
 
   const navigate = useNavigate();
 
+  // Handle input change event
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name == 'password') {
@@ -70,10 +75,9 @@ const ResetPassword: React.FC = () => {
     }
   };
 
+  // Handle submission of the reset code form
   const handleResetCodeSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('resetCode', resetCode);
-    console.log('reset_code', reset_code);
     try {
       if (resetCode !== reset_code) {
         // If reset codes don't match, set error message and prevent further action
@@ -94,28 +98,30 @@ const ResetPassword: React.FC = () => {
     dispatch(updateShowPassword());
   };
 
+  // Handle submission of the password confirmation form
   const handlePasswordSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     dispatch(updateErrorMessage(''));
 
-    // Check if passwords match
+    // If passwords don't match
     if (formData.password !== confirmPassword) {
       dispatch(updateErrorMessage("Passwords don't match."));
       return;
+      // If passwords match
     } else if (formData.password == confirmPassword) {
       dispatch(updateErrorMessage(''));
     }
 
-    dispatch(updateLoading(true));
-
+    dispatch(updateLoading(true)); // Update loading state to indicate request in progress
     try {
+      // Send password reset request to backend API
       await axios.post(
         `http://127.0.0.1:8000/api/reset-password-confirm/${user_id}`,
         {
           new_password: formData.password,
         },
       );
-      dispatch(updateLoading(false));
+      dispatch(updateLoading(false)); // Stop the loading
       dispatch(
         updateMessage('Your password has been reset. Redirecting to login'),
       );
@@ -131,6 +137,7 @@ const ResetPassword: React.FC = () => {
     }
   };
 
+  // Renders based on `stage` state
   const renderForm = () => {
     switch (stage) {
       case 'resetCode':

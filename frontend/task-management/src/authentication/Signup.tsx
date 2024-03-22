@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import axios, { AxiosError } from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+
+// Redux
 import { useDispatch, useSelector } from 'react-redux';
 import {
   updateConfirmPassword,
@@ -14,6 +16,8 @@ import {
   resetAppStates,
 } from '../redux/reducers/appSlice';
 import { RootState } from '../redux/store';
+
+// Styling
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Auth.css';
 import taskrize from '../images/taskrize.png';
@@ -21,6 +25,7 @@ import { Form } from 'react-bootstrap';
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
 
 const SignupPage: React.FC = () => {
+  // State management
   const dispatch = useDispatch();
   const formData = useSelector((state: RootState) => state.auth.formData);
   const confirmPassword = useSelector(
@@ -36,18 +41,20 @@ const SignupPage: React.FC = () => {
 
   const navigate = useNavigate();
 
-  // Reset initial state
+  // Reset Auth and App states to ensure a clean state on component mount
   useEffect(() => {
     dispatch(resetAppStates());
     dispatch(resetAuthStates());
   }, []);
 
+  // Handle input change event for form data
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const updatedFormData = { ...formData, [name]: value };
     dispatch(updateFormData(updatedFormData));
   };
 
+  // Handle input change event for confirm password
   const handleConfirmPasswordChange = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -58,6 +65,7 @@ const SignupPage: React.FC = () => {
     dispatch(updateShowPassword());
   };
 
+  // Handle form submission for sign up process
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (formData.password !== confirmPassword) {
@@ -65,14 +73,12 @@ const SignupPage: React.FC = () => {
       return;
     }
 
-    // Set loading state to true when making API call
-    dispatch(updateLoading(true));
-
+    dispatch(updateLoading(true)); // Update loading state to indicate request in progress
     try {
       await axios.post('http://127.0.0.1:8000/api/register', formData);
       dispatch(updateErrorMessage(''));
       dispatch(updateLoading(false));
-      navigate('/login');
+      navigate('/login'); // Redirect user to the login page
     } catch (error: any) {
       console.error('Error registering user:', error);
       dispatch(

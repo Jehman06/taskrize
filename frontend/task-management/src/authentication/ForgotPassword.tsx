@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 
+// Redux
 import { useDispatch, useSelector } from 'react-redux';
 import {
   resetAuthStates,
@@ -14,8 +15,9 @@ import {
   resetAppStates,
 } from '../redux/reducers/appSlice';
 import { RootState } from '../redux/store';
-import taskrize from '../images/taskrize.png';
 
+// Styling
+import taskrize from '../images/taskrize.png';
 import { spiral } from 'ldrs';
 
 const ForgotPassword: React.FC = () => {
@@ -27,41 +29,43 @@ const ForgotPassword: React.FC = () => {
     (state: RootState) => state.app.errorMessage,
   );
 
-  // Reset states
+  // Reset Auth and App states to ensure a clean state on component mount
   useEffect(() => {
-    dispatch(resetAppStates());
-    dispatch(resetAuthStates());
+    dispatch(resetAppStates()); // Reset app loading, message and error message states
+    dispatch(resetAuthStates()); // Reset authentication form data and showPassword states
   }, []);
 
   const navigate = useNavigate();
 
+  // Loading icon
   spiral.register();
 
+  // Handle input change event
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const updatedFormData = { ...formData, [name]: value };
     dispatch(updateFormData(updatedFormData));
   };
 
+  // Handle form submission for email input
   const handleEmailSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Update loading state
-    dispatch(updateLoading(true));
+
+    dispatch(updateLoading(true)); // Update loading state while waiting for API response
     try {
+      // Make API call to initiate reset process
       const response = await axios.post(
         'http://127.0.0.1:8000/api/reset-password',
         { email: formData.email },
       );
       const { user_id, reset_code } = response.data;
-      // Update resetCode state
-      dispatch(updateResetCode(reset_code));
-      // Navigation to the Reset Password page
+      dispatch(updateResetCode(reset_code)); // Update resetCode state
+      // Navigation to the Reset Password page with user ID and reset code
       navigate(`/resetpassword/${user_id}/${reset_code}`);
     } catch (error: any) {
       dispatch(updateErrorMessage('Email not found.'));
     } finally {
-      // Update loading state after password reset attempt
-      dispatch(updateLoading(false));
+      dispatch(updateLoading(false)); // Update loading state after password reset attempt
     }
   };
 

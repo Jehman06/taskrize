@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+
+// Redux
 import { useDispatch, useSelector } from 'react-redux';
 import {
   loginUser,
@@ -14,6 +16,8 @@ import {
   resetAppStates,
 } from '../redux/reducers/appSlice';
 import { RootState } from '../redux/store';
+
+// Styling
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Auth.css';
 import taskrize from '../images/taskrize.png';
@@ -35,14 +39,16 @@ const LoginPage: React.FC = () => {
 
   let navigate = useNavigate();
 
+  // Loading icon
   spiral.register();
 
-  // Set initial state
+  // Reset Auth and App states to ensure a clean state on component mount
   useEffect(() => {
     dispatch(resetAppStates());
     dispatch(resetAuthStates());
   }, []);
 
+  // Handle input change event
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const updatedFormData = { ...formData, [name]: value };
@@ -53,22 +59,25 @@ const LoginPage: React.FC = () => {
     dispatch(updateShowPassword());
   };
 
+  // Handle form submission for login
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    dispatch(updateLoading(true));
+
+    dispatch(updateLoading(true)); // Update loading state to indicate request in progress
     try {
+      // Send login request the the backend API
       const response = await axios.post(
         'http://127.0.0.1:8000/api/login',
         formData,
       );
       if (response.status === 200) {
         // Login successful
-        dispatch(updateErrorMessage('')); // Clear any previous error messages
-        const userData = response.data;
-        console.log(userData);
-        dispatch(loginUser({ user: userData }));
-        navigate('/home');
+        dispatch(updateErrorMessage(''));
+        const userData = response.data; // Extract user data from the response
+        dispatch(loginUser({ user: userData })); // Dispatch action to store data in Redux state
+        navigate('/home'); // Redirect user after successful login
       } else {
+        // Handle unexpected response status
         dispatch(
           updateErrorMessage(
             'An unexpected error occurred. Please try again later.',
@@ -76,7 +85,7 @@ const LoginPage: React.FC = () => {
         );
       }
     } catch (error: any) {
-      // Request failed or response status is not 200
+      // Handle errors from the login request
       if (error.response) {
         // Server responded with an error message
         if (error.response.status === 401 || error.response.status === 400) {
@@ -101,6 +110,9 @@ const LoginPage: React.FC = () => {
           ),
         );
       }
+    } finally {
+      // Update loading state after login attempt
+      dispatch(updateLoading(false));
     }
   };
 
