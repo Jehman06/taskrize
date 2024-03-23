@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 
 // Redux
@@ -23,19 +23,29 @@ import './Auth.css';
 import taskrize from '../images/taskrize.png';
 import { Form } from 'react-bootstrap';
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
+import { errorMonitor } from 'events';
+
+// Define types for form data
+interface FormData {
+  email: string;
+  password: string;
+  password_confirmation: string;
+}
 
 const SignupPage: React.FC = () => {
   // State management
   const dispatch = useDispatch();
-  const formData = useSelector((state: RootState) => state.auth.formData);
-  const confirmPassword = useSelector(
+  const formData: FormData = useSelector(
+    (state: RootState) => state.auth.formData,
+  );
+  const confirmPassword: string = useSelector(
     (state: RootState) => state.auth.formData.password_confirmation,
   );
-  const errorMessage = useSelector(
+  const errorMessage: string = useSelector(
     (state: RootState) => state.app.errorMessage,
   );
-  const loading = useSelector((state: RootState) => state.app.loading);
-  const showPassword = useSelector(
+  const loading: boolean = useSelector((state: RootState) => state.app.loading);
+  const showPassword: boolean = useSelector(
     (state: RootState) => state.auth.showPassword,
   );
 
@@ -48,7 +58,7 @@ const SignupPage: React.FC = () => {
   }, []);
 
   // Handle input change event for form data
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
     const updatedFormData = { ...formData, [name]: value };
     dispatch(updateFormData(updatedFormData));
@@ -57,16 +67,18 @@ const SignupPage: React.FC = () => {
   // Handle input change event for confirm password
   const handleConfirmPasswordChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  ): void => {
     dispatch(updateConfirmPassword(e.target.value));
   };
 
-  const togglePasswordVisibility = () => {
+  const togglePasswordVisibility = (): void => {
     dispatch(updateShowPassword());
   };
 
   // Handle form submission for sign up process
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
     e.preventDefault();
     if (formData.password !== confirmPassword) {
       dispatch(updateErrorMessage("Passwords don't match."));
@@ -76,16 +88,15 @@ const SignupPage: React.FC = () => {
     dispatch(updateLoading(true)); // Update loading state to indicate request in progress
     try {
       await axios.post('http://127.0.0.1:8000/api/register', formData);
-      dispatch(updateErrorMessage(''));
-      dispatch(updateLoading(false));
+      dispatch(updateErrorMessage(''), updateLoading(false));
       navigate('/login'); // Redirect user to the login page
     } catch (error: any) {
       console.error('Error registering user:', error);
+      const errorMessage: string =
+        (error as AxiosError<any>)?.response?.data?.error ||
+        'An error occurred during registration.';
       dispatch(
-        updateErrorMessage(
-          (error as AxiosError<any>)?.response?.data?.error ||
-            'An error occurred during registration.',
-        ),
+        updateErrorMessage(errorMessage),
         dispatch(updateLoading(false)),
       );
     }

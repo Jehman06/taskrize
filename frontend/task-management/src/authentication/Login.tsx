@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import axios from 'axios';
+import axios, { AxiosResponse, AxiosError } from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 
 // Redux
@@ -25,15 +25,23 @@ import { Form } from 'react-bootstrap';
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
 import { spiral } from 'ldrs';
 
+// Define types for formData
+interface formData {
+  email: string;
+  password: string;
+}
+
 const LoginPage: React.FC = () => {
   // State management
   const dispatch = useDispatch();
-  const formData = useSelector((state: RootState) => state.auth.formData);
-  const loading = useSelector((state: RootState) => state.app.loading);
-  const errorMessage = useSelector(
+  const formData: formData = useSelector(
+    (state: RootState) => state.auth.formData,
+  );
+  const loading: boolean = useSelector((state: RootState) => state.app.loading);
+  const errorMessage: string = useSelector(
     (state: RootState) => state.app.errorMessage,
   );
-  const showPassword = useSelector(
+  const showPassword: boolean = useSelector(
     (state: RootState) => state.auth.showPassword,
   );
 
@@ -49,71 +57,77 @@ const LoginPage: React.FC = () => {
   }, []);
 
   // Handle input change event
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
-    const updatedFormData = { ...formData, [name]: value };
+    const updatedFormData: formData = { ...formData, [name]: value };
     dispatch(updateFormData(updatedFormData));
   };
 
-  const togglePasswordVisibility = () => {
+  const togglePasswordVisibility = (): void => {
     dispatch(updateShowPassword());
   };
 
   // Handle form submission for login
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
     e.preventDefault();
 
     dispatch(updateLoading(true)); // Update loading state to indicate request in progress
     try {
-      // Send login request the the backend API
-      const response = await axios.post(
+      // Send login request to the backend API
+      const response: AxiosResponse = await axios.post(
         'http://127.0.0.1:8000/api/login',
         formData,
       );
       if (response.status === 200) {
         // Login successful
-        dispatch(updateErrorMessage(''));
         const userData = response.data; // Extract user data from the response
-        dispatch(loginUser({ user: userData })); // Dispatch action to store data in Redux state
+        dispatch(loginUser({ user: userData }));
         navigate('/home'); // Redirect user after successful login
       } else {
         // Handle unexpected response status
-        dispatch(
-          updateErrorMessage(
-            'An unexpected error occurred. Please try again later.',
-          ),
+        handleServerError(
+          'An unexpected error occurred. Please try again later.',
         );
       }
     } catch (error: any) {
       // Handle errors from the login request
-      if (error.response) {
-        // Server responded with an error message
-        if (error.response.status === 401 || error.response.status === 400) {
-          // Incorrect email/password error
-          dispatch(
-            updateErrorMessage('Invalid credentials. Please try again.'),
-          );
-          dispatch(updateLoading(false));
-        } else {
-          // Other error from the server
-          dispatch(
-            updateErrorMessage(
-              'An error occurred during login. Please try again.',
-            ),
-          );
-        }
-      } else {
-        // Network error or other unexpected error
-        dispatch(
-          updateErrorMessage(
-            'An unexpected error occurred. Please try again later.',
-          ),
-        );
-      }
+      handleRequestError(error);
     } finally {
       // Update loading state after login attempt
       dispatch(updateLoading(false));
     }
+  };
+
+  // Handle errors from the login request
+  const handleRequestError = (error: AxiosError): void => {
+    if (error.response) {
+      // Server responded with an error message
+      if (error.response.status === 401 || error.response.status === 400) {
+        // Incorrect email/password error
+        dispatch(updateErrorMessage('Invalid credentials. Please try again.'));
+      } else {
+        // Other error from the server
+        dispatch(
+          updateErrorMessage(
+            'An error occurred during login. Please try again.',
+          ),
+        );
+      }
+    } else {
+      // Network error or other unexpected error
+      dispatch(
+        updateErrorMessage(
+          'An unexpected error occurred. Please try again later.',
+        ),
+      );
+    }
+  };
+
+  // Handle server errors
+  const handleServerError = (message: string): void => {
+    dispatch(updateErrorMessage(message));
   };
 
   return (

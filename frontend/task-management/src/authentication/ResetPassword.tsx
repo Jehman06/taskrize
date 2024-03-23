@@ -27,23 +27,35 @@ import './Auth.css';
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
 import { spiral } from 'ldrs';
 
+interface formData {
+  password: string;
+  password_confirmation: string;
+}
+
 const ResetPassword: React.FC = () => {
   // State management
   const dispatch = useDispatch();
-  const formData = useSelector((state: RootState) => state.auth.formData);
-  const confirmPassword = useSelector(
+
+  const formData: formData = useSelector(
+    (state: RootState) => state.auth.formData,
+  );
+
+  const confirmPassword: string = useSelector(
     (state: RootState) => state.auth.formData.password_confirmation,
   );
-  const resetCode = useSelector(
+
+  const resetCode: string = useSelector(
     (state: RootState) => state.auth.resetCode || '',
   );
-  const loading = useSelector((state: RootState) => state.app.loading);
-  const message = useSelector((state: RootState) => state.app.message);
-  const stage = useSelector((state: RootState) => state.auth.stage);
-  const errorMessage = useSelector(
+
+  const loading: boolean = useSelector((state: RootState) => state.app.loading);
+  const message: string = useSelector((state: RootState) => state.app.message);
+  const stage: string = useSelector((state: RootState) => state.auth.stage);
+  const errorMessage: string = useSelector(
     (state: RootState) => state.app.errorMessage,
   );
-  const showPassword = useSelector(
+
+  const showPassword: boolean = useSelector(
     (state: RootState) => state.auth.showPassword,
   );
 
@@ -52,21 +64,18 @@ const ResetPassword: React.FC = () => {
 
   // Reset Auth, App and resetCode states to ensure a clean state on component mount
   useEffect(() => {
-    dispatch(resetAppStates());
-    dispatch(resetAuthStates());
-    dispatch(updateResetCode(''));
+    dispatch(resetAppStates(), resetAuthStates(), updateResetCode(''));
   }, []);
 
   // Extract params from the api endpoint
-  const { user_id, reset_code } = useParams<{
-    user_id: string;
+  const { reset_code } = useParams<{
     reset_code: string;
   }>();
 
   const navigate = useNavigate();
 
   // Handle input change event
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
     if (name == 'password') {
       dispatch(updateFormData({ ...formData, password: value }));
@@ -76,7 +85,9 @@ const ResetPassword: React.FC = () => {
   };
 
   // Handle submission of the reset code form
-  const handleResetCodeSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleResetCodeSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
     e.preventDefault();
     try {
       if (resetCode !== reset_code) {
@@ -85,8 +96,7 @@ const ResetPassword: React.FC = () => {
         return;
       }
       // If reset codes match, proceed to the password reset stage
-      dispatch(updateStage('reset'));
-      dispatch(updateErrorMessage(''));
+      dispatch(updateStage('reset'), updateErrorMessage(''));
     } catch (error: any) {
       dispatch(
         updateErrorMessage('An error occurred. Please try again later.'),
@@ -94,46 +104,77 @@ const ResetPassword: React.FC = () => {
     }
   };
 
-  const togglePasswordVisibility = () => {
+  const togglePasswordVisibility = (): void => {
     dispatch(updateShowPassword());
   };
 
   // Handle submission of the password confirmation form
-  const handlePasswordSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handlePasswordSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
     e.preventDefault();
     dispatch(updateErrorMessage(''));
-
-    // If passwords don't match
     if (formData.password !== confirmPassword) {
       dispatch(updateErrorMessage("Passwords don't match."));
       return;
-      // If passwords match
-    } else if (formData.password == confirmPassword) {
-      dispatch(updateErrorMessage(''));
     }
-
-    dispatch(updateLoading(true)); // Update loading state to indicate request in progress
+    dispatch(updateLoading(true));
     try {
-      // Send password reset request to backend API
-      await axios.post(
-        `http://127.0.0.1:8000/api/reset-password-confirm/${user_id}`,
+      const response = await axios.post(
+        'http://127.0.0.1:8000/api/reset-password-confirm/${user_id}',
         {
           new_password: formData.password,
         },
       );
-      dispatch(updateLoading(false)); // Stop the loading
-      dispatch(
-        updateMessage('Your password has been reset. Redirecting to login'),
-      );
-      dispatch(updateStage('complete'));
+      // Check if the response was successful
+      if (response.status === 200) {
+        dispatch(updateErrorMessage(''), updateStage('complete'));
 
-      // Redirects to login page after 3 seconds
-      setTimeout(() => {
-        navigate('/login');
-      }, 3000);
+        setTimeout(() => {
+          navigate('/login');
+        }, 3000);
+      } else {
+        // Handle unexpected response status
+        dispatch(
+          updateErrorMessage(
+            'An unexpected error occurred. Please try again later.',
+          ),
+        );
+      }
     } catch (error: any) {
+      // Handle specific types of errors
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          // Server responded with an error message
+          const errorMessage =
+            error.response.data?.message ||
+            'An error occurred. Please try to login.';
+          dispatch(updateErrorMessage(errorMessage));
+        } else if (error.request) {
+          // The request was made but no response was received
+          dispatch(
+            updateErrorMessage(
+              'No response received from the server. Please try again later.',
+            ),
+          );
+        } else {
+          // Something happened in setting up the request that triggered an error
+          dispatch(
+            updateErrorMessage(
+              'An unexpected error occurred. Please try again later.',
+            ),
+          );
+        }
+      } else {
+        // Handle other types of errors
+        dispatch(
+          updateErrorMessage(
+            'An unexpected error occurred. Please try again later.',
+          ),
+        );
+      }
+    } finally {
       dispatch(updateLoading(false));
-      dispatch(updateErrorMessage('An error occurred. Please try to login.'));
     }
   };
 

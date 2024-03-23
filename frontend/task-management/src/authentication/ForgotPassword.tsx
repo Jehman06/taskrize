@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 
 // Redux
@@ -20,12 +20,19 @@ import { RootState } from '../redux/store';
 import taskrize from '../images/taskrize.png';
 import { spiral } from 'ldrs';
 
+// Define type for formData
+interface formData {
+  email: string;
+}
+
 const ForgotPassword: React.FC = () => {
   // State management
   const dispatch = useDispatch();
-  const formData = useSelector((state: RootState) => state.auth.formData);
-  const loading = useSelector((state: RootState) => state.app.loading);
-  const errorMessage = useSelector(
+  const formData: formData = useSelector(
+    (state: RootState) => state.auth.formData,
+  );
+  const loading: boolean = useSelector((state: RootState) => state.app.loading);
+  const errorMessage: string = useSelector(
     (state: RootState) => state.app.errorMessage,
   );
 
@@ -54,16 +61,26 @@ const ForgotPassword: React.FC = () => {
     dispatch(updateLoading(true)); // Update loading state while waiting for API response
     try {
       // Make API call to initiate reset process
-      const response = await axios.post(
-        'http://127.0.0.1:8000/api/reset-password',
-        { email: formData.email },
-      );
+      const response: AxiosResponse<{ user_id: string; reset_code: string }> =
+        await axios.post('http://127.0.0.1:8000/api/reset-password', {
+          email: formData.email,
+        });
       const { user_id, reset_code } = response.data;
       dispatch(updateResetCode(reset_code)); // Update resetCode state
       // Navigation to the Reset Password page with user ID and reset code
       navigate(`/resetpassword/${user_id}/${reset_code}`);
     } catch (error: any) {
-      dispatch(updateErrorMessage('Email not found.'));
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          dispatch(updateErrorMessage('Email not found.'));
+        } else if (error.request) {
+          dispatch(
+            updateErrorMessage('A network error occurred. Please try again.'),
+          );
+        } else {
+          dispatch(updateErrorMessage('An error occurred. Please try again.'));
+        }
+      }
     } finally {
       dispatch(updateLoading(false)); // Update loading state after password reset attempt
     }

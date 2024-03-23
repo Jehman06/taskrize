@@ -4,7 +4,7 @@ interface AuthState {
   user: any;
   isAuthenticated: boolean;
   resetCode: string | null;
-  stage: string | null;
+  stage: string;
   showPassword: boolean;
   formData: {
     email: string;
