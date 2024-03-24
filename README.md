@@ -1,7 +1,10 @@
 # TaskRize
 
-## Summary
+## Description
+
 TaskRize is a robust task-management application, drawing inspiration from the renowned Trello platform. Offering a streamlined user experience, TaskRize empowers individuals and teams to efficiently organize tasks, collaborate seamlessly, and enhance productivity. With intuitive features and customizable boards, users can easily visualize workflows, assign tasks, track progress, and prioritize activities. TaskRize facilitates effective project management, fostering teamwork and enabling users to achieve their goals with ease.
+
+🚧 In progress: Continuing development towards MVP milestone. 🚧
 
 ## Technologies and Tools
 ### Frontend
