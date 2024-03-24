@@ -7,6 +7,7 @@
   height: 45px;
   padding: 0, 20;
   font-family: 'Montserrat', sans-serif;
+  border-bottom: 0.2px solid #9fadbc;
 }
 
 .private-logo {
@@ -28,7 +29,9 @@
 }
 
 .dropdown-menu {
-  background-color: #4a4d50 !important; /*#4a4d50*/
+  background-color: #4a4d50 !important;
+  border: 0.2px solid #9fadbc !important;
+  margin-top: 9px !important;
 }
 
 .dropdown-item {
@@ -102,10 +105,25 @@
   color: #04b97a;
   font-size: 30px;
   cursor: pointer;
-  margin-left: 10px;
   margin-right: 10px;
 }
 
 .account-icon:hover {
   color: #038759;
+}
+
+.dropdown-profile:hover {
+  background-color: #1d2125 !important;
+}
+
+.no-arrow:after {
+  display: none !important;
+}
+
+.profile-menu {
+  margin-right: 20px !important;
+}
+
+.profile-dropdown-item {
+  cursor: pointer;
 }

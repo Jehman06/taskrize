@@ -1,13 +1,29 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { logoutUser } from '../redux/reducers/authSlice';
 import taskrize from '../images/taskrize.png';
 import { SlMagnifier } from 'react-icons/sl';
 import { MdAccountCircle } from 'react-icons/md';
 import './PrivateNavbar.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import axios from 'axios';
 
 const PrivateNavbar: React.FC = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleLogout = async (): Promise<void> => {
+    try {
+      await axios.post('http://127.0.0.1:8000/api/logout');
+      dispatch(logoutUser());
+      navigate('/');
+    } catch (error: any) {
+      console.error('Error encountered when logging out. Please try again.');
+    }
+  };
+
   return (
     <nav className="navbar private-navbar justify-content-between align-items-center">
       {/* Left-aligned section */}
@@ -80,7 +96,35 @@ const PrivateNavbar: React.FC = () => {
           </div>
           <input className="search" placeholder="Search" />
         </div>
-        <MdAccountCircle className="account-icon" />
+        <div className="dropdown profile">
+          <button
+            className="dropdown-btn dropdown-profile dropdown-toggle no-arrow"
+            type="button"
+            id="dropdownMenuButton3"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <MdAccountCircle className="account-icon" />
+          </button>
+          <ul
+            className="dropdown-menu dropdown-menu-end"
+            aria-labelledby="dropdownMenuButton3"
+          >
+            <li>
+              <a className="dropdown-item" href="#">
+                Profile
+              </a>
+            </li>
+            <li>
+              <a
+                className="dropdown-item profile-dropdown-item"
+                onClick={handleLogout}
+              >
+                Logout
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
     </nav>
   );
