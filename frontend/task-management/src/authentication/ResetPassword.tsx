@@ -64,12 +64,14 @@ const ResetPassword: React.FC = () => {
 
   // Reset Auth, App and resetCode states to ensure a clean state on component mount
   useEffect(() => {
-    dispatch(resetAppStates(), resetAuthStates(), updateResetCode(''));
+    dispatch(resetAppStates(), resetAuthStates());
+    dispatch(updateResetCode(''));
   }, []);
 
   // Extract params from the api endpoint
-  const { reset_code } = useParams<{
+  const { reset_code, user_id } = useParams<{
     reset_code: string;
+    user_id: string;
   }>();
 
   const navigate = useNavigate();
@@ -91,12 +93,13 @@ const ResetPassword: React.FC = () => {
     e.preventDefault();
     try {
       if (resetCode !== reset_code) {
-        // If reset codes don't match, set error message and prevent further action
         dispatch(updateErrorMessage('Reset codes do not match.'));
         return;
+      } else {
+        dispatch(updateErrorMessage(''));
+        dispatch(updateResetCode('')); // Clear the reset code after submission
+        dispatch(updateStage('reset'));
       }
-      // If reset codes match, proceed to the password reset stage
-      dispatch(updateStage('reset'), updateErrorMessage(''));
     } catch (error: any) {
       dispatch(
         updateErrorMessage('An error occurred. Please try again later.'),
@@ -121,14 +124,16 @@ const ResetPassword: React.FC = () => {
     dispatch(updateLoading(true));
     try {
       const response = await axios.post(
-        'http://127.0.0.1:8000/api/reset-password-confirm/${user_id}',
+        `http://127.0.0.1:8000/api/reset-password-confirm/${user_id}`,
         {
           new_password: formData.password,
         },
       );
       // Check if the response was successful
       if (response.status === 200) {
-        dispatch(updateErrorMessage(''), updateStage('complete'));
+        dispatch(updateErrorMessage(''));
+        dispatch(updateMessage('Redirecting to Login page.'));
+        dispatch(updateStage('complete'));
 
         setTimeout(() => {
           navigate('/login');
@@ -219,6 +224,7 @@ const ResetPassword: React.FC = () => {
                     onChange={(e) => dispatch(updateResetCode(e.target.value))}
                     required
                     placeholder="Reset Code"
+                    autoComplete="off"
                   />
                 </div>
                 <button type="submit" className="btn btn-primary w-100 mb-1">
@@ -329,7 +335,7 @@ const ResetPassword: React.FC = () => {
                 alt="TaskRize logo"
                 style={{ height: '60px', width: '150px' }}
               />
-              <div className="p-1 text-success bg-success-subtle border border-success rounded-3 w-100 mb-2">
+              <div className="p-1 text-success bg-success-subtle border border-success rounded-3 w-100 mb-2 text-center">
                 {message}
               </div>
             </div>

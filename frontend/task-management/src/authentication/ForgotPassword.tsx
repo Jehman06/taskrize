@@ -38,8 +38,7 @@ const ForgotPassword: React.FC = () => {
 
   // Reset Auth and App states to ensure a clean state on component mount
   useEffect(() => {
-    dispatch(resetAppStates()); // Reset app loading, message and error message states
-    dispatch(resetAuthStates()); // Reset authentication form data and showPassword states
+    dispatch(resetAppStates(), resetAuthStates());
   }, []);
 
   const navigate = useNavigate();
@@ -48,14 +47,16 @@ const ForgotPassword: React.FC = () => {
   spiral.register();
 
   // Handle input change event
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
     const updatedFormData = { ...formData, [name]: value };
     dispatch(updateFormData(updatedFormData));
   };
 
   // Handle form submission for email input
-  const handleEmailSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleEmailSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
     e.preventDefault();
 
     dispatch(updateLoading(true)); // Update loading state while waiting for API response

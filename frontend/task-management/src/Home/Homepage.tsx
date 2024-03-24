@@ -1,12 +1,26 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PublicNavbar from '../Navbar/PublicNavbar';
 import './Homepage.css';
 
+// Redux
+import { useDispatch, useSelector } from 'react-redux';
+import { resetAuthStates, updateResetCode } from '../redux/reducers/authSlice';
+import { resetAppStates } from '../redux/reducers/appSlice';
+import { RootState } from '../redux/store';
+
 const HomePage: React.FC = () => {
+  // State management
+  const dispatch = useDispatch();
+
   let navigate = useNavigate();
 
-  const handleSignupRedirect = () => {
+  useEffect(() => {
+    dispatch(resetAppStates(), resetAuthStates());
+    dispatch(updateResetCode(''));
+  }, []);
+
+  const handleSignupRedirect = (): void => {
     navigate('/signup');
   };
 

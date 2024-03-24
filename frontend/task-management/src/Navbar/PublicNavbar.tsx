@@ -11,7 +11,7 @@ const PublicNavbar: React.FC = () => {
         backgroundColor: 'white',
         position: 'relative',
         height: '60px',
-        padding: '0 20px', // Add padding to the navbar
+        padding: '0 20px',
       }}
     >
       <div className="container d-flex align-items-center h-100">

@@ -17,18 +17,9 @@ const Home: React.FC = () => {
     dispatch(resetAppStates());
   });
 
-  if (!user) {
-    return (
-      <div className="text-center mt-5 mb-5">
-        <l-spiral size="30" color="teal"></l-spiral>
-      </div>
-    );
-  }
-
   return (
-    <div>
+    <div style={{ backgroundColor: '#33373a', height: '100vh' }}>
       <PrivateNavbar />
-      <h1>Hey, {user.email}! Welcome to your dashboard!</h1>
     </div>
   );
 };

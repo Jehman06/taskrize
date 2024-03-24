@@ -35,10 +35,14 @@ const authSlice = createSlice({
       state.user = action.payload.user;
       state.isAuthenticated = true;
     },
+    logoutUser(state) {
+      state.user = null;
+      state.isAuthenticated = false;
+    },
     updateFormData(state, action: PayloadAction<any>) {
       state.formData = action.payload;
     },
-    updateResetCode(state, action: PayloadAction<string>) {
+    updateResetCode(state, action: PayloadAction<any>) {
       state.resetCode = action.payload;
     },
     updateStage(
@@ -57,6 +61,7 @@ const authSlice = createSlice({
         password_confirmation: '',
       };
       state.showPassword = false;
+      state.stage = 'resetCode';
     },
     updateShowPassword(state) {
       state.showPassword = !state.showPassword;
@@ -66,6 +71,7 @@ const authSlice = createSlice({
 
 export const {
   loginUser,
+  logoutUser,
   updateFormData,
   updateResetCode,
   updateStage,
