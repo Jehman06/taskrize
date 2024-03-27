@@ -1,1 +1,117 @@
-/* backgroundColor: '#33373a', height: '100vh' */
+.home {
+    background-color: #33373a;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.home-container {
+    display: flex;
+    flex: 1;
+    margin: 50px;
+}
+
+.home-sidebar {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Align items to the start vertically */
+    align-items: center; /* Center items horizontally */
+    flex: 0 0 15%;
+    margin: 0;
+    margin-right: 0;
+    font-size: 18px;
+    color: #9fadbc;
+}
+
+.home-sidebar > p {
+    width: 100%;
+    padding: 5px 5px 5px 20px;
+    margin: 5px;
+    border-radius: 10px;
+}
+
+.home-sidebar > p:hover {
+    background-color: #474b4d;
+}
+
+.selected {
+    background-color: #223e66 !important;
+    color: #579dff;
+}
+
+.home-content {
+    flex: 2;
+    margin-left: 30px;
+}
+
+.board-content-title {
+    color: #9fadbc;
+    font-size: 20px;
+}
+
+.board {
+    position: relative;
+    width: 200px;
+    height: 150px;
+    margin: 10px;
+    overflow: hidden;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.board-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.board:hover .board-img {
+    opacity: 0.7; /* Reduce opacity on hover */
+}
+
+.board-title {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.star-icon {
+    color: white;
+    font-size: 18px;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    opacity: 0;
+    transition:
+        transform 0.3s ease,
+        opacity 0.3s ease,
+        font-size 0.1s ease;
+}
+
+.star-icon:hover {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.board:hover .star-icon {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+}
+
+.star-full {
+    color: #e5c100;
+    font-size: 18px;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    opacity: 1;
+    transition: font-size 0.1s ease;
+}
+
+.star-full:hover {
+    font-size: 20px;
+}
