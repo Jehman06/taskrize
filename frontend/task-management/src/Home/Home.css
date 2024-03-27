@@ -49,14 +49,22 @@
     font-size: 20px;
 }
 
+.board-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
 .board {
     position: relative;
-    width: 200px;
+    width: 300px;
     height: 150px;
     margin: 10px;
     overflow: hidden;
     border-radius: 10px;
     cursor: pointer;
+    flex: 0 0 20%;
+    margin: 10px;
 }
 
 .board-img {

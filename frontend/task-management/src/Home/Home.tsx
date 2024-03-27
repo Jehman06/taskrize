@@ -58,15 +58,17 @@ const Home: React.FC = () => {
                             <FaRegClock /> Recently viewed
                         </p>
                     </div>
-                    <div className="board">
-                        <img src={placeholder} alt="Board image" className="board-img" />
-                        <div className="board-title">Board Title</div>
-                        <div onClick={toggleStar}>
-                            {starFilled ? (
-                                <FaStar className="star-full" />
-                            ) : (
-                                <FaRegStar className="star-icon" />
-                            )}
+                    <div className="board-wrapper">
+                        <div className="board">
+                            <img src={placeholder} alt="Board image" className="board-img" />
+                            <div className="board-title">Board Title</div>
+                            <div onClick={toggleStar}>
+                                {starFilled ? (
+                                    <FaStar className="star-full" />
+                                ) : (
+                                    <FaRegStar className="star-icon" />
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
