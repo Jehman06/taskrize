@@ -8,6 +8,9 @@ import './Home.css';
 import { FaRegClock } from 'react-icons/fa';
 import { FaRegStar } from 'react-icons/fa';
 import { FaStar } from 'react-icons/fa';
+import { FaFlipboard } from 'react-icons/fa';
+import { BsFillPeopleFill } from 'react-icons/bs';
+import { IoSettingsSharp } from 'react-icons/io5';
 import placeholder from '../images/placeholder.png';
 
 const Home: React.FC = () => {
@@ -53,21 +56,156 @@ const Home: React.FC = () => {
 
                 {/* BOARDS */}
                 <div className="container home-content">
-                    <div className="board-content-title">
-                        <p>
-                            <FaRegClock /> Recently viewed
-                        </p>
+                    <div className="boards">
+                        <div className="board-content-title">
+                            <p>
+                                <FaRegStar className="board-content-title-icon" /> Favorites
+                            </p>
+                        </div>
+                        <div className="board-content">
+                            <div className="board-wrapper">
+                                <div className="board">
+                                    <img
+                                        src={placeholder}
+                                        alt="Board image"
+                                        className="board-img"
+                                    />
+                                    <div className="board-title">Board Title</div>
+                                    <div onClick={toggleStar}>
+                                        {starFilled ? (
+                                            <FaStar className="star-full" />
+                                        ) : (
+                                            <FaRegStar className="star-icon" />
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="board-wrapper">
+                                <div className="board">
+                                    <img
+                                        src={placeholder}
+                                        alt="Board image"
+                                        className="board-img"
+                                    />
+                                    <div className="board-title">Board Title</div>
+                                    <div onClick={toggleStar}>
+                                        {starFilled ? (
+                                            <FaStar className="star-full" />
+                                        ) : (
+                                            <FaRegStar className="star-icon" />
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="board-content-title">
+                            <p>
+                                <FaRegClock className="board-content-title-icon" /> Recently viewed
+                            </p>
+                        </div>
+                        <div className="board-content">
+                            <div className="board-wrapper">
+                                <div className="board">
+                                    <img
+                                        src={placeholder}
+                                        alt="Board image"
+                                        className="board-img"
+                                    />
+                                    <div className="board-title">Board Title</div>
+                                    <div onClick={toggleStar}>
+                                        {starFilled ? (
+                                            <FaStar className="star-full" />
+                                        ) : (
+                                            <FaRegStar className="star-icon" />
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="board-wrapper">
+                                <div className="board">
+                                    <img
+                                        src={placeholder}
+                                        alt="Board image"
+                                        className="board-img"
+                                    />
+                                    <div className="board-title">Board Title</div>
+                                    <div onClick={toggleStar}>
+                                        {starFilled ? (
+                                            <FaStar className="star-full" />
+                                        ) : (
+                                            <FaRegStar className="star-icon" />
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div className="board-wrapper">
-                        <div className="board">
-                            <img src={placeholder} alt="Board image" className="board-img" />
-                            <div className="board-title">Board Title</div>
-                            <div onClick={toggleStar}>
-                                {starFilled ? (
-                                    <FaStar className="star-full" />
-                                ) : (
-                                    <FaRegStar className="star-icon" />
-                                )}
+
+                    {/* WORKSPACES */}
+                    <div className="workspaces">
+                        <div className="board-content-title">
+                            <p>WORKSPACES</p>
+                        </div>
+                        <div className="workspace">
+                            <div className="workspace-settings">
+                                <div className="workspace-title">
+                                    <p>
+                                        <u>TaskRize</u>
+                                    </p>
+                                </div>
+                                <div className="workspace-buttons">
+                                    <button className="btn button">
+                                        <FaFlipboard className="settings-icon" /> Boards
+                                    </button>
+                                    <button className="btn button">
+                                        <BsFillPeopleFill className="settings-icon" /> Members
+                                    </button>
+                                    <button className="btn button">
+                                        <IoSettingsSharp className="settings-icon" /> Settings
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* BOARDS */}
+                            <div className="board-content">
+                                <div className="board-wrapper">
+                                    <div className="board">
+                                        <img
+                                            src={placeholder}
+                                            alt="Board image"
+                                            className="board-img"
+                                        />
+                                        <div className="board-title">Board Title</div>
+                                        <div onClick={toggleStar}>
+                                            {starFilled ? (
+                                                <FaStar className="star-full" />
+                                            ) : (
+                                                <FaRegStar className="star-icon" />
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="board-wrapper">
+                                    <div className="board">
+                                        <img
+                                            src={placeholder}
+                                            alt="Board image"
+                                            className="board-img"
+                                        />
+                                        <div className="board-title">Board Title</div>
+                                        <div onClick={toggleStar}>
+                                            {starFilled ? (
+                                                <FaStar className="star-full" />
+                                            ) : (
+                                                <FaRegStar className="star-icon" />
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

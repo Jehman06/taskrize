@@ -1,8 +1,8 @@
 .home {
     background-color: #33373a;
-    height: 100vh;
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
 }
 
 .home-container {
@@ -44,31 +44,38 @@
     margin-left: 30px;
 }
 
+.boards {
+    margin-bottom: 30px;
+}
+
 .board-content-title {
     color: #9fadbc;
     font-size: 20px;
+    margin-top: 30px;
 }
 
-.board-wrapper {
+.board-content-title-icon {
+    margin-right: 8px;
+}
+
+.board-content {
     display: flex;
     flex-wrap: wrap;
-    flex-direction: row;
 }
 
 .board {
     position: relative;
-    width: 300px;
+    width: 250px !important;
     height: 150px;
-    margin: 10px;
     overflow: hidden;
     border-radius: 10px;
     cursor: pointer;
-    flex: 0 0 20%;
-    margin: 10px;
+    margin: 0px 10px 10px 10px;
+    /* flex: 0 0 calc(30% - 10px); */
 }
 
 .board-img {
-    width: 100%;
+    width: 100% !important;
     height: 100%;
     object-fit: cover;
 }
@@ -82,9 +89,10 @@
     top: 10px;
     left: 10px;
     color: white;
-    font-weight: bold;
+    font-weight: 900;
     font-size: 16px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    margin-bottom: 0 !important;
 }
 
 .star-icon {
@@ -122,4 +130,47 @@
 
 .star-full:hover {
     font-size: 20px;
+}
+
+.workspace {
+    width: calc(100% - 20px); /* Adjust the width as needed */
+    max-width: 70vw; /* Limit the maximum width */
+}
+
+.workspace-settings {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.workspace-title {
+    color: #9fadbc;
+    font-size: 20px;
+    font-weight: 900;
+}
+
+.workspace-buttons {
+    display: flex;
+    flex-direction: row;
+    margin-right: 150px;
+}
+
+.button {
+    margin-left: 10px;
+    height: 30px;
+    font-size: 13px;
+    background-color: #474b4d !important;
+}
+
+.button:hover {
+    background-color: #595d5e !important;
+}
+
+.settings-icon {
+    margin-right: 5px;
+}
+
+.board-content {
+    display: flex;
+    flex-wrap: wrap;
 }
