@@ -18,8 +18,10 @@ from django.contrib import admin
 from django.urls import path, re_path
 from authentication import views
 from django.views.generic import RedirectView
+from boards.views import BoardListView, BoardDetailView, BoardCreateView, BoardUpdateView, BoardDeleteView, BoardFavoriteListView, BoardFavoriteCreateView
 
 urlpatterns = [
+    # Authentication
     path('', RedirectView.as_view(url='/admin/')),  # Redirect to the admin page
     path('admin/', admin.site.urls),
     path('api/register', views.register_user, name='register'),
@@ -27,4 +29,13 @@ urlpatterns = [
     path('api/logout', views.logout_user, name='logout'),
     path('api/reset-password', views.reset_password_request, name='reset-password-request'),
     re_path(r'^api/reset-password-confirm/(?P<user_id>\d+)/?(?P<reset_code>\w+)?$', views.reset_password_confirm, name='reset-password-confirm'),
+    # Boards
+    path('api/boards/', BoardListView.as_view(), name='board-list'),
+    path('api/boards/<int:pk>/', BoardDetailView.as_view(), name='board-detail'),
+    path('api/boards/create/', BoardCreateView.as_view(), name='board-create'),
+    path('api/boards/<int:pk>/update/', BoardUpdateView.as_view(), name='board-update'),
+    path('api/boards/<int:pk>/delete/', BoardDeleteView.as_view(), name='board-delete'),
+    # Favorite boards
+    path('api/users/<int:user_id>/favorite-boards/', BoardFavoriteListView.as_view(), name='user-favorite-board-list'),
+    path('api/users/<int:user_id>/favorite-boards/add/', BoardFavoriteCreateView.as_view(), name='user-favorite-board-add'),
 ]

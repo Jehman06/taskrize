@@ -3,6 +3,7 @@ from django.db import models
 from .managers import CustomUserManager
 from django.conf import settings
 
+# Authentication model
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     reset_code = models.CharField(max_length=100, blank=True, null=True)
@@ -14,7 +15,8 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
-    
+
+# User profile model    
 class UserProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, blank=True)
