@@ -5,7 +5,7 @@ from rest_framework.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.conf import settings
 import secrets
-from django.contrib.auth.tokens import default_token_generator
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate, login, logout
 from .models import CustomUser
 
@@ -68,7 +68,11 @@ def login_user(request):
     if user is not None:
         # Log the user in
         login(request, user)
-        return Response({'email': email, 'password': password, 'message': 'Login successful'}, status=status.HTTP_200_OK)
+
+        # Generate JWT tokens
+        refresh = RefreshToken.for_user(user)
+
+        return Response({'email': email, 'refresh': str(refresh), 'access': str(refresh.access_token), 'message': 'Login successful'}, status=status.HTTP_200_OK)
     else:
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 

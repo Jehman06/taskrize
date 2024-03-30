@@ -19,16 +19,22 @@ from django.urls import path, re_path
 from authentication import views
 from django.views.generic import RedirectView
 from boards.views import BoardListView, BoardDetailView, BoardCreateView, BoardUpdateView, BoardDeleteView, BoardFavoriteListView, BoardFavoriteCreateView
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
 
 urlpatterns = [
     # Authentication
     path('', RedirectView.as_view(url='/admin/')),  # Redirect to the admin page
     path('admin/', admin.site.urls),
     path('api/register', views.register_user, name='register'),
-    path('api/login', views.login_user, name='login'),
+    path('api/login', TokenObtainPairView.as_view(), name='login'),
     path('api/logout', views.logout_user, name='logout'),
     path('api/reset-password', views.reset_password_request, name='reset-password-request'),
     re_path(r'^api/reset-password-confirm/(?P<user_id>\d+)/?(?P<reset_code>\w+)?$', views.reset_password_confirm, name='reset-password-confirm'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
     # Boards
     path('api/boards/', BoardListView.as_view(), name='board-list'),
     path('api/boards/<int:pk>/', BoardDetailView.as_view(), name='board-detail'),
