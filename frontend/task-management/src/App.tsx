@@ -5,6 +5,7 @@ import SignupPage from './authentication/Signup';
 import LoginPage from './authentication/Login';
 import ForgotPassword from './authentication/ForgotPassword';
 import ResetPassword from './authentication/ResetPassword';
+import useAuth from './Hooks/useAuth';
 
 function App() {
     return (
