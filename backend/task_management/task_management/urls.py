@@ -19,6 +19,10 @@ from django.urls import path, re_path
 from authentication import views
 from django.views.generic import RedirectView
 from boards.views import BoardListView, BoardDetailView, BoardCreateView, BoardUpdateView, BoardDeleteView, BoardFavoriteListView, BoardFavoriteCreateView
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 urlpatterns = [
     # Authentication
@@ -29,6 +33,9 @@ urlpatterns = [
     path('api/logout', views.logout_user, name='logout'),
     path('api/reset-password', views.reset_password_request, name='reset-password-request'),
     re_path(r'^api/reset-password-confirm/(?P<user_id>\d+)/?(?P<reset_code>\w+)?$', views.reset_password_confirm, name='reset-password-confirm'),
+    # Tokens
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     # Boards
     path('api/boards/', BoardListView.as_view(), name='board-list'),
     path('api/boards/<int:pk>/', BoardDetailView.as_view(), name='board-detail'),

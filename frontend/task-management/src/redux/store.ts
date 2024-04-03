@@ -6,27 +6,15 @@ import appSlice from './reducers/appSlice';
 
 // Combine all reducers
 const rootReducer = combineReducers({
-  auth: authSlice,
-  app: appSlice,
+    auth: authSlice,
+    app: appSlice,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
 
-// Configure Redux Persist
-const persistConfig = {
-  key: 'root',
-  storage,
-};
-
-// Wrap the root reducer with Redux Persist
-const persistedReducer = persistReducer(persistConfig, rootReducer);
-
 // Create the Redux store
 const store = configureStore({
-  reducer: persistedReducer, // Use the persisted reducer
+    reducer: rootReducer, // Use the persisted reducer
 });
 
-// Create the Redux persistor
-const persistor = persistStore(store);
-
-export { store, persistor };
+export { store };

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { logoutUser } from '../redux/reducers/authSlice';
+import { logoutUser, resetAuthStates } from '../redux/reducers/authSlice';
 import taskrize from '../images/taskrize.png';
 import { SlMagnifier } from 'react-icons/sl';
 import { MdAccountCircle } from 'react-icons/md';
@@ -9,6 +9,8 @@ import './PrivateNavbar.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
 import axios from 'axios';
+import Cookies from 'js-cookie';
+import { resetAppStates } from '../redux/reducers/appSlice';
 
 const PrivateNavbar: React.FC = () => {
     const navigate = useNavigate();
@@ -16,8 +18,27 @@ const PrivateNavbar: React.FC = () => {
 
     const handleLogout = async (): Promise<void> => {
         try {
-            await axios.post('http://127.0.0.1:8000/api/logout');
+            // Get the access token from cookies
+            const accessToken = Cookies.get('access_token');
+
+            await axios.post(
+                'http://127.0.0.1:8000/api/logout',
+                {},
+                {
+                    headers: {
+                        Authorization: accessToken,
+                    },
+                }
+            );
+            // Update states and remove tokens from cookies
             dispatch(logoutUser());
+            dispatch(resetAppStates());
+            dispatch(resetAuthStates());
+            Cookies.remove('access_token');
+            Cookies.remove('refresh_token');
+            Cookies.remove('csrftoken');
+            Cookies.remove('sessionid');
+            // Navigate to the homepage
             navigate('/');
         } catch (error: any) {
             console.error('Error encountered when logging out. Please try again.');

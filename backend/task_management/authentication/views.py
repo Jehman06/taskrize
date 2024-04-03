@@ -1,31 +1,20 @@
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.conf import settings
+from django.http import JsonResponse
+from django.contrib.auth import authenticate, logout
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.decorators import api_view, authentication_classes
+from rest_framework.exceptions import ValidationError
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
 import secrets
-from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth import authenticate, login, logout
 from .models import CustomUser
 
 # Signup function
 @api_view(['POST'])
 def register_user(request):
-    """
-    Registers a new user.
-
-    Checks if the provided password matches the confirmation.
-    Verifies if the email is not already in use.
-    Creates a new user with the provided email and password.
-
-    Args:
-        request: HTTP request containing user data (email, password, password_confirmation).
-
-    Returns:
-        HTTP response with a success message if the user is created successfully,
-        otherwise returns an error response.
-    """
+    # Extract email, password and password_confirmation from the request
     email = request.data.get('email')
     password = request.data.get('password')
     password_confirmation = request.data.get('password_confirmation')
@@ -47,49 +36,40 @@ def register_user(request):
 # Login function
 @api_view(['POST'])
 def login_user(request):
-    """
-    Logs in a user.
-
-    Authenticates the user with provided email and password.
-    If authentication is successful, creates a session for the user.
-
-    Args:
-        request: HTTP request containing user credentials (email, password).
-
-    Returns:
-        HTTP response with user data and a success message if login is successful,
-        otherwise returns an error response.
-    """
+    # Extract the email and password from the request
     email = request.data.get('email')
     password = request.data.get('password')
 
+    # Authenticate the user
     user = authenticate(request, email=email, password=password)
 
     if user is not None:
-        # Log the user in
-        login(request, user)
-        return Response({'email': email, 'password': password, 'message': 'Login successful'}, status=status.HTTP_200_OK)
+        # Generate JWT tokens
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+
+        # Set tokens as HTTP-only cookies
+        response = JsonResponse({'access_token': access_token, 'refresh_token': str(refresh)})
+        
+        # Set tokens as cookies in the response
+        response.set_cookie(key='access_token', value=access_token, httponly=False, samesite='None', secure=True)
+        response.set_cookie(key='refresh_token', value=str(refresh), httponly=False, samesite='None', secure=True)
+        
+        # Set CORS headers
+        response["Access-Control-Allow-Origin"] = "http://127.0.0.1:3000"
+        response["Access-Control-Allow-Credentials"] = "true"
+
+        return response
     else:
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 # Forgot Password function  
 @api_view(['POST'])
 def reset_password_request(request):
-    """
-    Initiates the process of resetting the user's password.
-
-    Generates a reset code and sends it to the user's email address.
-    Stores the reset code along with the user for verification.
-
-    Args:
-        request: HTTP request containing user email.
-
-    Returns:
-        HTTP response with user ID, reset code, and a success message if email is sent successfully,
-        otherwise returns an error response.
-    """
+    # Extract the email and user from the request
     email = request.data.get('email')
     user = CustomUser.objects.filter(email=email).first()
+
     if user:
         # Generate a random code
         reset_code = secrets.token_hex(5)
@@ -111,20 +91,6 @@ def reset_password_request(request):
 # Reset Password function
 @api_view(['POST'])
 def reset_password_confirm(request, user_id, reset_code=None):
-    """
-    Resets the user's password using the provided reset code.
-
-    Verifies the reset code and updates the user's password.
-
-    Args:
-        request: HTTP request containing user ID and new password.
-        user_id: ID of the user whose password needs to be reset.
-        reset_code: Optional reset code for verification.
-
-    Returns:
-        HTTP response with a success message if password is reset successfully,
-        otherwise returns an error response.
-    """
     try:
         if reset_code is not None:
             # Check if the reset_code matches the one stored in the database
@@ -144,6 +110,7 @@ def reset_password_confirm(request, user_id, reset_code=None):
 
 # Logout function
 @api_view(['POST'])
+@authentication_classes([JWTAuthentication])
 def logout_user(request):
     logout(request)
     return Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
