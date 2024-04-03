@@ -29,7 +29,7 @@ urlpatterns = [
     path('', RedirectView.as_view(url='/admin/')),  # Redirect to the admin page
     path('admin/', admin.site.urls),
     path('api/register', views.register_user, name='register'),
-    path('api/login', TokenObtainPairView.as_view(), name='login'),
+    path('api/login', views.login_user, name='login'),
     path('api/logout', views.logout_user, name='logout'),
     path('api/reset-password', views.reset_password_request, name='reset-password-request'),
     re_path(r'^api/reset-password-confirm/(?P<user_id>\d+)/?(?P<reset_code>\w+)?$', views.reset_password_confirm, name='reset-password-confirm'),
