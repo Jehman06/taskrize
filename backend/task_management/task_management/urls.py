@@ -22,6 +22,7 @@ from boards.views import BoardListView, BoardDetailView, BoardCreateView, BoardU
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
+    TokenVerifyView,
 )
 
 urlpatterns = [
@@ -36,6 +37,7 @@ urlpatterns = [
     # Tokens
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     # Boards
     path('api/boards/', BoardListView.as_view(), name='board-list'),
     path('api/boards/<int:pk>/', BoardDetailView.as_view(), name='board-detail'),

@@ -15,7 +15,6 @@ import os
 from dotenv import load_dotenv
 from django.core.management.utils import get_random_secret_key
 from datetime import timedelta
-
 load_dotenv()
 
 SIMPLE_JWT = {
