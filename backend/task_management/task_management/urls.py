@@ -16,35 +16,31 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path
-from authentication import views
+from authentication.views import register_user, login_user, logout_user, reset_password_request, reset_password_confirm
 from django.views.generic import RedirectView
-from boards.views import BoardListView, BoardDetailView, BoardCreateView, BoardUpdateView, BoardDeleteView, BoardFavoriteListView, BoardFavoriteCreateView
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-    TokenVerifyView,
-)
+from workspaces.views import create_default_workspace, create_workspace, get_workspaces
+from boards.views import get_boards, create_board, toggle_favorite_board
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 urlpatterns = [
     # Authentication
-    path('', RedirectView.as_view(url='/admin/')),  # Redirect to the admin page
+    path('', RedirectView.as_view(url='/admin/')), # Redirect to the admin page
     path('admin/', admin.site.urls),
-    path('api/register', views.register_user, name='register'),
-    path('api/login', views.login_user, name='login'),
-    path('api/logout', views.logout_user, name='logout'),
-    path('api/reset-password', views.reset_password_request, name='reset-password-request'),
-    re_path(r'^api/reset-password-confirm/(?P<user_id>\d+)/?(?P<reset_code>\w+)?$', views.reset_password_confirm, name='reset-password-confirm'),
+    path('api/register', register_user, name='register'),
+    path('api/login', login_user, name='login'),
+    path('api/logout', logout_user, name='logout'),
+    path('api/reset-password', reset_password_request, name='reset-password-request'),
+    re_path(r'^api/reset-password-confirm/(?P<user_id>\d+)/?(?P<reset_code>\w+)?$', reset_password_confirm, name='reset-password-confirm'),
     # Tokens
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    # Workspaces
+    path('api/workspaces/', get_workspaces, name='workspace-list'),
+    path('api/workspaces/create-default/', create_default_workspace, name='default-workspace-create'),
+    path('api/workspaces/create', create_workspace, name='workspace-create'),
     # Boards
-    path('api/boards/', BoardListView.as_view(), name='board-list'),
-    path('api/boards/<int:pk>/', BoardDetailView.as_view(), name='board-detail'),
-    path('api/boards/create/', BoardCreateView.as_view(), name='board-create'),
-    path('api/boards/<int:pk>/update/', BoardUpdateView.as_view(), name='board-update'),
-    path('api/boards/<int:pk>/delete/', BoardDeleteView.as_view(), name='board-delete'),
-    # Favorite boards
-    path('api/users/<int:user_id>/favorite-boards/', BoardFavoriteListView.as_view(), name='user-favorite-board-list'),
-    path('api/users/<int:user_id>/favorite-boards/add/', BoardFavoriteCreateView.as_view(), name='user-favorite-board-add'),
+    # path('api/boards/', get_boards, name='board-list'),
+    # path('api/boards/create', create_board, name='board-create'),
+    # path('api/boards/toggle-favorite', toggle_favorite_board, name='toggle-favorite-board'),
 ]

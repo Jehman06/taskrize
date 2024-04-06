@@ -50,6 +50,9 @@ def login_user(request):
 
         # Set tokens as HTTP-only cookies
         response = JsonResponse({'access_token': access_token, 'refresh_token': str(refresh)})
+
+        # Set the content-type explicitly
+        response['Content-Type'] = 'application/json'
         
         # Set tokens as cookies in the response
         response.set_cookie(key='access_token', value=access_token, httponly=False, samesite='None', secure=True)

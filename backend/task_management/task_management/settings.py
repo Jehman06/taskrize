@@ -97,6 +97,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'authentication.apps.AuthenticationConfig',
+    'workspaces.apps.WorkspacesConfig',
     'boards.apps.BoardsConfig',
     'lists.apps.ListsConfig',
     'cards.apps.CardsConfig',
