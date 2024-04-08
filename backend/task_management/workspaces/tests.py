@@ -3,7 +3,6 @@ from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from workspaces.models import Workspace
 from authentication.models import CustomUser
-from authentication.views import register_user
 
 class WorkspaceAPITestCase(APITestCase):
     def setUp(self):
@@ -23,17 +22,6 @@ class WorkspaceAPITestCase(APITestCase):
 
         # Retrieve the user object
         self.user = CustomUser.objects.get(email='testuser@gmail.com')
-
-    def test_create_default_workspace(self):
-        # Ensure no default workspace exists initially
-        self.assertFalse(Workspace.objects.filter(owner=self.user).exists())
-        # Make a POST request to create a default workspace
-        url = reverse('default-workspace-create')
-        response = self.client.post(url, HTTP_AUTHORIZATION=f'Bearer {self.token}')
-        # Check that the response status code is 201 Created
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        # Check that a default workspace is created
-        self.assertTrue(Workspace.objects.filter(owner=self.user).exists())
     
     def test_get_workspaces(self):
         # Ensure no workspaces exist initially

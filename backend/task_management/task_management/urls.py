@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, re_path
 from authentication.views import register_user, login_user, logout_user, reset_password_request, reset_password_confirm
 from django.views.generic import RedirectView
-from workspaces.views import create_default_workspace, create_workspace, get_workspaces
+from workspaces.views import create_workspace, get_workspaces
 from boards.views import get_boards, create_board, toggle_favorite_board
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
@@ -37,10 +37,9 @@ urlpatterns = [
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     # Workspaces
     path('api/workspaces/', get_workspaces, name='workspace-list'),
-    path('api/workspaces/create-default/', create_default_workspace, name='default-workspace-create'),
     path('api/workspaces/create', create_workspace, name='workspace-create'),
     # Boards
-    # path('api/boards/', get_boards, name='board-list'),
-    # path('api/boards/create', create_board, name='board-create'),
-    # path('api/boards/toggle-favorite', toggle_favorite_board, name='toggle-favorite-board'),
+    path('api/boards/', get_boards, name='board-list'),
+    path('api/boards/create', create_board, name='board-create'),
+    path('api/boards/toggle-favorite', toggle_favorite_board, name='toggle-favorite-board'),
 ]

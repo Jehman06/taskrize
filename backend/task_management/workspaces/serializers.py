@@ -2,8 +2,16 @@ from rest_framework import serializers
 from .models import Workspace
 
 class WorkspaceSerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.id')
-
     class Meta:
         model = Workspace
-        fields = ['id', 'name', 'description', 'created_at', 'updated_at', 'owner', 'members']
+        fields = ['id', 'name', 'owner', 'members']
+
+    def create(self, validated_data):
+        # Extract and remove members data from validated data
+        members_data = validated_data.pop('members', [])
+        # Create workspace instance
+        workspace = Workspace.objects.create(**validated_data)
+        # Set members for the workspace
+        for member_data in members_data:
+            workspace.members.add(member_data)
+        return workspace

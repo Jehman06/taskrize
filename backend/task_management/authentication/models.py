@@ -7,6 +7,7 @@ from django.conf import settings
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     reset_code = models.CharField(max_length=100, blank=True, null=True)
+    board_favorite = models.ManyToManyField('boards.Board', related_name='favorited_by', blank=True)  # Added this line
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
