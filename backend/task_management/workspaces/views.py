@@ -42,3 +42,42 @@ def create_workspace(request):
     else:
         print("Validation errors:", serializer.errors)  # Print validation errors for debugging
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+# Update workspace
+@api_view(['PUT'])
+@authentication_classes([JWTAuthentication])
+def update_workspace(request):
+    # Retrieve the data from the request
+    workspace_id = request.data.get('workspace_id')
+    updated_data = request.data.get('updated_data', {})
+    if not workspace_id:
+        return Response({'error': 'Workspace ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        workspace = Workspace.objects.get(id=workspace_id)
+        for key, value in updated_data.items():
+            setattr(workspace, key, value)
+        # Save the updated workspace
+        workspace.save()
+        # Serialize and update the workspace
+        serializer = WorkspaceSerializer(workspace)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Workspace.DoesNotExist:
+        return Response({'error': 'Workspace not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+# Delete board
+@api_view(['DELETE'])
+@authentication_classes([JWTAuthentication])
+def delete_workspace(request):
+    # Retrieve the workspace ID from the request
+    workspace_id = request.data.get('workspace_id')
+    if not workspace_id:
+        return Response({'error': 'Workspace ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        workspace = Workspace.objects.get(id=workspace_id)
+        # Delete the workspace
+        workspace.delete()
+        return Response({'message': 'Workspace deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+    except Workspace.DoesNotExist:
+        return Response({'error': 'Workspace not found'}, status=status.HTTP_404_NOT_FOUND)

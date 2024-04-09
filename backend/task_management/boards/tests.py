@@ -128,3 +128,48 @@ class BoardAPITestCase(APITestCase):
             board_obj = Board.objects.get(id=board['id'])
             # Ensure the user is the creator of the board
             self.assertEqual(board_obj.creator, self.user)
+
+    def test_update_board(self):
+        # Create a board
+        self.assertFalse(Board.objects.filter(creator=self.user).exists())
+        create_url = reverse('board-create')
+        data = {
+            'title': 'Board',
+        }
+        create_response = self.client.post(create_url, data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
+
+        # Extract the board ID from the response
+        board_id = create_response.data['id']
+
+        # Update the board
+        update_url = reverse('board-update')
+        updated_data = {
+            'board_id': board_id,
+            'updated_data': {
+                'title': 'Test Board'
+            }
+        }
+        update_response = self.client.put(update_url, updated_data, format='json', HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        self.assertEqual(update_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(Board.objects.filter(id=board_id, title='Test Board').exists())
+
+    def test_delete_board(self):
+        # Create a board
+        self.assertFalse(Board.objects.filter(creator=self.user).exists())
+        create_url = reverse('board-create')
+        data = {
+            'title': 'Board',
+        }
+        create_response = self.client.post(create_url, data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
+
+        # Extract the board ID from the response
+        board_id = create_response.data['id']
+
+        # Delete the board
+        delete_url = reverse('board-delete')
+        delete_data = {'board_id': board_id}
+        delete_response = self.client.delete(delete_url, delete_data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Board.objects.filter(id=board_id, title='Board').exists())

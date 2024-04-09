@@ -73,6 +73,32 @@ def create_board(request):
     else:
         # If the serializer data is invalid, return the validation errors in the response
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+# Update board
+@api_view(['PUT'])
+@authentication_classes([JWTAuthentication])
+def update_board(request):
+    # Retrieve the data from the request
+    board_id = request.data.get('board_id')
+    updated_data = request.data.get('updated_data', {})
+
+    # Check if the board is provided
+    if not board_id:
+        return Response({'error': 'Board ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        # Retrieve the board object
+        board = Board.objects.get(id=board_id)
+        # Update board fields with new data
+        for key, value in updated_data.items():
+            setattr(board, key, value)
+        # Save updated board
+        board.save()
+        # Serialize and return the updated board
+        serializer = BoardSerializer(board)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Board.DoesNotExist:
+        return Response({'error': 'Board not found'}, status=status.HTTP_404_NOT_FOUND)
 
 # Add board to favorites
 @api_view(['POST'])
@@ -107,5 +133,24 @@ def toggle_favorite_board(request):
             action = 'added to'
         
         return Response({'message': f'Board {action} favorites successfully'}, status=status.HTTP_200_OK)
+    except Board.DoesNotExist:
+        return Response({'error': 'Board not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+# Delete board
+@api_view(['DELETE'])
+@authentication_classes([JWTAuthentication])
+def delete_board(request):
+    # Retrieve the board ID from the request
+    board_id = request.data.get('board_id')
+    # Check if the board is provided
+    if not board_id:
+        return Response({'error': 'Board ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        # Retrieve the board object
+        board = Board.objects.get(id=board_id)
+        # Delete the board from the database
+        board.delete()
+        return Response({'message': 'Board deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
     except Board.DoesNotExist:
         return Response({'error': 'Board not found'}, status=status.HTTP_404_NOT_FOUND)

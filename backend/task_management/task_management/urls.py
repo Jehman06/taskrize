@@ -18,8 +18,8 @@ from django.contrib import admin
 from django.urls import path, re_path
 from authentication.views import register_user, login_user, logout_user, reset_password_request, reset_password_confirm
 from django.views.generic import RedirectView
-from workspaces.views import create_workspace, get_workspaces
-from boards.views import get_boards, create_board, toggle_favorite_board
+from workspaces.views import create_workspace, get_workspaces, update_workspace, delete_workspace
+from boards.views import get_boards, create_board, update_board, toggle_favorite_board, delete_board
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 urlpatterns = [
@@ -38,8 +38,12 @@ urlpatterns = [
     # Workspaces
     path('api/workspaces/', get_workspaces, name='workspace-list'),
     path('api/workspaces/create', create_workspace, name='workspace-create'),
+    path('api/workspaces/update', update_workspace, name='workspace-update'),
+    path('api/workspaces/delete', delete_workspace, name='workspace-delete'),
     # Boards
     path('api/boards/', get_boards, name='board-list'),
     path('api/boards/create', create_board, name='board-create'),
+    path('api/boards/update', update_board, name='board-update'),
     path('api/boards/toggle-favorite', toggle_favorite_board, name='toggle-favorite-board'),
+    path('api/boards/delete', delete_board, name='board-delete'),
 ]
