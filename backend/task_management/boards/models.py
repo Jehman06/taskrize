@@ -1,11 +1,11 @@
+import random
 from django.db import models
 from authentication.models import CustomUser
 from workspaces.models import Workspace
-import random
 
 DEFAULT_IMAGES = [
-    'images/cherryblossom.jpg',
-    'images/mountainlake.jpg',
+    ('cherryBlossom', 'images/cherryblossom.jpg'),
+    ('mountainLake', 'images/mountainlake.jpg'),
 ]
 
 class Board(models.Model):
@@ -13,7 +13,8 @@ class Board(models.Model):
     description = models.TextField(blank=True)
     creator = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     favorite = models.ManyToManyField(CustomUser, related_name='favorite_boards', blank=True)
-    image = models.ImageField(upload_to='board_images/', blank=True) 
+    custom_image = models.ImageField(upload_to='board_images/', blank=True, null=True)
+    default_image = models.CharField(max_length=100, choices=DEFAULT_IMAGES, blank=True, null=True) 
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name='boards', null=True, blank=True)
     members = models.ManyToManyField(CustomUser, related_name='boards', blank=True)
 
@@ -21,6 +22,8 @@ class Board(models.Model):
         return self.title
     
     def save(self, *args, **kwargs):
-        if not self.image: # If no image is provided by the user
-            self.image = random.choice(DEFAULT_IMAGES) # Set a random default image
+        if not self.custom_image and not self.default_image:  # If neither custom nor default image is provided
+            # Set a random default image if it's not selected by the user
+            default_image = random.choice(DEFAULT_IMAGES)
+            self.default_image = default_image[0]  # Set the default image identifier
         super().save(*args, **kwargs)

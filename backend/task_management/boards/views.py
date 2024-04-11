@@ -41,7 +41,7 @@ def create_board(request):
     data = request.data.copy()  # Create a mutable copy of the data dictionary
     print("Request data:", request.data)
     # Ensure the workspace ID is provided in the request data
-    workspace_id = data.get('workspace')
+    workspace_id = data.get('workspace', {}).get('id')
     if not workspace_id:
         # Create a default workspace for the user if one doesn't already exist
         default_workspace = create_default_workspace_for_user(user)
@@ -62,6 +62,11 @@ def create_board(request):
 
     # Prepare the data for board creation
     board_data = request.data.copy()
+
+    # Check if either custom_image or default_image is provided
+    if not board_data.get('custom_image') and not board_data.get('default_image'):
+        return Response({'error': 'Either custom_image or default_image must be provided'}, status=status.HTTP_400_BAD_REQUEST)
+
     board_data['workspace'] = workspace_id  # Associate the workspace with the board
     # Create a serializer instance with the prepared data and pass the request context
     serializer = BoardSerializer(data=board_data, context={'request': request})

@@ -18,6 +18,7 @@ import {
     updateCreateBoardModal,
     updateCreateWorkspaceModal,
 } from '../redux/reducers/modalSlice';
+import { verifyAccessToken } from '../utils/apiUtils';
 
 const PrivateNavbar: React.FC = () => {
     const navigate = useNavigate();
@@ -25,60 +26,25 @@ const PrivateNavbar: React.FC = () => {
 
     const handleLogout = async (): Promise<void> => {
         try {
+            await verifyAccessToken();
+
             // Get the access token and refresh token from cookies
-            let accessToken = Cookies.get('access_token') as string;
-            const refreshToken = Cookies.get('refresh_token');
+            const accessToken = Cookies.get('access_token') as string;
 
-            // Ensure we have valid values for accessToken and refreshToken
-            if (!accessToken || typeof refreshToken !== 'string') {
-                console.error(
-                    'Access token or refresh token not found or invalid. Please log in again.'
-                );
-                return;
-            }
-
-            try {
-                // Verify the access token
-                await axios.post(
-                    'http://127.0.0.1:8000/api/token/verify/',
-                    { token: accessToken },
-                    { headers: { 'Content-Type': 'application/json' } }
-                );
-            } catch (verifyError) {
-                // Handle token verification error
-                const errorResponse = (verifyError as AxiosError).response;
-                if (errorResponse && errorResponse.status === 401) {
-                    try {
-                        // If verification fails (status 401), refresh the access token
-                        const refreshResponse = await axios.post(
-                            'http://127.0.0.1:8000/api/token/refresh/',
-                            { refresh: refreshToken },
-                            { headers: { 'Content-Type': 'application/json' } }
-                        );
-                        // Update the access token with the refreshed token from the response
-                        accessToken = refreshResponse.data.access;
-                    } catch (refreshError) {
-                        console.error('Error refreshing access token:', refreshError);
-                        throw refreshError;
-                    }
-                } else {
-                    // Handle other verification errors
-                    console.error('Error verifying access token:', verifyError);
-                    throw verifyError;
-                }
-            }
-
-            // Once the token has been validate or refreshed, log the user out
+            // Once the token has been validated, log the user out
             await axios.post(
                 'http://127.0.0.1:8000/api/logout',
                 {},
-                { headers: { Authorization: `Bearer ${accessToken}` } }
+                {
+                    headers: { Authorization: `Bearer ${accessToken}` },
+                }
             );
 
             // Update states and remove tokens from cookies
             dispatch(logoutUser());
             dispatch(resetAppStates());
             dispatch(resetAuthStates());
+
             Cookies.remove('access_token');
             Cookies.remove('refresh_token');
             Cookies.remove('csrftoken');

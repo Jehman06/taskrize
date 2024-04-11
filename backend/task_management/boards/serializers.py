@@ -6,7 +6,7 @@ class BoardSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Board
-        fields = ['id', 'title', 'description', 'favorite', 'image', 'workspace']
+        fields = ['id', 'title', 'description', 'favorite', 'custom_image', 'default_image', 'workspace']
 
     def create(self, validated_data):
         validated_data['creator'] = self.context['request'].user

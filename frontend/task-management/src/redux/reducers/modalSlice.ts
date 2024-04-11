@@ -12,12 +12,17 @@ interface ModalState {
         title: string;
         description: string;
         workspace: Workspace | null;
-        image: string | null;
+        custom_image: File | string | null; // Allow both string (for default images) and File (for custom images)
+        default_image: string | null;
     };
     workspaceFormData: {
         name: string;
         description: string;
     };
+    workspaces: Workspace[]; // Add workspaces to modal state
+    selectedWorkspace: Workspace | null; // Add selectedWorkspace to modal state
+    selectedDefaultImage: string | null; // Add selectedDefaultImage to modal state
+    selectedCustomImage: File | null; // Add selectedCustomImage to modal state
 }
 
 const initialState: ModalState = {
@@ -27,12 +32,17 @@ const initialState: ModalState = {
         title: '',
         description: '',
         workspace: null,
-        image: null,
+        custom_image: null,
+        default_image: null,
     },
     workspaceFormData: {
         name: '',
         description: '',
     },
+    workspaces: [],
+    selectedWorkspace: null,
+    selectedDefaultImage: null,
+    selectedCustomImage: null,
 };
 
 const modalSlice = createSlice({
@@ -54,6 +64,18 @@ const modalSlice = createSlice({
         ) {
             state.workspaceFormData = { ...state.workspaceFormData, ...action.payload };
         },
+        updateWorkspaces(state, action: PayloadAction<Workspace[]>) {
+            state.workspaces = action.payload;
+        },
+        updateSelectedWorkspace(state, action: PayloadAction<Workspace | null>) {
+            state.selectedWorkspace = action.payload;
+        },
+        updateSelectedDefaultImage(state, action: PayloadAction<string | null>) {
+            state.selectedDefaultImage = action.payload;
+        },
+        updateSelectedCustomImage(state, action: PayloadAction<File | null>) {
+            state.selectedCustomImage = action.payload;
+        },
     },
 });
 
@@ -62,5 +84,10 @@ export const {
     updateCreateWorkspaceModal,
     updateBoardFormData,
     updateWorkspaceFormData,
+    updateWorkspaces,
+    updateSelectedWorkspace,
+    updateSelectedDefaultImage,
+    updateSelectedCustomImage,
 } = modalSlice.actions;
+
 export default modalSlice.reducer;

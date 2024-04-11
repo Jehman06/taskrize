@@ -1,13 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { updateCreateBoardModal, updateBoardFormData } from '../redux/reducers/modalSlice';
+import {
+    updateCreateBoardModal,
+    updateBoardFormData,
+    updateSelectedCustomImage,
+    updateSelectedDefaultImage,
+    updateSelectedWorkspace,
+    updateWorkspaces,
+} from '../redux/reducers/modalSlice';
 import { RootState } from '../redux/store';
 import './Modal.css';
 import { Modal, Form, Button, DropdownButton, ButtonGroup, Dropdown } from 'react-bootstrap';
-import axios, { AxiosResponse, AxiosError } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import Cookies from 'js-cookie';
 import cherryBlossom from '../images/cherryblossom.jpg';
 import mountainLake from '../images/mountainlake.jpg';
+import { verifyAccessToken } from '../utils/apiUtils';
 
 interface Workspace {
     id: number;
@@ -18,33 +26,53 @@ interface BoardFormData {
     title: string;
     description: string;
     workspace: Workspace | null;
-    image: string | null;
+    custom_image: File | string | null; // Allow both string (for default images) and File (for custom images)
+    default_image: string | null;
 }
 
 const CreateBoardModal: React.FC = () => {
+    // Redux state management
     const createBoardShow: boolean = useSelector(
         (state: RootState) => state.modal.createBoardModal
     );
     const boardFormData: BoardFormData = useSelector(
         (state: RootState) => state.modal.boardFormData
     );
+    const workspaces: Workspace[] = useSelector((state: RootState) => state.modal.workspaces);
+    const selectedWorkspace: Workspace | null = useSelector(
+        (state: RootState) => state.modal.selectedWorkspace
+    );
+    const selectedDefaultImage: string | null = useSelector(
+        (state: RootState) => state.modal.selectedDefaultImage
+    );
     const dispatch = useDispatch();
 
-    // TODO: Use Redux for state management
-    const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-    const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(null);
-    const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
-    const handleImageSelect = (image: string) => {
-        setSelectedImage(image);
-        dispatch(updateBoardFormData({ image })); // Dispatch action to update image in board form data
+    const handleImageSelect = (image: string | File) => {
+        if (typeof image === 'string') {
+            // If the selected image is one of the default images, set it as the selectedDefaultImage
+            dispatch(updateSelectedDefaultImage(image));
+            dispatch(updateSelectedCustomImage(null));
+            // Update board form data with default image
+            dispatch(updateBoardFormData({ custom_image: null, default_image: image }));
+        } else {
+            // If the selected image is a custom image, set it as the selectedCustomImage
+            dispatch(updateSelectedCustomImage(image));
+            dispatch(updateSelectedDefaultImage(null));
+            // Update board form data with custom image
+            dispatch(updateBoardFormData({ custom_image: image, default_image: null }));
+        }
     };
 
-    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0]; // Get the uploaded file
-        // Handle the file as needed, for example, upload it to the backend or display it preview
-        // For now, let's just log the file details
-        console.log('Uploaded file:', file);
+    const handleFileUpload = (file: File | undefined) => {
+        if (file) {
+            // Handle the file as needed, upload it to the backend or display it preview
+            // For now, let's just log the file details
+            console.log('Uploaded file:', file);
+            // Set the custom image in state
+            dispatch(updateSelectedCustomImage(file));
+            // Clear the default image selection
+            dispatch(updateSelectedDefaultImage(null));
+        }
     };
 
     useEffect(() => {
@@ -54,56 +82,39 @@ const CreateBoardModal: React.FC = () => {
     useEffect(() => {
         // Set the first workspace as the default selected workspace when workspaces change
         if (workspaces.length > 0) {
-            setSelectedWorkspace(workspaces[0]);
+            dispatch(updateSelectedWorkspace(workspaces[0]));
         }
     }, [workspaces]);
 
-    let accessToken = Cookies.get('access_token');
-    const refreshToken = Cookies.get('refresh_token');
-
+    // Get the workspaces from the database
     const getWorkspaces = async () => {
         try {
-            // Verify the access token
-            await axios.post(
-                'http://127.0.0.1:8000/api/token/verify/',
-                { token: accessToken },
-                { headers: { 'Content-Type': 'application/json' } }
-            );
-        } catch (verifyError) {
-            // Handle token verification error
-            const errorResponse = (verifyError as AxiosError).response;
-            if (errorResponse && errorResponse.status === 401) {
-                try {
-                    // If verification fails (status 401), refresh the access token
-                    const refreshResponse = await axios.post(
-                        'http://127.0.0.1:8000/api/token/refresh/',
-                        { refresh: refreshToken },
-                        { headers: { 'Content-Type': 'application/json' } }
-                    );
-                    // Update the access token with the refreshed token from the response
-                    accessToken = refreshResponse.data.access;
-                    // Store new token in cookies
-                    Cookies.set('access_token', accessToken ?? '');
-                } catch (refreshError) {
-                    console.error('Error refreshing access token:', refreshError);
-                    throw refreshError;
+            // Verify the access token or refresh it if it's expired
+            await verifyAccessToken();
+
+            // Get the access token and refresh token from cookies
+            const accessToken = Cookies.get('access_token');
+
+            // Once the token has been validated or refreshed, create the new workspace
+            const response: AxiosResponse = await axios.get(
+                'http://127.0.0.1:8000/api/workspaces/',
+                {
+                    headers: { Authorization: `Bearer ${accessToken}` },
                 }
-            } else {
-                // Handle other verification errors
-                console.error('Error verifying access token:', verifyError);
-                throw verifyError;
-            }
+            );
+            dispatch(updateWorkspaces(response.data));
+        } catch (error) {
+            console.error('Error creating the workspace');
         }
-        const response: AxiosResponse = await axios.get('http://127.0.0.1:8000/api/workspaces/', {
-            headers: { Authorization: `Bearer ${accessToken}` },
-        });
-        const workspaces = response.data;
-        console.log('workspaces: ', workspaces);
-        setWorkspaces(response.data);
     };
 
     const createBoard = async (boardFormData: BoardFormData) => {
+        // Get the access token from cookies
+        const accessToken = Cookies.get('access_token');
         try {
+            await verifyAccessToken();
+
+            // Send POST request to Board API to create the board
             const response = await axios.post(
                 'http://127.0.0.1:8000/api/boards/create',
                 boardFormData,
@@ -114,16 +125,16 @@ const CreateBoardModal: React.FC = () => {
                     },
                 }
             );
-            console.log('Board created:', response.data);
             // Handle success
+            console.log('Board created:', response.data);
         } catch (error) {
-            console.error('Error creating board:', error);
             // Handle error
+            console.error('Error creating board:', error);
         }
     };
 
     const handleWorkspaceSelect = (workspace: Workspace) => {
-        setSelectedWorkspace(workspace);
+        dispatch(updateSelectedWorkspace(workspace));
         dispatch(updateBoardFormData({ workspace: workspace })); // Dispatch action to update workspace in board form data
     };
 
@@ -131,7 +142,7 @@ const CreateBoardModal: React.FC = () => {
         // Dispatch action to create board with form data
         dispatch(updateCreateBoardModal());
         console.log(boardFormData);
-        createBoard(boardFormData); // Assuming boardFormData is accessible here
+        createBoard(boardFormData);
     };
 
     return (
@@ -149,7 +160,7 @@ const CreateBoardModal: React.FC = () => {
                         <div className="modal-background-images">
                             <img
                                 className={
-                                    selectedImage === 'cherryBlossom'
+                                    selectedDefaultImage === 'cherryBlossom'
                                         ? 'modal-background selected'
                                         : 'modal-background'
                                 }
@@ -159,7 +170,7 @@ const CreateBoardModal: React.FC = () => {
                             />
                             <img
                                 className={
-                                    selectedImage === 'mountainLake'
+                                    selectedDefaultImage === 'mountainLake'
                                         ? 'modal-background selected'
                                         : 'modal-background'
                                 }
@@ -176,7 +187,7 @@ const CreateBoardModal: React.FC = () => {
                                 id="file-upload"
                                 type="file"
                                 accept="image/*"
-                                onChange={handleFileUpload}
+                                onChange={(e) => handleFileUpload(e.target.files?.[0])}
                             />
                         </div>
                     </Form.Group>

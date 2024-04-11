@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Form, DropdownButton, Dropdown, Button } from 'react-bootstrap';
-import { UseDispatch, useDispatch, useSelector } from 'react-redux';
+import React from 'react';
+import { Modal, Form, Button } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
-import axios, { AxiosResponse, AxiosError } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import Cookies from 'js-cookie';
 import { updateCreateWorkspaceModal, updateWorkspaceFormData } from '../redux/reducers/modalSlice';
+import { verifyAccessToken } from '../utils/apiUtils';
 
 interface WorkspaceFormData {
     name: string;
@@ -12,6 +13,7 @@ interface WorkspaceFormData {
 }
 
 const CreateWorkspaceModal: React.FC = () => {
+    // Redux state management
     const createWorkspaceShow: boolean = useSelector(
         (state: RootState) => state.modal.createWorkspaceModal
     );
@@ -20,11 +22,12 @@ const CreateWorkspaceModal: React.FC = () => {
     );
     const dispatch = useDispatch();
 
-    let accessToken = Cookies.get('access_token');
-    const refreshToken = Cookies.get('refresh_token');
-
+    // Create a new workspace
     const createWorkspace = async (workspaceFormData: WorkspaceFormData) => {
         try {
+            await verifyAccessToken();
+            // Get access token from cookies
+            const accessToken = Cookies.get('access_token');
             // Send POST request to workspace API
             const response: AxiosResponse = await axios.post(
                 'http://127.0.0.1:8000/api/workspaces/create',
@@ -42,40 +45,8 @@ const CreateWorkspaceModal: React.FC = () => {
         }
     };
 
-    // Make a POST request to save the new workspace
     const handleFormSubmit = async (): Promise<void> => {
-        try {
-            // Verify the access token
-            await axios.post(
-                'http://127.0.0.1:8000/api/token/verify/',
-                { token: accessToken },
-                { headers: { 'Content-Type': 'application/json' } }
-            );
-        } catch (verifyError) {
-            // Handle token verification error
-            const errorResponse = (verifyError as AxiosError).response;
-            if (errorResponse && errorResponse.status === 401) {
-                try {
-                    // If verification fails (status 401), refresh the access token
-                    const refreshResponse = await axios.post(
-                        'http://127.0.0.1:8000/api/token/refresh/',
-                        { refresh: refreshToken },
-                        { headers: { 'Content-Type': 'application/json' } }
-                    );
-                    // Update the access token with the refreshed token from the response
-                    accessToken = refreshResponse.data.access;
-                    // Store new token in cookies
-                    Cookies.set('access_token', accessToken ?? '');
-                } catch (refreshError) {
-                    console.error('Error refreshing access token:', refreshError);
-                    throw refreshError;
-                }
-            } else {
-                // Handle other verification errors
-                console.error('Error verifying access token:', verifyError);
-                throw verifyError;
-            }
-        }
+        // Dispatch action to create workspace with form data
         createWorkspace(workspaceFormData);
         dispatch(updateCreateWorkspaceModal());
         console.log(workspaceFormData);
