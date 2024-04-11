@@ -4,7 +4,7 @@ from .models import Workspace
 class WorkspaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Workspace
-        fields = ['id', 'name', 'owner', 'members']
+        fields = ['id', 'name', 'description', 'owner', 'members']
 
     def create(self, validated_data):
         # Extract and remove members data from validated data

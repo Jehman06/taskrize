@@ -39,6 +39,7 @@ def create_board(request):
     user = request.user
     # Extract the data from the request payload
     data = request.data.copy()  # Create a mutable copy of the data dictionary
+    print("Request data:", request.data)
     # Ensure the workspace ID is provided in the request data
     workspace_id = data.get('workspace')
     if not workspace_id:

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logoutUser, resetAuthStates } from '../redux/reducers/authSlice';
@@ -11,6 +11,13 @@ import 'bootstrap';
 import axios, { AxiosError } from 'axios';
 import Cookies from 'js-cookie';
 import { resetAppStates } from '../redux/reducers/appSlice';
+import CreateBoardModal from '../Components/CreateBoardModal';
+import CreateWorkspaceModal from '../Components/CreateWorkspaceModal';
+import {
+    updateBoardFormData,
+    updateCreateBoardModal,
+    updateCreateWorkspaceModal,
+} from '../redux/reducers/modalSlice';
 
 const PrivateNavbar: React.FC = () => {
     const navigate = useNavigate();
@@ -169,7 +176,11 @@ const PrivateNavbar: React.FC = () => {
                         aria-labelledby="dropdownMenuButton3"
                     >
                         <li>
-                            <a className="dropdown-item" href="#">
+                            <a
+                                className="dropdown-item"
+                                onClick={() => dispatch(updateCreateBoardModal())}
+                            >
+                                {' '}
                                 <p className="create-title"> Create Board</p>
                                 <p className="create-description">
                                     Start a new board to visually organize tasks, track progress,
@@ -179,6 +190,7 @@ const PrivateNavbar: React.FC = () => {
                                 </p>
                             </a>
                         </li>
+                        <CreateBoardModal />
                         <li>
                             <a className="dropdown-item" href="#">
                                 <p className="create-title">Start from a template</p>
@@ -186,7 +198,10 @@ const PrivateNavbar: React.FC = () => {
                             </a>
                         </li>
                         <li>
-                            <a className="dropdown-item" href="#">
+                            <a
+                                className="dropdown-item"
+                                onClick={() => dispatch(updateCreateWorkspaceModal())}
+                            >
                                 <p className="create-title">Create a Workspace</p>
                                 <p className="create-description">
                                     Set up a dedicated workspace to organize boards, share
@@ -196,6 +211,7 @@ const PrivateNavbar: React.FC = () => {
                                 </p>
                             </a>
                         </li>
+                        <CreateWorkspaceModal />
                     </ul>
                 </div>
             </div>

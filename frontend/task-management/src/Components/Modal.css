@@ -1,0 +1,56 @@
+.modal-background-images {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.modal-background {
+    height: 4rem;
+    width: 6rem;
+    margin: 0.4rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition:
+        border 0.2s ease,
+        transform 0.2s ease;
+}
+
+.modal-background:hover {
+    border: 3px solid teal;
+    transform: scale(1.1);
+}
+
+.modal-background.selected {
+    border: 3px solid teal;
+    transform: scale(1.1);
+}
+
+.modal-dropdown-item {
+    width: 100%;
+}
+
+.file-upload-label {
+    margin: 0.5rem 0 0.5rem 0;
+}
+
+.modal-input {
+    background-color: #1d2125;
+    outline: teal;
+    color: #9fadbc;
+}
+
+.modal-input:focus:not(:hover) {
+    background-color: #33373a;
+    color: #9fadbc;
+}
+
+.modal-input:hover {
+    background-color: #33373a;
+    border: 1px solid teal;
+    color: #9fadbc;
+}
+
+/* Custom styles for the dropdown button */
+.modal-dropdown-button {
+    width: 100%;
+    border: 1px solid #9fadbc;
+}

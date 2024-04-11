@@ -46,9 +46,9 @@
 
 .create-button {
     margin-left: 20px;
-    background-color: #579dff;
+    background-color: #579dff !important;
     border: none;
-    color: #1d2125;
+    color: #1d2125 !important;
     border-radius: 5px;
     padding-left: 10px;
     padding-right: 10px;
@@ -71,7 +71,7 @@
 }
 
 .create-button:hover {
-    background-color: #85b8ff;
+    background-color: #85b8ff !important;
 }
 
 .search-container {

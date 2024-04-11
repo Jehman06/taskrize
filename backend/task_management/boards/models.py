@@ -3,12 +3,9 @@ from authentication.models import CustomUser
 from workspaces.models import Workspace
 import random
 
-
 DEFAULT_IMAGES = [
-    'path_to_image1.jpg'
-    'path_to_image2.jpg'
-    'path_to_image3.jpg'
-    'path_to_image4.jpg'
+    'images/cherryblossom.jpg',
+    'images/mountainlake.jpg',
 ]
 
 class Board(models.Model):
