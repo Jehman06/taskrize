@@ -23,21 +23,25 @@ class BoardAPITestCase(APITestCase):
         # Retrieve the user object and workspace_id for future tests
         self.user = CustomUser.objects.get(email='testuser@gmail.com')
 
-    def test_create_board_in_default_workspace(self):
-        # Make a POST request to create a board within the default workspace
+    def test_create_board_and_workspace(self):
+        # Make a POST request to create a board within a specified workspace
         create_board_url = reverse('board-create')
         data = {
             'title': 'New Board',
+            'default_image': 'cherryBlossom',
+            'workspace': {
+                'name': 'Test Workspace'
             }
-        response = self.client.post(create_board_url, data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        }
+        response = self.client.post(create_board_url, data, format='json', HTTP_AUTHORIZATION=f'Bearer {self.token}')
         # Ensure that the board is created successfully
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        # Check if a default workspace was created for the user
-        self.assertTrue(Workspace.objects.filter(owner=self.user, name='My First Workspace').exists())
-        # Check that the board is associated with the default workspace
-        default_workspace = Workspace.objects.get(owner=self.user, name='My First Workspace')
+        # Check if a workspace with the provided name was created for the user
+        self.assertTrue(Workspace.objects.filter(owner=self.user, name='Test Workspace').exists())
+        # Check that the board is associated with the created workspace
+        created_workspace = Workspace.objects.get(owner=self.user, name='Test Workspace')
         board = Board.objects.get(id=response.data['id'])
-        self.assertEqual(board.workspace.id, default_workspace.id)
+        self.assertEqual(board.workspace.id, created_workspace.id)
 
     def test_create_board_in_existing_workspace(self):
         # Create a new Workspace
@@ -56,9 +60,12 @@ class BoardAPITestCase(APITestCase):
         board_url = reverse('board-create')
         board_data = {
             'title': 'Test Board in Test Workspace',
-            'workspace': test_workspace_id
+            'default_image': 'mountainLake',
+            'workspace': {
+                'id': test_workspace_id,
+            }
         }
-        board_response = self.client.post(board_url, board_data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        board_response = self.client.post(board_url, board_data, format='json', HTTP_AUTHORIZATION=f'Bearer {self.token}')
         self.assertEqual(board_response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(Board.objects.filter(creator=self.user, title='Test Board in Test Workspace').exists())
         # Check if the board is in the correct workspace
@@ -68,9 +75,11 @@ class BoardAPITestCase(APITestCase):
         # Create a board in a not existing workspace
         wrong_board_data = {
             'title': 'Wrong workspace',
-            'workspace': 9999
+            'workspace': {
+                'id': 9999
+            }
         }
-        wrong_board_response = self.client.post(board_url, wrong_board_data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        wrong_board_response = self.client.post(board_url, wrong_board_data, format='json', HTTP_AUTHORIZATION=f'Bearer {self.token}')
         self.assertEqual(wrong_board_response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertFalse(Board.objects.filter(creator=self.user, title='Wrong workspace').exists())
 
@@ -79,8 +88,12 @@ class BoardAPITestCase(APITestCase):
         board_url = reverse('board-create')
         board_data = {
             'title': 'Favorite',
+            'default_image': 'cherryBlossom',
+            'workspace': {
+                'name': 'Test'
+            }
         }
-        board_response = self.client.post(board_url, board_data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        board_response = self.client.post(board_url, board_data, format='json', HTTP_AUTHORIZATION=f'Bearer {self.token}')
         self.assertEqual(board_response.status_code, status.HTTP_201_CREATED)
         # Extract the board id from the request
         board_id = board_response.data['id']
@@ -110,18 +123,20 @@ class BoardAPITestCase(APITestCase):
         create_url = reverse('board-create')
         data = {
             'title': 'Board',
+            'default_image': 'mountainLake',
+            'workspace': {
+                'name': 'Test'
+            }
         }
-        create_response = self.client.post(create_url, data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        create_response = self.client.post(create_url, data, format='json', HTTP_AUTHORIZATION=f'Bearer {self.token}')
         self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
 
         # Fetch boards for user
         get_url = reverse('board-list')
         get_response = self.client.get(get_url, HTTP_AUTHORIZATION=f'Bearer {self.token}')
         self.assertEqual(get_response.status_code, status.HTTP_200_OK)
-        
         # Extract the board data from the response
         boards = get_response.data
-        
         # Check if the user is the creator of each board
         for board in boards:
             # Get the board object from the database
@@ -135,8 +150,12 @@ class BoardAPITestCase(APITestCase):
         create_url = reverse('board-create')
         data = {
             'title': 'Board',
+            'default_image': 'mountainLake',
+            'workspace': {
+                'name': 'Test'
+            }
         }
-        create_response = self.client.post(create_url, data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        create_response = self.client.post(create_url, data, format='json', HTTP_AUTHORIZATION=f'Bearer {self.token}')
         self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
 
         # Extract the board ID from the response
@@ -160,13 +179,15 @@ class BoardAPITestCase(APITestCase):
         create_url = reverse('board-create')
         data = {
             'title': 'Board',
+            'default_image': 'cherryBlossom',
+            'workspace': {
+                'name': 'Test'
+            }
         }
-        create_response = self.client.post(create_url, data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        create_response = self.client.post(create_url, data, format='json', HTTP_AUTHORIZATION=f'Bearer {self.token}')
         self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
-
         # Extract the board ID from the response
         board_id = create_response.data['id']
-
         # Delete the board
         delete_url = reverse('board-delete')
         delete_data = {'board_id': board_id}

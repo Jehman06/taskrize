@@ -100,8 +100,12 @@ class WorkspaceAPITestCase(APITestCase):
         create_url = reverse('board-create')
         data = {
             'title': 'Board',
+            'default_image': 'mountainLake',
+            'workspace': {
+                'name': 'Test'
+            }
         }
-        create_response = self.client.post(create_url, data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        create_response = self.client.post(create_url, data, format='json', HTTP_AUTHORIZATION=f'Bearer {self.token}')
         self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
 
         # Get the Board and Workspace id
