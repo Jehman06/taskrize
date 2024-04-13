@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
     updateCreateBoardModal,
@@ -28,7 +28,7 @@ interface BoardFormData {
     workspace: {
         name: string | null;
     };
-    custom_image: File | string | null; // Allow both string (for default images) and File (for custom images)
+    custom_image: File | string | null; // Feature to implement later
     default_image: string | null;
 }
 
@@ -66,18 +66,18 @@ const CreateBoardModal: React.FC = () => {
         }
     };
 
-    // Feature that will be worked on in the future
-    const handleFileUpload = (file: File | undefined) => {
-        if (file) {
-            // Handle the file as needed, upload it to the backend or display it preview
-            // For now, let's just log the file details
-            console.log('Uploaded file:', file);
-            // Set the custom image in state
-            dispatch(updateSelectedCustomImage(file));
-            // Clear the default image selection
-            dispatch(updateSelectedDefaultImage(null));
-        }
-    };
+    // // Feature that will be worked on in the future
+    // const handleFileUpload = (file: File | undefined) => {
+    //     if (file) {
+    //         // Handle the file as needed, upload it to the backend or display it preview
+    //         // For now, let's just log the file details
+    //         console.log('Uploaded file:', file);
+    //         // Set the custom image in state
+    //         dispatch(updateSelectedCustomImage(file));
+    //         // Clear the default image selection
+    //         dispatch(updateSelectedDefaultImage(null));
+    //     }
+    // };
 
     useEffect(() => {
         getWorkspaces();
@@ -117,7 +117,6 @@ const CreateBoardModal: React.FC = () => {
         const accessToken = Cookies.get('access_token');
         try {
             await verifyAccessToken();
-            console.log(boardFormData);
             // Send POST request to Board API to create the board
             const response = await axios.post(
                 'http://127.0.0.1:8000/api/boards/create',
@@ -131,6 +130,8 @@ const CreateBoardModal: React.FC = () => {
             );
             // Handle success
             console.log('Board created:', response.data);
+            // Reload the page to fetch updated data
+            window.location.reload();
         } catch (error) {
             // Handle error
             console.error('Error creating board:', error);
@@ -145,7 +146,6 @@ const CreateBoardModal: React.FC = () => {
     const handleFormSubmit = () => {
         // Dispatch action to create board with form data
         dispatch(updateCreateBoardModal());
-        console.log(boardFormData);
         createBoard(boardFormData);
     };
 
@@ -210,6 +210,7 @@ const CreateBoardModal: React.FC = () => {
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="exampleForm.ControlDropdown1">
                         <Form.Label>Workspace</Form.Label>
+                        {/* If no workspace exists, the user needs to create a new workspace */}
                         {workspaces.length === 0 ? (
                             <Form.Control
                                 type="text"
@@ -231,6 +232,7 @@ const CreateBoardModal: React.FC = () => {
                                 }
                             />
                         ) : (
+                            // If workspaces exist, the user has to provide the workspace they want their new board to be in
                             <DropdownButton
                                 as={ButtonGroup}
                                 title={selectedWorkspace ? selectedWorkspace.name : 'Workspace'}

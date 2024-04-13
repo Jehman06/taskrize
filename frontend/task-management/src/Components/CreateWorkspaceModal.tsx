@@ -22,9 +22,10 @@ const CreateWorkspaceModal: React.FC = () => {
     );
     const dispatch = useDispatch();
 
-    // Create a new workspace
+    // Send a POST request to the workspace API to create a new workspace
     const createWorkspace = async (workspaceFormData: WorkspaceFormData) => {
         try {
+            // Verify the validity of JWT token, and refresh it if invalid (See utils/apiUtils.ts)
             await verifyAccessToken();
             // Get access token from cookies
             const accessToken = Cookies.get('access_token');
@@ -40,6 +41,8 @@ const CreateWorkspaceModal: React.FC = () => {
                 }
             );
             console.log('Workspace created successfully:', response.data);
+            // Reload the page to fetch updated data
+            window.location.reload();
         } catch (error) {
             console.error('Error creating workspace:', error);
         }
