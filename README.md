@@ -20,8 +20,8 @@ TaskRize is a robust project management application. Offering a streamlined user
 TaskRize implements a JWT-based authentication system, providing secure access to authorized users. JSON Web Tokens (JWT) are used to authenticate users and maintain session state across requests. The authentication flow involves the following steps:
 
 - New users can register by providing an email and a password. The password needs to be retyped in order to register.
-- Existing users can login by providing their credentials. Upon successful login, the user receives a JWT token.
-- Users can invalidate their JWT token by logging out, ensuring that unauthorized access is prevented.
 - Existing users can reset their password if they forgot it. They have to submit their email and they will receive by email a verification code to verify their identity.
+- Existing users can login by providing their credentials. Upon successful login, the user receives a JWT token.
 - JWT tokens are securely stored on the client-side in http-only cookies and sent with each subsequent request to authenticate the user's identity.
 - JWT tokens have an expiration time to enhance security. Users must refresh their tokens periodically to maintain access.
+- Users can invalidate their JWT token by logging out, ensuring that unauthorized access is prevented.
