@@ -25,6 +25,9 @@ interface ModalState {
     selectedWorkspace: Workspace | null;
     selectedDefaultImage: string | null;
     selectedCustomImage: File | null;
+    errorTitleMessage: string | null;
+    errorImageMessage: string | null;
+    errorWorkspaceMessage: string | null;
 }
 
 const initialState: ModalState = {
@@ -47,6 +50,9 @@ const initialState: ModalState = {
     selectedWorkspace: null,
     selectedDefaultImage: null,
     selectedCustomImage: null,
+    errorTitleMessage: '',
+    errorImageMessage: '',
+    errorWorkspaceMessage: '',
 };
 
 const modalSlice = createSlice({
@@ -80,6 +86,32 @@ const modalSlice = createSlice({
         updateSelectedCustomImage(state, action: PayloadAction<File | null>) {
             state.selectedCustomImage = action.payload;
         },
+        updateErrorTitleMessage(state, action: PayloadAction<string | null>) {
+            state.errorTitleMessage = action.payload;
+        },
+        updateErrorImageMessage(state, action: PayloadAction<string | null>) {
+            state.errorImageMessage = action.payload;
+        },
+        updateErrorWorkspaceMessage(state, action: PayloadAction<string | null>) {
+            state.errorWorkspaceMessage = action.payload;
+        },
+        resetModalStates(state) {
+            const { boardFormData } = state;
+            const { workspaceFormData } = state;
+            state.errorImageMessage = '';
+            state.errorTitleMessage = '';
+            state.errorWorkspaceMessage = '';
+            state.selectedWorkspace = null;
+            state.selectedDefaultImage = null;
+            // Reset the board form data properties
+            boardFormData.default_image = '';
+            boardFormData.description = '';
+            boardFormData.title = '';
+            boardFormData.workspace.name = '';
+            // Reset the workspace data properties
+            workspaceFormData.name = '';
+            workspaceFormData.description = '';
+        },
     },
 });
 
@@ -92,6 +124,10 @@ export const {
     updateSelectedWorkspace,
     updateSelectedDefaultImage,
     updateSelectedCustomImage,
+    updateErrorTitleMessage,
+    updateErrorImageMessage,
+    updateErrorWorkspaceMessage,
+    resetModalStates,
 } = modalSlice.actions;
 
 export default modalSlice.reducer;

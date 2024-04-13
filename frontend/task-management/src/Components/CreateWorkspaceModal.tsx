@@ -4,9 +4,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import axios, { AxiosResponse } from 'axios';
 import Cookies from 'js-cookie';
-import { updateCreateWorkspaceModal, updateWorkspaceFormData } from '../redux/reducers/modalSlice';
+import {
+    resetModalStates,
+    updateCreateWorkspaceModal,
+    updateErrorTitleMessage,
+    updateWorkspaceFormData,
+} from '../redux/reducers/modalSlice';
 import { verifyAccessToken } from '../utils/apiUtils';
-import { resetAppStates, updateErrorMessage } from '../redux/reducers/appSlice';
 
 interface WorkspaceFormData {
     name: string;
@@ -21,7 +25,9 @@ const CreateWorkspaceModal: React.FC = () => {
     const workspaceFormData: WorkspaceFormData = useSelector(
         (state: RootState) => state.modal.workspaceFormData
     );
-    const errorMessage: string = useSelector((state: RootState) => state.app.errorMessage);
+    const errorTitleMessage: string | null = useSelector(
+        (state: RootState) => state.modal.errorTitleMessage
+    );
     const dispatch = useDispatch();
 
     // Send a POST request to the workspace API to create a new workspace
@@ -44,7 +50,7 @@ const CreateWorkspaceModal: React.FC = () => {
             );
             console.log('Workspace created successfully:', response.data);
             // Reset error message
-            dispatch(resetAppStates());
+            dispatch(resetModalStates());
             // Reload the page to fetch updated data
             window.location.reload();
         } catch (error) {
@@ -54,13 +60,13 @@ const CreateWorkspaceModal: React.FC = () => {
 
     const handleFormSubmit = async (): Promise<void> => {
         if (!workspaceFormData.name) {
-            dispatch(updateErrorMessage('Please provide a name for your workspace.'));
+            dispatch(updateErrorTitleMessage('Please provide a name for your workspace.'));
             return;
         }
         // Dispatch action to create workspace with form data
         createWorkspace(workspaceFormData);
         dispatch(updateCreateWorkspaceModal());
-        console.log(workspaceFormData);
+        dispatch(resetModalStates());
     };
 
     return (
@@ -90,9 +96,9 @@ const CreateWorkspaceModal: React.FC = () => {
                                 dispatch(updateWorkspaceFormData({ name: e.target.value }))
                             }
                         />
-                        {errorMessage && (
+                        {errorTitleMessage && (
                             <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
-                                {errorMessage}
+                                {errorTitleMessage}
                             </div>
                         )}
                     </Form.Group>

@@ -7,6 +7,10 @@ import {
     updateSelectedDefaultImage,
     updateSelectedWorkspace,
     updateWorkspaces,
+    updateErrorTitleMessage,
+    updateErrorImageMessage,
+    resetModalStates,
+    updateErrorWorkspaceMessage,
 } from '../redux/reducers/modalSlice';
 import { RootState } from '../redux/store';
 import './Modal.css';
@@ -16,7 +20,6 @@ import Cookies from 'js-cookie';
 import cherryBlossom from '../images/cherryblossom.jpg';
 import mountainLake from '../images/mountainlake.jpg';
 import { verifyAccessToken } from '../utils/apiUtils';
-import { resetAppStates, updateErrorMessage } from '../redux/reducers/appSlice';
 
 interface Workspace {
     id: number;
@@ -48,7 +51,15 @@ const CreateBoardModal: React.FC = () => {
     const selectedDefaultImage: string | null = useSelector(
         (state: RootState) => state.modal.selectedDefaultImage
     );
-    const errorMessage: string = useSelector((state: RootState) => state.app.errorMessage);
+    const errorTitleMessage: string | null = useSelector(
+        (state: RootState) => state.modal.errorTitleMessage
+    );
+    const errorImageMessage: string | null = useSelector(
+        (state: RootState) => state.modal.errorImageMessage
+    );
+    const errorWorkspaceMessage: string | null = useSelector(
+        (state: RootState) => state.modal.errorWorkspaceMessage
+    );
     const dispatch = useDispatch();
 
     // As of right now, users cannot upload their own images as backgrounds. It's a feature that I will be working on in the future.
@@ -83,6 +94,7 @@ const CreateBoardModal: React.FC = () => {
 
     useEffect(() => {
         getWorkspaces();
+        dispatch(resetModalStates());
     }, []);
 
     useEffect(() => {
@@ -134,7 +146,7 @@ const CreateBoardModal: React.FC = () => {
             // Handle success
             console.log('Board created:', response.data);
             // Reset error message
-            dispatch(resetAppStates());
+            // dispatch(resetModalStates());
             // Reload the page to fetch updated data
             window.location.reload();
         } catch (error) {
@@ -150,13 +162,20 @@ const CreateBoardModal: React.FC = () => {
 
     const handleFormSubmit = () => {
         if (!selectedDefaultImage) {
-            dispatch(updateErrorMessage('Please select a background image.'));
+            dispatch(updateErrorImageMessage('Please select a background image.'));
             return;
-        } else if (!boardFormData.title) {
-            dispatch(updateErrorMessage('Please provide a title for your board.'));
+        }
+        if (!boardFormData.title) {
+            dispatch(updateErrorTitleMessage('Please provide a title for your board.'));
+            return;
+        }
+        if (!boardFormData.workspace.name) {
+            dispatch(updateErrorWorkspaceMessage('Please create a workspace for your board.'));
+            return;
         }
         // Dispatch action to create board with form data
         dispatch(updateCreateBoardModal());
+        dispatch(resetModalStates());
         createBoard(boardFormData);
     };
 
@@ -193,9 +212,9 @@ const CreateBoardModal: React.FC = () => {
                                 alt="Mountain lake"
                                 onClick={() => handleImageSelect('mountainLake')}
                             />
-                            {errorMessage && (
+                            {errorImageMessage && (
                                 <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
-                                    {errorMessage}
+                                    {errorImageMessage}
                                 </div>
                             )}
                         </div>
@@ -223,9 +242,9 @@ const CreateBoardModal: React.FC = () => {
                                 dispatch(updateBoardFormData({ title: e.target.value }))
                             }
                         />
-                        {errorMessage && (
+                        {errorTitleMessage && (
                             <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
-                                {errorMessage}
+                                {errorTitleMessage}
                             </div>
                         )}
                     </Form.Group>
@@ -271,6 +290,11 @@ const CreateBoardModal: React.FC = () => {
                                     </Dropdown.Item>
                                 ))}
                             </DropdownButton>
+                        )}
+                        {errorWorkspaceMessage && (
+                            <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
+                                {errorWorkspaceMessage}
+                            </div>
                         )}
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
