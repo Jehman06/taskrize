@@ -41,9 +41,9 @@ def create_board(request):
     # Extract the data from the request payload
     data = request.data.copy()  # Create a mutable copy of the data dictionary
 
-    print(f'Data: {data}')
-
     workspace_data = data.get('workspace', {})
+
+    print(f'workspace_data: {workspace_data}')
 
     if not isinstance(workspace_data, dict):
         return Response({'error': 'Workspace data must be a dictionary'}, status=status.HTTP_400_BAD_REQUEST)

@@ -119,5 +119,5 @@ class WorkspaceAPITestCase(APITestCase):
         }
         delete_response = self.client.delete(delete_url, delete_data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
         self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertFalse(Workspace.objects.filter(id=workspace_id, name='New Workspace').exists())
+        self.assertFalse(Workspace.objects.filter(id=workspace_id, name='Test').exists())
         self.assertFalse(Board.objects.filter(id=board_id, title='Board').exists())

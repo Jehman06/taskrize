@@ -25,7 +25,9 @@ interface Workspace {
 interface BoardFormData {
     title: string;
     description: string;
-    workspace: Workspace | null;
+    workspace: {
+        name: string | null;
+    };
     custom_image: File | string | null; // Allow both string (for default images) and File (for custom images)
     default_image: string | null;
 }
@@ -47,6 +49,7 @@ const CreateBoardModal: React.FC = () => {
     );
     const dispatch = useDispatch();
 
+    // As of right now, users cannot upload their own images as backgrounds. It's a feature that I will be working on in the future.
     const handleImageSelect = (image: string | File) => {
         if (typeof image === 'string') {
             // If the selected image is one of the default images, set it as the selectedDefaultImage
@@ -63,6 +66,7 @@ const CreateBoardModal: React.FC = () => {
         }
     };
 
+    // Feature that will be worked on in the future
     const handleFileUpload = (file: File | undefined) => {
         if (file) {
             // Handle the file as needed, upload it to the backend or display it preview
@@ -113,14 +117,14 @@ const CreateBoardModal: React.FC = () => {
         const accessToken = Cookies.get('access_token');
         try {
             await verifyAccessToken();
-
+            console.log(boardFormData);
             // Send POST request to Board API to create the board
             const response = await axios.post(
                 'http://127.0.0.1:8000/api/boards/create',
                 boardFormData,
                 {
                     headers: {
-                        'Content-Type': 'multipart/form-data',
+                        'Content-Type': 'application/json',
                         Authorization: `Bearer ${accessToken}`,
                     },
                 }
@@ -179,7 +183,7 @@ const CreateBoardModal: React.FC = () => {
                                 onClick={() => handleImageSelect('mountainLake')}
                             />
                         </div>
-                        <div className="custom-upload">
+                        {/* <div className="custom-upload">
                             <label htmlFor="file-upload" className="file-upload-label">
                                 Or upload a custom image
                             </label>
@@ -189,7 +193,7 @@ const CreateBoardModal: React.FC = () => {
                                 accept="image/*"
                                 onChange={(e) => handleFileUpload(e.target.files?.[0])}
                             />
-                        </div>
+                        </div> */}
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                         <Form.Label>Board title</Form.Label>
@@ -206,23 +210,45 @@ const CreateBoardModal: React.FC = () => {
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="exampleForm.ControlDropdown1">
                         <Form.Label>Workspace</Form.Label>
-                        <DropdownButton
-                            as={ButtonGroup}
-                            title={selectedWorkspace ? selectedWorkspace.name : 'Workspace'}
-                            className="modal-dropdown-button custom-dropdown-button"
-                            variant="secondary"
-                        >
-                            {workspaces.map((workspace) => (
-                                <Dropdown.Item
-                                    key={workspace.id}
-                                    eventKey={workspace.id}
-                                    className="modal-dropdown-item"
-                                    onClick={() => handleWorkspaceSelect(workspace)}
-                                >
-                                    {workspace.name}
-                                </Dropdown.Item>
-                            ))}
-                        </DropdownButton>
+                        {workspaces.length === 0 ? (
+                            <Form.Control
+                                type="text"
+                                className="modal-input"
+                                required
+                                value={
+                                    boardFormData.workspace
+                                        ? boardFormData.workspace.name || ''
+                                        : ''
+                                }
+                                onChange={(e) =>
+                                    dispatch(
+                                        updateBoardFormData({
+                                            workspace: {
+                                                name: e.target.value,
+                                            },
+                                        })
+                                    )
+                                }
+                            />
+                        ) : (
+                            <DropdownButton
+                                as={ButtonGroup}
+                                title={selectedWorkspace ? selectedWorkspace.name : 'Workspace'}
+                                className="modal-dropdown-button custom-dropdown-button"
+                                variant="secondary"
+                            >
+                                {workspaces.map((workspace) => (
+                                    <Dropdown.Item
+                                        key={workspace.id}
+                                        eventKey={workspace.id}
+                                        className="modal-dropdown-item"
+                                        onClick={() => handleWorkspaceSelect(workspace)}
+                                    >
+                                        {workspace.name}
+                                    </Dropdown.Item>
+                                ))}
+                            </DropdownButton>
+                        )}
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
                         <Form.Label>Description</Form.Label>

@@ -59,7 +59,7 @@ const CreateWorkspaceModal: React.FC = () => {
             centered
         >
             <Modal.Header closeButton style={{ backgroundColor: '#33373a', color: '#9fadbc' }}>
-                <Modal.Title>Create a new Board</Modal.Title>
+                <Modal.Title>Create a new Workspace</Modal.Title>
             </Modal.Header>
             <Modal.Body
                 style={{ backgroundColor: '#33373a', color: '#9fadbc' }}
@@ -68,7 +68,7 @@ const CreateWorkspaceModal: React.FC = () => {
                 <Form>
                     <Form.Group className="mb-3" controlId="exampleForm.ControlInput1"></Form.Group>
                     <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-                        <Form.Label>Board title</Form.Label>
+                        <Form.Label>Workspace name</Form.Label>
                         <Form.Control
                             type="text"
                             className="modal-input"

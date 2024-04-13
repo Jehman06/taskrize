@@ -11,18 +11,20 @@ interface ModalState {
     boardFormData: {
         title: string;
         description: string;
-        workspace: Workspace | null;
-        custom_image: File | string | null; // Allow both string (for default images) and File (for custom images)
+        workspace: {
+            name: string | null;
+        };
+        custom_image: File | string | null;
         default_image: string | null;
     };
     workspaceFormData: {
         name: string;
         description: string;
     };
-    workspaces: Workspace[]; // Add workspaces to modal state
-    selectedWorkspace: Workspace | null; // Add selectedWorkspace to modal state
-    selectedDefaultImage: string | null; // Add selectedDefaultImage to modal state
-    selectedCustomImage: File | null; // Add selectedCustomImage to modal state
+    workspaces: Workspace[];
+    selectedWorkspace: Workspace | null;
+    selectedDefaultImage: string | null;
+    selectedCustomImage: File | null;
 }
 
 const initialState: ModalState = {
@@ -31,9 +33,11 @@ const initialState: ModalState = {
     boardFormData: {
         title: '',
         description: '',
-        workspace: null,
         custom_image: null,
         default_image: null,
+        workspace: {
+            name: '',
+        },
     },
     workspaceFormData: {
         name: '',
