@@ -16,6 +16,7 @@ import Cookies from 'js-cookie';
 import cherryBlossom from '../images/cherryblossom.jpg';
 import mountainLake from '../images/mountainlake.jpg';
 import { verifyAccessToken } from '../utils/apiUtils';
+import { resetAppStates, updateErrorMessage } from '../redux/reducers/appSlice';
 
 interface Workspace {
     id: number;
@@ -47,6 +48,7 @@ const CreateBoardModal: React.FC = () => {
     const selectedDefaultImage: string | null = useSelector(
         (state: RootState) => state.modal.selectedDefaultImage
     );
+    const errorMessage: string = useSelector((state: RootState) => state.app.errorMessage);
     const dispatch = useDispatch();
 
     // As of right now, users cannot upload their own images as backgrounds. It's a feature that I will be working on in the future.
@@ -87,6 +89,7 @@ const CreateBoardModal: React.FC = () => {
         // Set the first workspace as the default selected workspace when workspaces change
         if (workspaces.length > 0) {
             dispatch(updateSelectedWorkspace(workspaces[0]));
+            dispatch(updateBoardFormData({ workspace: workspaces[0] }));
         }
     }, [workspaces]);
 
@@ -130,6 +133,8 @@ const CreateBoardModal: React.FC = () => {
             );
             // Handle success
             console.log('Board created:', response.data);
+            // Reset error message
+            dispatch(resetAppStates());
             // Reload the page to fetch updated data
             window.location.reload();
         } catch (error) {
@@ -144,6 +149,12 @@ const CreateBoardModal: React.FC = () => {
     };
 
     const handleFormSubmit = () => {
+        if (!selectedDefaultImage) {
+            dispatch(updateErrorMessage('Please select a background image.'));
+            return;
+        } else if (!boardFormData.title) {
+            dispatch(updateErrorMessage('Please provide a title for your board.'));
+        }
         // Dispatch action to create board with form data
         dispatch(updateCreateBoardModal());
         createBoard(boardFormData);
@@ -182,6 +193,11 @@ const CreateBoardModal: React.FC = () => {
                                 alt="Mountain lake"
                                 onClick={() => handleImageSelect('mountainLake')}
                             />
+                            {errorMessage && (
+                                <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
+                                    {errorMessage}
+                                </div>
+                            )}
                         </div>
                         {/* <div className="custom-upload">
                             <label htmlFor="file-upload" className="file-upload-label">
@@ -207,6 +223,11 @@ const CreateBoardModal: React.FC = () => {
                                 dispatch(updateBoardFormData({ title: e.target.value }))
                             }
                         />
+                        {errorMessage && (
+                            <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
+                                {errorMessage}
+                            </div>
+                        )}
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="exampleForm.ControlDropdown1">
                         <Form.Label>Workspace</Form.Label>

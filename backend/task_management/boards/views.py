@@ -40,6 +40,7 @@ def create_board(request):
     
     # Extract the data from the request payload
     data = request.data.copy()  # Create a mutable copy of the data dictionary
+    print(f'data: {data}')
 
     workspace_data = data.get('workspace', {})
 
