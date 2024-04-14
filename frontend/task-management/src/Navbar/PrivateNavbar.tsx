@@ -11,8 +11,8 @@ import 'bootstrap';
 import axios, { AxiosError } from 'axios';
 import Cookies from 'js-cookie';
 import { resetAppStates } from '../redux/reducers/appSlice';
-import CreateBoardModal from '../Components/CreateBoardModal';
-import CreateWorkspaceModal from '../Components/CreateWorkspaceModal';
+import CreateBoardModal from '../Components/Modals/CreateBoardModal';
+import CreateWorkspaceModal from '../Components/Modals/CreateWorkspaceModal';
 import {
     updateBoardFormData,
     updateCreateBoardModal,

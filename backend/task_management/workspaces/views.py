@@ -2,8 +2,10 @@ from rest_framework.decorators import api_view, authentication_classes
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.response import Response
 from rest_framework import status
+from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from workspaces.models import Workspace
+from boards.models import Board
 from workspaces.serializers import WorkspaceSerializer
 
 # Get the workspaces for the user
@@ -18,6 +20,22 @@ def get_workspaces(request):
     # Serialize the list of workspaces into JSON format, allowing multiple instances
     serializer = WorkspaceSerializer(workspaces, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+# Get boards associated with a workspace
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+def get_workspace_boards(request, workspace_id):
+    # Retrieve the workspace instance from the database using the provided workspace_id
+    workspace = get_object_or_404(Workspace, id=workspace_id)
+
+    # Retrieve all boards associated with the workspace
+    boards = Board.objects.filter(workspace=workspace)
+
+    # Serialize the list of boards into JSON format
+    board_data = [{'id': board.id, 'title': board.title, 'description': board.description, 'default_image': board.default_image, 'favorite': list(board.favorite.values_list('id', flat=True))} for board in boards]
+
+    # Return the serialized board data as a JSON response
+    return Response(board_data, status=status.HTTP_200_OK)
 
 # Create a new workspace
 @api_view(['POST'])

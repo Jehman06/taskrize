@@ -1,0 +1,42 @@
+.workspace {
+    width: calc(100% - 20px); /* Adjust the width as needed */
+    max-width: 70vw; /* Limit the maximum width */
+}
+
+.workspace-settings {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.workspace-title {
+    color: #9fadbc;
+    font-size: 20px;
+    font-weight: 900;
+}
+
+.workspace-buttons {
+    display: flex;
+    flex-direction: row;
+    margin-right: 150px;
+}
+
+.button {
+    margin-left: 10px;
+    height: 30px;
+    font-size: 13px;
+    background-color: #474b4d !important;
+}
+
+.button:hover {
+    background-color: #595d5e !important;
+}
+
+.settings-icon {
+    margin-right: 5px;
+}
+
+.board-content {
+    display: flex;
+    flex-wrap: wrap;
+}

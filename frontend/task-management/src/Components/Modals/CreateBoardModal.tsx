@@ -11,15 +11,15 @@ import {
     updateErrorImageMessage,
     resetModalStates,
     updateErrorWorkspaceMessage,
-} from '../redux/reducers/modalSlice';
-import { RootState } from '../redux/store';
+} from '../../redux/reducers/modalSlice';
+import { RootState } from '../../redux/store';
 import './Modal.css';
 import { Modal, Form, Button, DropdownButton, ButtonGroup, Dropdown } from 'react-bootstrap';
 import axios, { AxiosResponse } from 'axios';
 import Cookies from 'js-cookie';
-import cherryBlossom from '../images/cherryblossom.jpg';
-import mountainLake from '../images/mountainlake.jpg';
-import { verifyAccessToken } from '../utils/apiUtils';
+import cherryBlossom from '../../images/cherryblossom.jpg';
+import mountainLake from '../../images/mountainlake.jpg';
+import { verifyAccessToken } from '../../utils/apiUtils';
 
 interface Workspace {
     id: number;

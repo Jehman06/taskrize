@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, re_path
 from authentication.views import register_user, login_user, logout_user, reset_password_request, reset_password_confirm
 from django.views.generic import RedirectView
-from workspaces.views import create_workspace, get_workspaces, update_workspace, delete_workspace
+from workspaces.views import create_workspace, get_workspaces, update_workspace, delete_workspace, get_workspace_boards
 from boards.views import get_boards, create_board, update_board, toggle_favorite_board, delete_board
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
@@ -37,6 +37,7 @@ urlpatterns = [
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     # Workspaces
     path('api/workspaces/', get_workspaces, name='workspace-list'),
+    path('api/workspaces/<int:workspace_id>/boards/', get_workspace_boards, name='workspace-board'),
     path('api/workspaces/create', create_workspace, name='workspace-create'),
     path('api/workspaces/update', update_workspace, name='workspace-update'),
     path('api/workspaces/delete', delete_workspace, name='workspace-delete'),

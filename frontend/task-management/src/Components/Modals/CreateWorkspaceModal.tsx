@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Form, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../redux/store';
+import { RootState } from '../../redux/store';
 import axios, { AxiosResponse } from 'axios';
 import Cookies from 'js-cookie';
 import {
@@ -9,8 +9,8 @@ import {
     updateCreateWorkspaceModal,
     updateErrorTitleMessage,
     updateWorkspaceFormData,
-} from '../redux/reducers/modalSlice';
-import { verifyAccessToken } from '../utils/apiUtils';
+} from '../../redux/reducers/modalSlice';
+import { verifyAccessToken } from '../../utils/apiUtils';
 
 interface WorkspaceFormData {
     name: string;

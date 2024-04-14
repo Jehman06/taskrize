@@ -9,6 +9,7 @@ interface BoardProps {
     favorite: boolean;
     default_image: string;
     workspace: number;
+    workspace_name: string;
     starFilled: boolean;
     toggleStar: (boardId: number) => void; // Modify the type of toggleStar to accept boardId
 }
@@ -20,6 +21,7 @@ const Board: React.FC<BoardProps> = ({
     favorite,
     default_image,
     workspace,
+    workspace_name,
     toggleStar,
     starFilled,
 }) => {
@@ -28,6 +30,7 @@ const Board: React.FC<BoardProps> = ({
             <div className="board">
                 <img src={default_image} alt="Board image" className="board-img" />
                 <div className="board-title">{title}</div>
+                <div className="workspace-name">In Workspace {workspace_name}</div>
                 <div onClick={() => toggleStar(id)}>
                     {starFilled ? (
                         <FaStar className="star-full" />
