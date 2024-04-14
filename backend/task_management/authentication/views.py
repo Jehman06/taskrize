@@ -48,8 +48,11 @@ def login_user(request):
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
 
+        # Extract user ID
+        user_id = user.id
+
         # Set tokens as HTTP-only cookies
-        response = JsonResponse({'access_token': access_token, 'refresh_token': str(refresh)})
+        response = JsonResponse({'user_id': user_id, 'access_token': access_token, 'refresh_token': str(refresh)})
 
         # Set the content-type explicitly
         response['Content-Type'] = 'application/json'

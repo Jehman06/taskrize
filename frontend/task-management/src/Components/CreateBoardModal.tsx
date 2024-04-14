@@ -94,7 +94,6 @@ const CreateBoardModal: React.FC = () => {
 
     useEffect(() => {
         getWorkspaces();
-        dispatch(resetModalStates());
     }, []);
 
     useEffect(() => {
@@ -146,7 +145,7 @@ const CreateBoardModal: React.FC = () => {
             // Handle success
             console.log('Board created:', response.data);
             // Reset error message
-            // dispatch(resetModalStates());
+            dispatch(resetModalStates());
             // Reload the page to fetch updated data
             window.location.reload();
         } catch (error) {

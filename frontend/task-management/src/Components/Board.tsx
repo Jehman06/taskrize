@@ -1,24 +1,40 @@
 import React from 'react';
 import { FaStar, FaRegStar } from 'react-icons/fa';
+import './Board.css';
 
 interface BoardProps {
+    id: number;
     title: string;
-    image: string;
+    description: string;
+    favorite: boolean;
+    default_image: string;
+    workspace: number;
     starFilled: boolean;
-    toggleStar: () => void;
+    toggleStar: (boardId: number) => void; // Modify the type of toggleStar to accept boardId
 }
 
-const Board: React.FC<BoardProps> = ({ title, image, starFilled, toggleStar }) => {
+const Board: React.FC<BoardProps> = ({
+    id,
+    title,
+    description,
+    favorite,
+    default_image,
+    workspace,
+    toggleStar,
+    starFilled,
+}) => {
     return (
-        <div className="board">
-            <img src={image} alt="Board image" className="board-img" />
-            <div className="board-title">{title}</div>
-            <div onClick={toggleStar}>
-                {starFilled ? (
-                    <FaStar className="star-full" />
-                ) : (
-                    <FaRegStar className="star-icon" />
-                )}
+        <div className="board-wrapper">
+            <div className="board">
+                <img src={default_image} alt="Board image" className="board-img" />
+                <div className="board-title">{title}</div>
+                <div onClick={() => toggleStar(id)}>
+                    {starFilled ? (
+                        <FaStar className="star-full" />
+                    ) : (
+                        <FaRegStar className="star-icon" />
+                    )}
+                </div>
             </div>
         </div>
     );

@@ -77,14 +77,14 @@ const LoginPage: React.FC = () => {
             if (response.status >= 200 && response.status < 300) {
                 // Login successful
                 // Extract the access and refresh tokens from the response
-                const { access_token, refresh_token } = response.data;
+                const { user_id, access_token, refresh_token } = response.data;
 
                 // Set access and refresh tokens as cookies
                 Cookies.set('access_token', access_token);
                 Cookies.set('refresh_token', refresh_token);
 
                 // Update states
-                dispatch(loginUser());
+                dispatch(loginUser(user_id));
                 dispatch(resetAuthStates());
                 // Redirect to Home
                 navigate('/home');

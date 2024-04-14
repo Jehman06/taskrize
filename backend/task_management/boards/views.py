@@ -123,16 +123,7 @@ def update_board(request):
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 def toggle_favorite_board(request):
-    # Extract the user's email from the request
-    user_email = request.user
-    # Retrieve the CustomUser instance based on the email
-    CustomUser = get_user_model()
-    try:
-        user = CustomUser.objects.get(email=user_email)
-    except CustomUser.DoesNotExist:
-        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-
-    # Extract the board ID from the request data
+    # Retrieve the board ID from the query parameters
     board_id = request.query_params.get('board_id')
 
     if not board_id:
@@ -141,14 +132,15 @@ def toggle_favorite_board(request):
     try:
         # Retrieve the board instance
         board = Board.objects.get(id=board_id)
-        # Check if the board is already in favorites for this user
-        if user.board_favorite.filter(id=board_id).exists():
-            # If it's in favorites, remove it
-            user.board_favorite.remove(board)
+        
+        # Toggle the favorite status for the current user
+        if board.favorite.filter(id=request.user.id).exists():
+            # If the board is in favorites, remove it
+            board.favorite.remove(request.user)
             action = 'removed from'
         else:
-            # If it's not in favorites, add it
-            user.board_favorite.add(board)
+            # If the board is not in favorites, add it
+            board.favorite.add(request.user)
             action = 'added to'
         
         return Response({'message': f'Board {action} favorites successfully'}, status=status.HTTP_200_OK)

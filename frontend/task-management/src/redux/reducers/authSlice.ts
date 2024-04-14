@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface AuthState {
     user: {
         isAuthenticated: boolean;
+        id: number | null;
     };
     resetCode: string | null;
     stage: string;
@@ -17,6 +18,7 @@ interface AuthState {
 const initialState: AuthState = {
     user: {
         isAuthenticated: false,
+        id: null,
     },
     resetCode: '',
     stage: 'resetCode',
@@ -33,11 +35,13 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         // Action to update state when login request is initiated
-        loginUser(state) {
+        loginUser(state, action: PayloadAction<number>) {
             state.user.isAuthenticated = true;
+            state.user.id = action.payload;
         },
         logoutUser(state) {
             state.user.isAuthenticated = false;
+            state.user.id = null;
         },
         updateFormData(state, action: PayloadAction<any>) {
             state.formData = action.payload;

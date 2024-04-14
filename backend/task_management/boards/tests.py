@@ -106,7 +106,7 @@ class BoardAPITestCase(APITestCase):
         # Check if the board is favorited after toggling
         user = CustomUser.objects.get(email='testuser@gmail.com')
         board = Board.objects.get(id=board_id)
-        board_favorited = user.board_favorite.filter(id=board_id).exists()
+        board_favorited = board.favorite.filter(id=user.id).exists()
         self.assertTrue(board_favorited)
 
         # Toggle favorite status back
@@ -114,7 +114,7 @@ class BoardAPITestCase(APITestCase):
         self.assertEqual(favorite_response.status_code, status.HTTP_200_OK)
 
         # Check if the board is unfavorited after toggling back
-        board_favorited = user.board_favorite.filter(id=board_id).exists()
+        board_favorited = board.favorite.filter(id=user.id).exists()
         self.assertFalse(board_favorited)
 
     def test_get_boards(self):
