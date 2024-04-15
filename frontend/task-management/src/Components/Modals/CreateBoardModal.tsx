@@ -19,6 +19,12 @@ import axios, { AxiosResponse } from 'axios';
 import Cookies from 'js-cookie';
 import cherryBlossom from '../../images/cherryblossom.jpg';
 import mountainLake from '../../images/mountainlake.jpg';
+import newYork from '../../images/newYork.jpg';
+import goldenGate from '../../images/goldenGate.jpg';
+import palmTrees from '../../images/palmTrees.jpg';
+import bigSur from '../../images/bigSur.jpg';
+import yellowstone from '../../images/yellowstone.jpg';
+import monumentValley from '../../images/monumentValley.jpg';
 import { verifyAccessToken } from '../../utils/apiUtils';
 
 interface Workspace {
@@ -210,6 +216,66 @@ const CreateBoardModal: React.FC = () => {
                                 src={mountainLake}
                                 alt="Mountain lake"
                                 onClick={() => handleImageSelect('mountainLake')}
+                            />
+                            <img
+                                className={
+                                    selectedDefaultImage === 'bigSur'
+                                        ? 'modal-background selected'
+                                        : 'modal-background'
+                                }
+                                src={bigSur}
+                                alt="Big Sur"
+                                onClick={() => handleImageSelect('bigSur')}
+                            />
+                            <img
+                                className={
+                                    selectedDefaultImage === 'newYork'
+                                        ? 'modal-background selected'
+                                        : 'modal-background'
+                                }
+                                src={newYork}
+                                alt="New York"
+                                onClick={() => handleImageSelect('newYork')}
+                            />
+                            <img
+                                className={
+                                    selectedDefaultImage === 'palmTrees'
+                                        ? 'modal-background selected'
+                                        : 'modal-background'
+                                }
+                                src={palmTrees}
+                                alt="Palm Trees"
+                                onClick={() => handleImageSelect('palmTrees')}
+                            />
+                            <img
+                                className={
+                                    selectedDefaultImage === 'goldenGate'
+                                        ? 'modal-background selected'
+                                        : 'modal-background'
+                                }
+                                src={goldenGate}
+                                alt="Golden Gate"
+                                onClick={() => handleImageSelect('goldenGate')}
+                            />
+                            <img
+                                className={
+                                    selectedDefaultImage === 'yellowstone'
+                                        ? 'modal-background selected'
+                                        : 'modal-background'
+                                }
+                                src={yellowstone}
+                                alt="Yellowstone"
+                                onClick={() => handleImageSelect('yellowstone')}
+                            />
+                            <img
+                                className={
+                                    selectedDefaultImage === 'monumentValley'
+                                        ? 'modal-background selected'
+                                        : 'modal-background'
+                                }
+                                src={monumentValley}
+                                alt="Monument Valley"
+                                onClick={() => handleImageSelect('monumentValley')}
                             />
                             {errorImageMessage && (
                                 <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">

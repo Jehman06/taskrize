@@ -5,19 +5,16 @@ import Board from '../Board/Board';
 import { FaFlipboard } from 'react-icons/fa';
 import { BsFillPeopleFill } from 'react-icons/bs';
 import { IoSettingsSharp } from 'react-icons/io5';
-import { FaStar, FaRegStar } from 'react-icons/fa';
-import cherryBlossom from '../../images/cherryblossom.jpg';
-import mountainLake from '../../images/mountainlake.jpg';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
-
-interface Workspaces {
-    id: number;
-    name: string;
-    description: string;
-    owner: number;
-    members: number[];
-}
+import cherryBlossom from '../../images/cherryblossom.jpg';
+import mountainLake from '../../images/mountainlake.jpg';
+import newYork from '../../images/newYork.jpg';
+import goldenGate from '../../images/goldenGate.jpg';
+import palmTrees from '../../images/palmTrees.jpg';
+import bigSur from '../../images/bigSur.jpg';
+import yellowstone from '../../images/yellowstone.jpg';
+import monumentValley from '../../images/monumentValley.jpg';
 
 interface WorkspaceProps {
     name: string;
@@ -26,15 +23,8 @@ interface WorkspaceProps {
     members: number[];
     boards: any[];
     toggleStar: (boardId: number) => Promise<void>;
-    workspaces: Workspaces[]; // Add workspaces to the WorkspaceProps interface
+    favoriteBoards: any[]; // Add favoriteBoards to the WorkspaceProps interface
 }
-
-// Map image names to file paths
-const imageMapping: { [key: string]: string } = {
-    cherryBlossom: cherryBlossom,
-    mountainLake: mountainLake,
-    // Add more image names and file paths as needed
-};
 
 const Workspace: React.FC<WorkspaceProps> = ({
     name,
@@ -43,14 +33,26 @@ const Workspace: React.FC<WorkspaceProps> = ({
     members,
     boards,
     toggleStar,
-    workspaces,
+    favoriteBoards,
 }) => {
     // Redux state management
     const userId: number | null = useSelector((state: RootState) => state.auth.user.id);
 
     // Function to determine if a board is favorited by the user
     const isBoardFavorited = (board: any): boolean => {
-        return board.favorite.includes(userId);
+        return favoriteBoards.some((favoriteBoard) => favoriteBoard.id === board.id);
+    };
+
+    // Map image names to file paths
+    const imageMapping: { [key: string]: string } = {
+        cherryBlossom: cherryBlossom,
+        mountainLake: mountainLake,
+        newYork: newYork,
+        monumentValley: monumentValley,
+        yellowstone: yellowstone,
+        bigSur: bigSur,
+        palmTrees: palmTrees,
+        goldenGate: goldenGate,
     };
 
     return (
@@ -77,10 +79,7 @@ const Workspace: React.FC<WorkspaceProps> = ({
             {/* Render the boards */}
             <div className="board-content">
                 {boards.map((board: any) => {
-                    console.log('User ID:', userId);
-                    console.log('Favorite array:', board.favorite);
                     const starFilled = isBoardFavorited(board);
-                    console.log('starFilled:', starFilled);
                     return (
                         <Board
                             key={board.id}

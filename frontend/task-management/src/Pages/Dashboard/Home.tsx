@@ -14,17 +14,33 @@ import Board from '../../Components/Board/Board';
 import Workspace from '../../Components/Workspace/Workspace';
 import cherryBlossom from '../../images/cherryblossom.jpg';
 import mountainLake from '../../images/mountainlake.jpg';
+import newYork from '../../images/newYork.jpg';
+import goldenGate from '../../images/goldenGate.jpg';
+import palmTrees from '../../images/palmTrees.jpg';
+import bigSur from '../../images/bigSur.jpg';
+import yellowstone from '../../images/yellowstone.jpg';
+import monumentValley from '../../images/monumentValley.jpg';
 
 // Map image names to file paths
 const imageMapping: { [key: string]: string } = {
     cherryBlossom: cherryBlossom,
     mountainLake: mountainLake,
-    // Add more image names and file paths as needed
+    newYork: newYork,
+    monumentValley: monumentValley,
+    yellowstone: yellowstone,
+    bigSur: bigSur,
+    palmTrees: palmTrees,
+    goldenGate: goldenGate,
 };
 
 interface Board {
     id: number;
     title: string;
+    description: string;
+    favorite: any; // You might want to define a type for favorite property
+    default_image: string;
+    workspace: any; // You might want to define a type for workspace property
+    workspace_name: string;
     starFilled: boolean;
 }
 
@@ -37,6 +53,11 @@ interface Workspaces {
     boards: Board[];
 }
 
+interface FavoriteBoard {
+    id: number;
+    starFilled: boolean;
+}
+
 const Home: React.FC = () => {
     // Redux state management
     const userId: number | null = useSelector((state: RootState) => state.auth.user.id);
@@ -47,6 +68,7 @@ const Home: React.FC = () => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [boards, setBoards] = useState<Board[]>([]);
     const [workspaces, setWorkspaces] = useState<Workspaces[]>([]);
+    const [favoriteBoards, setFavoriteBoards] = useState<FavoriteBoard[]>([]);
 
     const handleItemClick = (item: any) => {
         setSelectedItem(item);
@@ -63,11 +85,18 @@ const Home: React.FC = () => {
             // Toggle the starFilled property locally
             const updatedBoards = boards.map((board) => {
                 if (board.id === boardId) {
+                    // Toggle the starFilled property
                     return { ...board, starFilled: !board.starFilled };
                 }
                 return board;
             });
+
+            // Update boards state
             setBoards(updatedBoards);
+
+            // Update favoriteBoards state
+            const updatedFavoriteBoards = updatedBoards.filter((board) => board.starFilled);
+            setFavoriteBoards(updatedFavoriteBoards);
 
             // Send a request to the backend to update the favorite status
             await axios.post(
@@ -85,9 +114,19 @@ const Home: React.FC = () => {
     };
 
     useEffect(() => {
-        getBoardsAndWorkspaces();
-        dispatch(resetAppStates());
+        const fetchDataAndInitialize = async () => {
+            await getBoardsAndWorkspaces();
+            dispatch(resetAppStates());
+        };
+
+        fetchDataAndInitialize();
     }, []);
+
+    useEffect(() => {
+        // Initialize favoriteBoards state with initial favorite boards data
+        const initialFavoriteBoards = boards.filter((board: Board) => board.starFilled);
+        setFavoriteBoards(initialFavoriteBoards);
+    }, [boards]);
 
     const fetchData = async (url: string): Promise<any> => {
         try {
@@ -109,40 +148,49 @@ const Home: React.FC = () => {
         const boardsUrl = 'http://127.0.0.1:8000/api/boards/';
         const workspacesUrl = 'http://127.0.0.1:8000/api/workspaces/';
 
-        const [boardsResponse, workspacesResponse] = await Promise.all([
-            fetchData(boardsUrl),
-            fetchData(workspacesUrl),
-        ]);
+        try {
+            const [boardsResponse, workspacesResponse] = await Promise.all([
+                fetchData(boardsUrl),
+                fetchData(workspacesUrl),
+            ]);
 
-        if (boardsResponse && workspacesResponse) {
-            // Process boards data
-            const fetchedBoards = boardsResponse.map((board: any) => ({
-                ...board,
-                starFilled: board.favorite.includes(userId),
-            }));
-            setBoards(fetchedBoards);
+            if (boardsResponse && workspacesResponse) {
+                // Process boards data
+                const fetchedBoards = boardsResponse.map((board: any) => ({
+                    ...board,
+                    starFilled: board.favorite.includes(userId),
+                }));
+                setBoards(fetchedBoards);
 
-            // Process workspaces data
-            const updatedWorkspaces = await Promise.all(
-                workspacesResponse.map(async (workspace: any) => {
-                    const boardsData = await fetchData(`${workspacesUrl}${workspace.id}/boards`);
+                // Filter favorite boards
+                const initialFavoriteBoards = fetchedBoards.filter(
+                    (board: any) => board.starFilled
+                );
+                setFavoriteBoards(initialFavoriteBoards);
 
-                    // Merge the fetched boards data with the workspace object
-                    return {
-                        ...workspace,
-                        boards: boardsData,
-                    };
-                })
-            );
+                // Process workspaces data
+                const updatedWorkspaces = await Promise.all(
+                    workspacesResponse.map(async (workspace: any) => {
+                        const boardsData = await fetchData(
+                            `${workspacesUrl}${workspace.id}/boards`
+                        );
 
-            setWorkspaces(updatedWorkspaces);
-        } else {
-            console.error('Error fetching boards or workspaces.');
+                        // Merge the fetched boards data with the workspace object
+                        return {
+                            ...workspace,
+                            boards: boardsData,
+                        };
+                    })
+                );
+
+                setWorkspaces(updatedWorkspaces);
+            } else {
+                console.error('Error fetching boards or workspaces.');
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
         }
     };
-
-    // Filter the favorite boards
-    const favoriteBoards = boards.filter((board) => board.starFilled);
 
     return (
         <div className="home">
@@ -226,7 +274,7 @@ const Home: React.FC = () => {
                                     members={workspace.members}
                                     boards={workspace.boards}
                                     toggleStar={toggleStar}
-                                    workspaces={workspaces}
+                                    favoriteBoards={favoriteBoards}
                                 />
                             ))}
                     </div>

@@ -4,7 +4,6 @@ import storage from 'redux-persist/lib/storage';
 import authSlice from './reducers/authSlice';
 import appSlice from './reducers/appSlice';
 import modalSlice from './reducers/modalSlice';
-import boardWorkspaceSlice from './reducers/boardWorkspaceSlice';
 
 const persistConfig = {
     key: 'root',

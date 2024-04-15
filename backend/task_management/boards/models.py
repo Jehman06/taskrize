@@ -6,6 +6,12 @@ from workspaces.models import Workspace
 DEFAULT_IMAGES = [
     ('cherryBlossom', 'images/cherryblossom.jpg'),
     ('mountainLake', 'images/mountainlake.jpg'),
+    ('goldenGate', 'images/goldenGate.jpg'),
+    ('palmTrees', 'images/palmTrees.jpg'),
+    ('bigSur', 'images/bigSur.jpg'),
+    ('newYork', 'images/newYork.jpg'),
+    ('yellowstone', 'images/yellowstone.jpg'),
+    ('monumentValley', 'images/monumentValley.jpg')
 ]
 
 class Board(models.Model):

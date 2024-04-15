@@ -23,7 +23,7 @@ const Board: React.FC<BoardProps> = ({
     workspace,
     workspace_name,
     toggleStar,
-    starFilled,
+    starFilled, // Here we receive the starFilled prop
 }) => {
     return (
         <div className="board-wrapper">
@@ -33,9 +33,9 @@ const Board: React.FC<BoardProps> = ({
                 <div className="workspace-name">In Workspace {workspace_name}</div>
                 <div onClick={() => toggleStar(id)}>
                     {starFilled ? (
-                        <FaStar className="star-full" />
+                        <FaStar className="star-full" /> // Render filled star icon if starFilled is true
                     ) : (
-                        <FaRegStar className="star-icon" />
+                        <FaRegStar className="star-icon" /> // Render empty star icon if starFilled is false
                     )}
                 </div>
             </div>
