@@ -92,6 +92,7 @@ const Workspace: React.FC<WorkspaceProps> = ({
                             workspace_name={board.workspace_name}
                             starFilled={starFilled}
                             toggleStar={() => toggleStar(board.id)}
+                            showWorkspaceName={false}
                         />
                     );
                 })}
