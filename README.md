@@ -1,5 +1,17 @@
 # TaskRize
 
+## Sneak Peek
+Here's a quick video of the current state of TaskRize :smile:
+
+<div>
+    <a href="https://www.loom.com/share/d769749ccdc94b4f82f059d2fad4fd89">
+      <p>TaskRize - Watch Video</p>
+    </a>
+    <a href="https://www.loom.com/share/d769749ccdc94b4f82f059d2fad4fd89">
+      <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/d769749ccdc94b4f82f059d2fad4fd89-with-play.gif">
+    </a>
+  </div>
+  
 ## Description
 
 TaskRize is a robust project management application. Offering a streamlined user experience, TaskRize empowers individuals and teams to efficiently organize tasks, collaborate seamlessly, and enhance productivity. With intuitive features and customizable boards, users can easily visualize workflows, assign tasks, track progress, and prioritize activities. TaskRize facilitates effective project management, fostering teamwork and enabling users to achieve their goals with ease.
