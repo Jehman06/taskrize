@@ -1,4 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { RootState } from '../store';
 
 interface Workspace {
     id: number;
@@ -23,11 +24,17 @@ interface Board {
 interface workspaceState {
     workspaces: Workspace[];
     boards: Board[];
+    workspaceName: string;
+    editing: boolean;
+    editingWorkspaceId: number | null;
 }
 
 const initialState: workspaceState = {
     workspaces: [],
     boards: [],
+    workspaceName: '',
+    editing: false,
+    editingWorkspaceId: null,
 };
 
 const workspaceSLice = createSlice({
@@ -37,8 +44,18 @@ const workspaceSLice = createSlice({
         setWorkspaces(state, action: PayloadAction<Workspace[]>) {
             state.workspaces = action.payload;
         },
+        setWorkspaceName(state, action: PayloadAction<string>) {
+            state.workspaceName = action.payload;
+        },
+        setEditing(state, action: PayloadAction<boolean>) {
+            state.editing = action.payload;
+        },
+        setEditingWorkspaceId(state, action: PayloadAction<number | null>) {
+            state.editingWorkspaceId = action.payload;
+        },
     },
 });
 
-export const { setWorkspaces } = workspaceSLice.actions;
+export const { setWorkspaces, setWorkspaceName, setEditing, setEditingWorkspaceId } =
+    workspaceSLice.actions;
 export default workspaceSLice.reducer;

@@ -277,6 +277,7 @@ const Home: React.FC = () => {
                                 boards={workspace.boards || []}
                                 toggleStar={toggleStar}
                                 favoriteBoards={favoriteBoards}
+                                id={workspace.id}
                             />
                         ))}
                     </div>
