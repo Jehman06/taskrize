@@ -6,6 +6,7 @@ from django.conf import settings
 # Authentication model
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
+    username = models.CharField(max_length=150, unique=False, null=True, blank=True)  # Make username nullable and non-unique
     reset_code = models.CharField(max_length=100, blank=True, null=True)
     board_favorite = models.ManyToManyField('boards.Board', related_name='favorited_by', blank=True)  # Added this line
 

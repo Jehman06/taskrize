@@ -19,11 +19,11 @@ def register_user(request):
     password = request.data.get('password')
     password_confirmation = request.data.get('password_confirmation')
 
-    if password != password_confirmation:
-        raise ValidationError({'error': 'Passwords do not match'})
+    if not email or not password or not password_confirmation:
+        return Response({'error': 'Please provide email, password, and password_confirmation'}, status=status.HTTP_400_BAD_REQUEST)
     
-    if not email or not password:
-        return Response({'error': 'Please provide email and password'}, status=status.HTTP_400_BAD_REQUEST)
+    if password != password_confirmation:
+        return Response({'error': 'Passwords do not match'}, status=status.HTTP_400_BAD_REQUEST)
     
     # Check if the email is already in use
     if CustomUser.objects.filter(email=email).exists():
