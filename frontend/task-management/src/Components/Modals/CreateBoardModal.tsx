@@ -14,7 +14,7 @@ import {
 import { RootState } from '../../redux/store';
 import './Modal.css';
 import { Modal, Form, Button, DropdownButton, ButtonGroup, Dropdown } from 'react-bootstrap';
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import Cookies from 'js-cookie';
 import cherryBlossom from '../../images/cherryblossom.jpg';
 import mountainLake from '../../images/mountainlake.jpg';
@@ -25,7 +25,6 @@ import bigSur from '../../images/bigSur.jpg';
 import yellowstone from '../../images/yellowstone.jpg';
 import monumentValley from '../../images/monumentValley.jpg';
 import { verifyAccessToken } from '../../utils/apiUtils';
-import { setWorkspaces } from '../../redux/reducers/workspaceSlice';
 
 interface Workspace {
     id: number;
@@ -41,6 +40,17 @@ interface BoardFormData {
     custom_image: File | string | null; // Feature to implement later
     default_image: string | null;
 }
+
+const images = [
+    cherryBlossom,
+    mountainLake,
+    newYork,
+    goldenGate,
+    palmTrees,
+    bigSur,
+    yellowstone,
+    monumentValley,
+];
 
 const CreateBoardModal: React.FC = () => {
     // Redux state management
@@ -68,6 +78,19 @@ const CreateBoardModal: React.FC = () => {
         (state: RootState) => state.modal.errorWorkspaceMessage
     );
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        // Preload images when the component mounts
+        preloadImages(Object.values(images));
+    }, []);
+
+    // Function to preload images
+    const preloadImages = (urls: string[]) => {
+        urls.forEach((url) => {
+            const img = new Image();
+            img.src = url;
+        });
+    };
 
     // As of right now, users cannot upload their own images as backgrounds. It's a feature that I will be working on in the future.
     const handleImageSelect = (image: string | File) => {
@@ -100,38 +123,12 @@ const CreateBoardModal: React.FC = () => {
     // };
 
     useEffect(() => {
-        getWorkspaces();
-    }, []);
-
-    useEffect(() => {
         // Set the first workspace as the default selected workspace when workspaces change
         if (workspaces.length > 0) {
             dispatch(updateSelectedWorkspace(workspaces[0]));
             dispatch(updateBoardFormData({ workspace: workspaces[0] }));
         }
-    }, [workspaces]);
-
-    // Get the workspaces from the database
-    const getWorkspaces = async () => {
-        try {
-            // Verify the access token or refresh it if it's expired
-            await verifyAccessToken();
-
-            // Get the access token and refresh token from cookies
-            const accessToken = Cookies.get('access_token');
-
-            // Once the token has been validated or refreshed, create the new workspace
-            const response: AxiosResponse = await axios.get(
-                'http://127.0.0.1:8000/api/workspaces/',
-                {
-                    headers: { Authorization: `Bearer ${accessToken}` },
-                }
-            );
-            dispatch(setWorkspaces(response.data));
-        } catch (error) {
-            console.error('Error creating the workspace');
-        }
-    };
+    }, [workspaces, dispatch]);
 
     const createBoard = async (boardFormData: BoardFormData) => {
         // Get the access token from cookies

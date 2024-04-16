@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import PrivateNavbar from '../../Navbar/PrivateNavbar';
@@ -91,37 +91,7 @@ const Home: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        const fetchDataAndInitialize = async () => {
-            await getBoardsAndWorkspaces();
-            dispatch(resetAppStates());
-        };
-
-        fetchDataAndInitialize();
-    }, []);
-
-    useEffect(() => {
-        const initialFavoriteBoards = boards.filter((board) => board.starFilled);
-        dispatch(setFavoriteBoards(initialFavoriteBoards));
-    }, [boards]);
-
-    const fetchData = async (url: string): Promise<any> => {
-        try {
-            await verifyAccessToken();
-            const accessToken = Cookies.get('access_token');
-            const response: AxiosResponse = await axios.get(url, {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            });
-            return response.data;
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            return null;
-        }
-    };
-
-    const getBoardsAndWorkspaces = async (): Promise<void> => {
+    const getBoardsAndWorkspaces = useCallback(async (): Promise<void> => {
         const boardsUrl = 'http://127.0.0.1:8000/api/boards/';
         const workspacesUrl = 'http://127.0.0.1:8000/api/workspaces/';
 
@@ -167,6 +137,50 @@ const Home: React.FC = () => {
             }
         } catch (error) {
             console.error('Error fetching data:', error);
+        }
+    }, [dispatch, userId]);
+
+    useEffect(() => {
+        const fetchDataAndInitialize = async () => {
+            await getBoardsAndWorkspaces();
+            dispatch(resetAppStates());
+        };
+
+        fetchDataAndInitialize();
+    }, [dispatch, getBoardsAndWorkspaces]);
+
+    useEffect(() => {
+        const initialFavoriteBoards = boards.filter((board) => board.starFilled);
+        dispatch(setFavoriteBoards(initialFavoriteBoards));
+    }, [boards, dispatch]);
+
+    useEffect(() => {
+        // Preload images when the component mounts
+        preloadImages(Object.values(imageMapping));
+    }, []);
+
+    // Function to preload images
+    const preloadImages = (urls: string[]) => {
+        urls.forEach((url) => {
+            const img = new Image();
+            img.src = url;
+        });
+    };
+
+    // Verify the validity of access token
+    const fetchData = async (url: string): Promise<any> => {
+        try {
+            await verifyAccessToken();
+            const accessToken = Cookies.get('access_token');
+            const response: AxiosResponse = await axios.get(url, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            return null;
         }
     };
 
