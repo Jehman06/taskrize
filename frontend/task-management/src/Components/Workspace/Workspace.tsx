@@ -26,18 +26,7 @@ interface WorkspaceProps {
     favoriteBoards: any[];
 }
 
-const Workspace: React.FC<WorkspaceProps> = ({
-    name,
-    description,
-    ownerId,
-    members,
-    boards,
-    toggleStar,
-    favoriteBoards,
-}) => {
-    // Redux state management
-    const userId: number | null = useSelector((state: RootState) => state.auth.user.id);
-
+const Workspace: React.FC<WorkspaceProps> = ({ name, boards, toggleStar, favoriteBoards }) => {
     // Calculate the starFilled property for each board
     const boardsWithStarFilled = boards.map((board) => ({
         ...board,
@@ -92,7 +81,7 @@ const Workspace: React.FC<WorkspaceProps> = ({
                             workspace_name={board.workspace_name}
                             starFilled={board.starFilled}
                             toggleStar={() => toggleStar(board.id)}
-                            showWorkspaceName={false}
+                            showWorkspaceName={false} // Because the board is in the Workspace section, we don't display the workspace name
                         />
                     );
                 })}

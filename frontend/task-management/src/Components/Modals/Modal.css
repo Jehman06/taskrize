@@ -33,9 +33,9 @@
 }
 
 .modal-input {
-    background-color: #1d2125;
+    background-color: #1d2125 !important;
     outline: teal;
-    color: #9fadbc;
+    color: #9fadbc !important;
 }
 
 .modal-input:focus:not(:hover) {

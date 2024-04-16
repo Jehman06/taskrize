@@ -1,17 +1,24 @@
 import React, { useCallback, useEffect, useState } from 'react';
+// Redux
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
-import PrivateNavbar from '../../Navbar/PrivateNavbar';
-import { spiral } from 'ldrs';
 import { resetAppStates } from '../../redux/reducers/appSlice';
-import './Home.css';
-import { FaRegClock } from 'react-icons/fa';
-import { FaRegStar } from 'react-icons/fa';
+import { setBoards, setFavoriteBoards } from '../../redux/reducers/boardSlice';
+import { setWorkspaces } from '../../redux/reducers/workspaceSlice';
+// Components
+import PrivateNavbar from '../../Navbar/PrivateNavbar';
+import Board from '../../Components/Board/Board';
+import Workspace from '../../Components/Workspace/Workspace';
+// API related
 import axios, { AxiosResponse } from 'axios';
 import { verifyAccessToken } from '../../utils/apiUtils';
 import Cookies from 'js-cookie';
-import Board from '../../Components/Board/Board';
-import Workspace from '../../Components/Workspace/Workspace';
+// Styling
+import './Home.css';
+import { spiral } from 'ldrs';
+import { FaRegClock } from 'react-icons/fa';
+import { FaRegStar } from 'react-icons/fa';
+// Images
 import cherryBlossom from '../../images/cherryblossom.jpg';
 import mountainLake from '../../images/mountainlake.jpg';
 import newYork from '../../images/newYork.jpg';
@@ -20,8 +27,6 @@ import palmTrees from '../../images/palmTrees.jpg';
 import bigSur from '../../images/bigSur.jpg';
 import yellowstone from '../../images/yellowstone.jpg';
 import monumentValley from '../../images/monumentValley.jpg';
-import { setBoards, setFavoriteBoards } from '../../redux/reducers/boardSlice';
-import { setWorkspaces } from '../../redux/reducers/workspaceSlice';
 
 // Map image names to file paths
 const imageMapping: { [key: string]: string } = {
@@ -38,59 +43,50 @@ const imageMapping: { [key: string]: string } = {
 spiral.register();
 
 const Home: React.FC = () => {
+    const [selectedItem, setSelectedItem] = useState(null);
     // Redux state management
     const userId: number | null = useSelector((state: RootState) => state.auth.user.id);
     const dispatch = useDispatch();
-
-    const [selectedItem, setSelectedItem] = useState(null);
     const boards = useSelector((state: RootState) => state.board.boards);
     const workspaces = useSelector((state: RootState) => state.workspace.workspaces);
-    // const [workspaces, setWorkspaces] = useState<Workspaces[]>([]);
     const favoriteBoards = useSelector((state: RootState) => state.board.favoriteBoards);
 
     const handleItemClick = (item: any) => {
         setSelectedItem(item);
     };
 
-    // Add board to favorite
-    const toggleStar = async (boardId: number) => {
+    // Preload images for improved performance
+    useEffect(() => {
+        // Preload images when the component mounts
+        preloadImages(Object.values(imageMapping));
+    }, []);
+
+    const preloadImages = (urls: string[]) => {
+        urls.forEach((url) => {
+            const img = new Image();
+            img.src = url;
+        });
+    };
+
+    // Fetch boards and workspaces
+    const fetchData = async (url: string): Promise<any> => {
+        // Verify the validity of access token
         try {
-            // Verify the access token's validity and refresh it if it's expired
             await verifyAccessToken();
-            // Get the valid token from the cookies
             const accessToken = Cookies.get('access_token');
-
-            // Toggle the starFilled property locally
-            const updatedBoards = boards.map((board) => {
-                if (board.id === boardId) {
-                    // Toggle the starFilled property
-                    return { ...board, starFilled: !board.starFilled };
-                }
-                return board;
+            const response: AxiosResponse = await axios.get(url, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
             });
-
-            // Update boards state
-            dispatch(setBoards(updatedBoards));
-
-            // Update favoriteBoards state
-            const updatedFavoriteBoards = updatedBoards.filter((board) => board.starFilled);
-            dispatch(setFavoriteBoards(updatedFavoriteBoards));
-
-            // Send a request to the backend to update the favorite status
-            await axios.post(
-                `http://127.0.0.1:8000/api/boards/toggle-favorite?board_id=${boardId}`, // Send boardId as a query parameter
-                null, // No request body
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                }
-            );
+            return response.data;
         } catch (error) {
-            console.error('Error toggling star:', error);
+            console.error('Error fetching data:', error);
+            return null;
         }
     };
 
+    // Fetch the boards and workspaces for the user
     const getBoardsAndWorkspaces = useCallback(async (): Promise<void> => {
         const boardsUrl = 'http://127.0.0.1:8000/api/boards/';
         const workspacesUrl = 'http://127.0.0.1:8000/api/workspaces/';
@@ -140,6 +136,46 @@ const Home: React.FC = () => {
         }
     }, [dispatch, userId]);
 
+    // Add board to favorite
+    const toggleStar = async (boardId: number) => {
+        try {
+            // Verify the access token's validity and refresh it if it's expired
+            await verifyAccessToken();
+            // Get the valid token from the cookies
+            const accessToken = Cookies.get('access_token');
+
+            // Toggle the starFilled property locally
+            const updatedBoards = boards.map((board) => {
+                if (board.id === boardId) {
+                    // Toggle the starFilled property
+                    return { ...board, starFilled: !board.starFilled };
+                }
+                return board;
+            });
+
+            // Update boards state
+            dispatch(setBoards(updatedBoards));
+
+            // Update favoriteBoards state
+            const updatedFavoriteBoards = updatedBoards.filter((board) => board.starFilled);
+            dispatch(setFavoriteBoards(updatedFavoriteBoards));
+
+            // Send a request to the backend to update the favorite status
+            await axios.post(
+                `http://127.0.0.1:8000/api/boards/toggle-favorite?board_id=${boardId}`, // Send boardId as a query parameter
+                null, // No request body
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                }
+            );
+        } catch (error) {
+            console.error('Error toggling star:', error);
+        }
+    };
+
+    // Fetch the data on component mount
     useEffect(() => {
         const fetchDataAndInitialize = async () => {
             await getBoardsAndWorkspaces();
@@ -149,40 +185,11 @@ const Home: React.FC = () => {
         fetchDataAndInitialize();
     }, [dispatch, getBoardsAndWorkspaces]);
 
+    // Allow to have favorite boards displayed in the favorite section dynamically (on component mount)
     useEffect(() => {
         const initialFavoriteBoards = boards.filter((board) => board.starFilled);
         dispatch(setFavoriteBoards(initialFavoriteBoards));
     }, [boards, dispatch]);
-
-    useEffect(() => {
-        // Preload images when the component mounts
-        preloadImages(Object.values(imageMapping));
-    }, []);
-
-    // Function to preload images
-    const preloadImages = (urls: string[]) => {
-        urls.forEach((url) => {
-            const img = new Image();
-            img.src = url;
-        });
-    };
-
-    // Verify the validity of access token
-    const fetchData = async (url: string): Promise<any> => {
-        try {
-            await verifyAccessToken();
-            const accessToken = Cookies.get('access_token');
-            const response: AxiosResponse = await axios.get(url, {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            });
-            return response.data;
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            return null;
-        }
-    };
 
     return (
         <div className="home">

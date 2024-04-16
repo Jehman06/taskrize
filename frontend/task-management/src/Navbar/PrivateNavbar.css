@@ -39,6 +39,10 @@
     color: #9fadbc !important;
 }
 
+.dropdown-item-name {
+    font-size: 0.8rem;
+}
+
 .dropdown-item:hover {
     background-color: #333c44 !important;
     color: #9fadbc;

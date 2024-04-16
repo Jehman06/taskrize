@@ -1,28 +1,32 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+// Redux
+import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser, resetAuthStates } from '../redux/reducers/authSlice';
+import { resetAppStates } from '../redux/reducers/appSlice';
+import CreateBoardModal from '../Components/Modals/CreateBoardModal';
+import CreateWorkspaceModal from '../Components/Modals/CreateWorkspaceModal';
+import { updateCreateBoardModal, updateCreateWorkspaceModal } from '../redux/reducers/modalSlice';
+import { RootState } from '../redux/store';
+// API
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import { verifyAccessToken } from '../utils/apiUtils';
+// Styling
 import taskrize from '../images/taskrize.png';
 import { SlMagnifier } from 'react-icons/sl';
 import { MdAccountCircle } from 'react-icons/md';
 import './PrivateNavbar.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
-import axios, { AxiosError } from 'axios';
-import Cookies from 'js-cookie';
-import { resetAppStates } from '../redux/reducers/appSlice';
-import CreateBoardModal from '../Components/Modals/CreateBoardModal';
-import CreateWorkspaceModal from '../Components/Modals/CreateWorkspaceModal';
-import {
-    updateBoardFormData,
-    updateCreateBoardModal,
-    updateCreateWorkspaceModal,
-} from '../redux/reducers/modalSlice';
-import { verifyAccessToken } from '../utils/apiUtils';
 
 const PrivateNavbar: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+
+    const favoriteBoards = useSelector((state: RootState) => state.board.favoriteBoards);
+    const boards = useSelector((state: RootState) => state.board.boards);
+    const workspaces = useSelector((state: RootState) => state.workspace.workspaces);
 
     const handleLogout = async (): Promise<void> => {
         try {
@@ -44,7 +48,6 @@ const PrivateNavbar: React.FC = () => {
             dispatch(logoutUser());
             dispatch(resetAppStates());
             dispatch(resetAuthStates());
-
             Cookies.remove('access_token');
             Cookies.remove('refresh_token');
             Cookies.remove('csrftoken');
@@ -71,7 +74,57 @@ const PrivateNavbar: React.FC = () => {
                     className="mr-3 private-logo"
                     onClick={handleLogoClick}
                 />
-                <div className="dropdown recent">
+
+                <div className="dropdown">
+                    <button
+                        className="dropdown-btn dropdown-toggle"
+                        type="button"
+                        id="dropdownBoardsButton"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
+                        Workspaces
+                    </button>
+                    <ul className="dropdown-menu" aria-labelledby="dropdownWorkspacesButton">
+                        {workspaces &&
+                            workspaces.map((workspace) => {
+                                return (
+                                    <li key={workspace.id}>
+                                        <a className="dropdown-item" href="#">
+                                            {workspace.name}
+                                        </a>
+                                    </li>
+                                );
+                            })}
+                    </ul>
+                </div>
+                <div className="dropdown">
+                    <button
+                        className="dropdown-btn dropdown-toggle"
+                        type="button"
+                        id="dropdownBoardsButton"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
+                        Boards
+                    </button>
+                    <ul className="dropdown-menu" aria-labelledby="dropdownBoardsButton">
+                        {boards &&
+                            boards.map((board) => {
+                                return (
+                                    <li key={board.id}>
+                                        <a className="dropdown-item" href="#">
+                                            {board.title}
+                                            <div className="dropdown-item-name">
+                                                {board.workspace_name}
+                                            </div>
+                                        </a>
+                                    </li>
+                                );
+                            })}
+                    </ul>
+                </div>
+                <div className="dropdown">
                     <button
                         className="dropdown-btn dropdown-toggle"
                         type="button"
@@ -79,27 +132,13 @@ const PrivateNavbar: React.FC = () => {
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
                     >
-                        Recent
+                        Recents
                     </button>
                     <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                        <li>
-                            <a className="dropdown-item" href="#">
-                                Board 1
-                            </a>
-                        </li>
-                        <li>
-                            <a className="dropdown-item" href="#">
-                                Board 2
-                            </a>
-                        </li>
-                        <li>
-                            <a className="dropdown-item" href="#">
-                                Board 3
-                            </a>
-                        </li>
+                        {/* Dropdown items for Recent */}
                     </ul>
                 </div>
-                <div className="dropdown favorites">
+                <div className="dropdown">
                     <button
                         className="dropdown-btn dropdown-toggle"
                         type="button"
@@ -110,24 +149,22 @@ const PrivateNavbar: React.FC = () => {
                         Favorites
                     </button>
                     <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-                        <li>
-                            <a className="dropdown-item" href="#">
-                                Favorite 1
-                            </a>
-                        </li>
-                        <li>
-                            <a className="dropdown-item" href="#">
-                                Favorite 2
-                            </a>
-                        </li>
-                        <li>
-                            <a className="dropdown-item" href="#">
-                                Favorite 3
-                            </a>
-                        </li>
+                        {favoriteBoards &&
+                            favoriteBoards.map((favoriteBoard) => {
+                                return (
+                                    <li key={favoriteBoard.id}>
+                                        <a className="dropdown-item" href="#">
+                                            {favoriteBoard.title}
+                                            <div className="dropdown-item-name">
+                                                {favoriteBoard.workspace_name}
+                                            </div>
+                                        </a>
+                                    </li>
+                                );
+                            })}
                     </ul>
                 </div>
-                <div className="dropdown create">
+                <div className="dropdown">
                     <button
                         className="create-button dropdown-toggle no-arrow"
                         type="button"

@@ -18,14 +18,11 @@ interface BoardProps {
 const Board: React.FC<BoardProps> = ({
     id,
     title,
-    description,
-    favorite,
     default_image,
-    workspace,
     workspace_name,
     toggleStar,
-    starFilled, // Here we receive the starFilled prop
-    showWorkspaceName = true,
+    starFilled,
+    showWorkspaceName = true, // Show the Workspace name if Board isn't in the Workspace section, for clarity
 }) => {
     return (
         <div className="board-wrapper">
