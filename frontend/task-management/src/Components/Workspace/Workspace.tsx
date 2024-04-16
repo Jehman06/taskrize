@@ -1,9 +1,29 @@
 import React from 'react';
+// Redux
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
+import {
+    setEditing,
+    setEditingWorkspaceId,
+    setShowDeleteModal,
+    setWorkspaceName,
+} from '../../redux/reducers/workspaceSlice';
+// Component
+import Board from '../Board/Board';
+// API related
+import { verifyAccessToken } from '../../utils/apiUtils';
+import Cookies from 'js-cookie';
+import axios from 'axios';
+// Styling
+
 import './Workspace.css';
 import '../Board/Board.css';
-import Board from '../Board/Board';
+import '../Modals/Modal.css';
+import { Button, Modal } from 'react-bootstrap';
 import { BsFillPeopleFill } from 'react-icons/bs';
-import { IoSettingsSharp } from 'react-icons/io5';
+import { IoSettingsSharp, IoExitOutline } from 'react-icons/io5';
+import { MdDriveFileRenameOutline, MdDelete } from 'react-icons/md';
+// Images
 import cherryBlossom from '../../images/cherryblossom.jpg';
 import mountainLake from '../../images/mountainlake.jpg';
 import newYork from '../../images/newYork.jpg';
@@ -12,16 +32,6 @@ import palmTrees from '../../images/palmTrees.jpg';
 import bigSur from '../../images/bigSur.jpg';
 import yellowstone from '../../images/yellowstone.jpg';
 import monumentValley from '../../images/monumentValley.jpg';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
-import {
-    setEditing,
-    setEditingWorkspaceId,
-    setWorkspaceName,
-} from '../../redux/reducers/workspaceSlice';
-import { verifyAccessToken } from '../../utils/apiUtils';
-import Cookies from 'js-cookie';
-import axios from 'axios';
 
 interface WorkspaceProps {
     id: number;
@@ -34,6 +44,18 @@ interface WorkspaceProps {
     favoriteBoards: any[];
 }
 
+// Map image names to file paths
+const imageMapping: { [key: string]: string } = {
+    cherryBlossom: cherryBlossom,
+    mountainLake: mountainLake,
+    newYork: newYork,
+    monumentValley: monumentValley,
+    yellowstone: yellowstone,
+    bigSur: bigSur,
+    palmTrees: palmTrees,
+    goldenGate: goldenGate,
+};
+
 const Workspace: React.FC<WorkspaceProps> = ({ name, boards, toggleStar, favoriteBoards, id }) => {
     // Redux state management
     const editing = useSelector((state: RootState) => state.workspace.editing);
@@ -41,6 +63,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ name, boards, toggleStar, favorit
     const editingWorkspaceId = useSelector(
         (state: RootState) => state.workspace.editingWorkspaceId
     );
+    const showDeleteModal = useSelector((state: RootState) => state.workspace.showDeleteModal);
     const dispatch = useDispatch();
 
     // Calculate the starFilled property for each board
@@ -49,6 +72,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ name, boards, toggleStar, favorit
         starFilled: favoriteBoards.some((favoriteBoard) => favoriteBoard.id === board.id),
     }));
 
+    // Update Workspace
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         dispatch(setWorkspaceName(e.target.value));
     };
@@ -110,16 +134,48 @@ const Workspace: React.FC<WorkspaceProps> = ({ name, boards, toggleStar, favorit
         }
     };
 
-    // Map image names to file paths
-    const imageMapping: { [key: string]: string } = {
-        cherryBlossom: cherryBlossom,
-        mountainLake: mountainLake,
-        newYork: newYork,
-        monumentValley: monumentValley,
-        yellowstone: yellowstone,
-        bigSur: bigSur,
-        palmTrees: palmTrees,
-        goldenGate: goldenGate,
+    // Delete Workspace
+    const handleDelete = () => {
+        // Open the Modal to confirm deletion
+        dispatch(setShowDeleteModal(true));
+    };
+
+    const confirmDelete = () => {
+        // Call the onDelete function to delete the workspace
+        onDelete(id); // Pass the workspaceId as a parameter
+        // Close the modal
+        dispatch(setShowDeleteModal(false));
+    };
+
+    const onDelete = async (workspaceId: number): Promise<void> => {
+        try {
+            await verifyAccessToken();
+            const accessToken = Cookies.get('access_token');
+
+            // Make a DELETE request to the Workspace API to delete the workspace
+            const response = await axios.delete('http://127.0.0.1:8000/api/workspaces/delete', {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json', // Include Content-Type header
+                },
+                data: { workspace_id: workspaceId }, // Pass workspace_id in the request body
+            });
+
+            // Check if the response is successful
+            if (response.status === 204) {
+                console.log('Workspace deleted successfully');
+                window.location.reload();
+            } else {
+                console.error('Error deleting workspace: ', response.data);
+            }
+        } catch (error) {
+            console.error('Error deleting the workspace: ', error);
+        }
+    };
+
+    const cancelDelete = () => {
+        // Close the modal without deleting the workspace
+        dispatch(setShowDeleteModal(false));
     };
 
     return (
@@ -163,12 +219,57 @@ const Workspace: React.FC<WorkspaceProps> = ({ name, boards, toggleStar, favorit
                             style={{ cursor: 'pointer' }}
                             onClick={handleRenameClick}
                         >
+                            <MdDriveFileRenameOutline className="settings-dropdown-icons" />
                             Rename
                         </li>
-                        <li className="dropdown-item" style={{ cursor: 'pointer' }}>
+                        <li
+                            className="dropdown-item"
+                            onClick={handleDelete}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            <MdDelete className="settings-dropdown-icons" />
                             Delete
                         </li>
+                        <li className="dropdown-item" style={{ cursor: 'pointer' }}>
+                            <IoExitOutline className="settings-dropdown-icons" />
+                            Leave workspace
+                        </li>
                     </ul>
+
+                    {/* Confirm-Delete-Modal */}
+                    <Modal
+                        show={showDeleteModal}
+                        onHide={() => dispatch(setShowDeleteModal(false))}
+                        backdrop="static"
+                        keyboard={false}
+                        style={{ borderRadius: '0.3rem' }}
+                        centered
+                    >
+                        <Modal.Body
+                            className="modal-body"
+                            style={{ backgroundColor: '#33373a', color: '#9fadbc' }}
+                        >
+                            <div className="modal-delete-text">
+                                All boards will be deleted for you and all members. Are you sure?
+                            </div>
+                            <div className="modal-delete-buttons">
+                                <Button
+                                    variant="success"
+                                    className="modal-delete-button"
+                                    onClick={confirmDelete}
+                                >
+                                    Yes
+                                </Button>
+                                <Button
+                                    variant="danger"
+                                    className="modal-delete-button"
+                                    onClick={cancelDelete}
+                                >
+                                    No
+                                </Button>
+                            </div>
+                        </Modal.Body>
+                    </Modal>
                 </div>
             </div>
 

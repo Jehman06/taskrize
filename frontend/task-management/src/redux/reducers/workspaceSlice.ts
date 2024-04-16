@@ -27,6 +27,7 @@ interface workspaceState {
     workspaceName: string;
     editing: boolean;
     editingWorkspaceId: number | null;
+    showDeleteModal: boolean;
 }
 
 const initialState: workspaceState = {
@@ -35,6 +36,7 @@ const initialState: workspaceState = {
     workspaceName: '',
     editing: false,
     editingWorkspaceId: null,
+    showDeleteModal: false,
 };
 
 const workspaceSLice = createSlice({
@@ -53,9 +55,17 @@ const workspaceSLice = createSlice({
         setEditingWorkspaceId(state, action: PayloadAction<number | null>) {
             state.editingWorkspaceId = action.payload;
         },
+        setShowDeleteModal(state, action: PayloadAction<boolean>) {
+            state.showDeleteModal = action.payload;
+        },
     },
 });
 
-export const { setWorkspaces, setWorkspaceName, setEditing, setEditingWorkspaceId } =
-    workspaceSLice.actions;
+export const {
+    setWorkspaces,
+    setWorkspaceName,
+    setEditing,
+    setEditingWorkspaceId,
+    setShowDeleteModal,
+} = workspaceSLice.actions;
 export default workspaceSLice.reducer;
