@@ -74,9 +74,6 @@ const modalSlice = createSlice({
         ) {
             state.workspaceFormData = { ...state.workspaceFormData, ...action.payload };
         },
-        updateWorkspaces(state, action: PayloadAction<Workspace[]>) {
-            state.workspaces = action.payload;
-        },
         updateSelectedWorkspace(state, action: PayloadAction<Workspace | null>) {
             state.selectedWorkspace = action.payload;
         },
@@ -120,7 +117,6 @@ export const {
     updateCreateWorkspaceModal,
     updateBoardFormData,
     updateWorkspaceFormData,
-    updateWorkspaces,
     updateSelectedWorkspace,
     updateSelectedDefaultImage,
     updateSelectedCustomImage,

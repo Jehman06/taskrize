@@ -6,7 +6,6 @@ import {
     updateSelectedCustomImage,
     updateSelectedDefaultImage,
     updateSelectedWorkspace,
-    updateWorkspaces,
     updateErrorTitleMessage,
     updateErrorImageMessage,
     resetModalStates,
@@ -26,6 +25,7 @@ import bigSur from '../../images/bigSur.jpg';
 import yellowstone from '../../images/yellowstone.jpg';
 import monumentValley from '../../images/monumentValley.jpg';
 import { verifyAccessToken } from '../../utils/apiUtils';
+import { setWorkspaces } from '../../redux/reducers/workspaceSlice';
 
 interface Workspace {
     id: number;
@@ -50,7 +50,8 @@ const CreateBoardModal: React.FC = () => {
     const boardFormData: BoardFormData = useSelector(
         (state: RootState) => state.modal.boardFormData
     );
-    const workspaces: Workspace[] = useSelector((state: RootState) => state.modal.workspaces);
+    const workspaces = useSelector((state: RootState) => state.workspace.workspaces);
+    // const workspaces: Workspace[] = useSelector((state: RootState) => state.modal.workspaces);
     const selectedWorkspace: Workspace | null = useSelector(
         (state: RootState) => state.modal.selectedWorkspace
     );
@@ -126,7 +127,7 @@ const CreateBoardModal: React.FC = () => {
                     headers: { Authorization: `Bearer ${accessToken}` },
                 }
             );
-            dispatch(updateWorkspaces(response.data));
+            dispatch(setWorkspaces(response.data));
         } catch (error) {
             console.error('Error creating the workspace');
         }

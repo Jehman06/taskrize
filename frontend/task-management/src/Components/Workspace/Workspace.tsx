@@ -23,7 +23,7 @@ interface WorkspaceProps {
     members: number[];
     boards: any[];
     toggleStar: (boardId: number) => Promise<void>;
-    favoriteBoards: any[]; // Add favoriteBoards to the WorkspaceProps interface
+    favoriteBoards: any[];
 }
 
 const Workspace: React.FC<WorkspaceProps> = ({
@@ -38,10 +38,11 @@ const Workspace: React.FC<WorkspaceProps> = ({
     // Redux state management
     const userId: number | null = useSelector((state: RootState) => state.auth.user.id);
 
-    // Function to determine if a board is favorited by the user
-    const isBoardFavorited = (board: any): boolean => {
-        return favoriteBoards.some((favoriteBoard) => favoriteBoard.id === board.id);
-    };
+    // Calculate the starFilled property for each board
+    const boardsWithStarFilled = boards.map((board) => ({
+        ...board,
+        starFilled: favoriteBoards.some((favoriteBoard) => favoriteBoard.id === board.id),
+    }));
 
     // Map image names to file paths
     const imageMapping: { [key: string]: string } = {
@@ -78,8 +79,7 @@ const Workspace: React.FC<WorkspaceProps> = ({
 
             {/* Render the boards */}
             <div className="board-content">
-                {boards.map((board: any) => {
-                    const starFilled = isBoardFavorited(board);
+                {boardsWithStarFilled.map((board: any) => {
                     return (
                         <Board
                             key={board.id}
@@ -90,7 +90,7 @@ const Workspace: React.FC<WorkspaceProps> = ({
                             default_image={imageMapping[board.default_image]}
                             workspace={board.workspace}
                             workspace_name={board.workspace_name}
-                            starFilled={starFilled}
+                            starFilled={board.starFilled}
                             toggleStar={() => toggleStar(board.id)}
                             showWorkspaceName={false}
                         />

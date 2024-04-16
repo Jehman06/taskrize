@@ -4,6 +4,8 @@ import storage from 'redux-persist/lib/storage';
 import authSlice from './reducers/authSlice';
 import appSlice from './reducers/appSlice';
 import modalSlice from './reducers/modalSlice';
+import boardSlice from './reducers/boardSlice';
+import workspaceSlice from './reducers/workspaceSlice';
 
 const persistConfig = {
     key: 'root',
@@ -16,7 +18,8 @@ const rootReducer = combineReducers({
     auth: authSlice,
     app: appSlice,
     modal: modalSlice,
-    api: appSlice,
+    board: boardSlice,
+    workspace: workspaceSlice,
 });
 
 // Persist the combined reducer

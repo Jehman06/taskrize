@@ -20,6 +20,8 @@ import palmTrees from '../../images/palmTrees.jpg';
 import bigSur from '../../images/bigSur.jpg';
 import yellowstone from '../../images/yellowstone.jpg';
 import monumentValley from '../../images/monumentValley.jpg';
+import { setBoards, setFavoriteBoards } from '../../redux/reducers/boardSlice';
+import { setWorkspaces } from '../../redux/reducers/workspaceSlice';
 
 // Map image names to file paths
 const imageMapping: { [key: string]: string } = {
@@ -33,42 +35,18 @@ const imageMapping: { [key: string]: string } = {
     goldenGate: goldenGate,
 };
 
-interface Board {
-    id: number;
-    title: string;
-    description: string;
-    favorite: any; // You might want to define a type for favorite property
-    default_image: string;
-    workspace: any; // You might want to define a type for workspace property
-    workspace_name: string;
-    starFilled: boolean;
-}
-
-interface Workspaces {
-    id: number;
-    name: string;
-    description: string;
-    owner: number;
-    members: number[];
-    boards: Board[];
-}
-
-interface FavoriteBoard {
-    id: number;
-    starFilled: boolean;
-}
+spiral.register();
 
 const Home: React.FC = () => {
     // Redux state management
     const userId: number | null = useSelector((state: RootState) => state.auth.user.id);
     const dispatch = useDispatch();
 
-    spiral.register();
-
     const [selectedItem, setSelectedItem] = useState(null);
-    const [boards, setBoards] = useState<Board[]>([]);
-    const [workspaces, setWorkspaces] = useState<Workspaces[]>([]);
-    const [favoriteBoards, setFavoriteBoards] = useState<FavoriteBoard[]>([]);
+    const boards = useSelector((state: RootState) => state.board.boards);
+    const workspaces = useSelector((state: RootState) => state.workspace.workspaces);
+    // const [workspaces, setWorkspaces] = useState<Workspaces[]>([]);
+    const favoriteBoards = useSelector((state: RootState) => state.board.favoriteBoards);
 
     const handleItemClick = (item: any) => {
         setSelectedItem(item);
@@ -92,11 +70,11 @@ const Home: React.FC = () => {
             });
 
             // Update boards state
-            setBoards(updatedBoards);
+            dispatch(setBoards(updatedBoards));
 
             // Update favoriteBoards state
             const updatedFavoriteBoards = updatedBoards.filter((board) => board.starFilled);
-            setFavoriteBoards(updatedFavoriteBoards);
+            dispatch(setFavoriteBoards(updatedFavoriteBoards));
 
             // Send a request to the backend to update the favorite status
             await axios.post(
@@ -123,9 +101,8 @@ const Home: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        // Initialize favoriteBoards state with initial favorite boards data
-        const initialFavoriteBoards = boards.filter((board: Board) => board.starFilled);
-        setFavoriteBoards(initialFavoriteBoards);
+        const initialFavoriteBoards = boards.filter((board) => board.starFilled);
+        dispatch(setFavoriteBoards(initialFavoriteBoards));
     }, [boards]);
 
     const fetchData = async (url: string): Promise<any> => {
@@ -160,7 +137,7 @@ const Home: React.FC = () => {
                     ...board,
                     starFilled: board.favorite.includes(userId),
                 }));
-                setBoards(fetchedBoards);
+                dispatch(setBoards(fetchedBoards));
 
                 // Filter favorite boards
                 const initialFavoriteBoards = fetchedBoards.filter(
@@ -182,8 +159,9 @@ const Home: React.FC = () => {
                         };
                     })
                 );
-
-                setWorkspaces(updatedWorkspaces);
+                console.log('updatedWorkspaces: ', updatedWorkspaces);
+                dispatch(setWorkspaces(updatedWorkspaces));
+                // setWorkspaces(updatedWorkspaces);
             } else {
                 console.error('Error fetching boards or workspaces.');
             }
@@ -230,7 +208,9 @@ const Home: React.FC = () => {
                                     default_image={imageMapping[board.default_image]}
                                     workspace={board.workspace}
                                     workspace_name={board.workspace_name}
-                                    starFilled={board.starFilled}
+                                    starFilled={favoriteBoards.some(
+                                        (favoriteBoard) => favoriteBoard.id === board.id
+                                    )}
                                     toggleStar={() => toggleStar(board.id)}
                                 />
                             ))}
@@ -252,7 +232,9 @@ const Home: React.FC = () => {
                                     default_image={imageMapping[board.default_image]}
                                     workspace={board.workspace}
                                     workspace_name={board.workspace_name}
-                                    starFilled={board.starFilled}
+                                    starFilled={favoriteBoards.some(
+                                        (favoriteBoard) => favoriteBoard.id === board.id
+                                    )}
                                     toggleStar={() => toggleStar(board.id)}
                                 />
                             ))}
@@ -264,19 +246,18 @@ const Home: React.FC = () => {
                         <div className="board-content-title">
                             <p>WORKSPACES</p>
                         </div>
-                        {workspaces &&
-                            workspaces.map((workspace: any) => (
-                                <Workspace
-                                    key={workspace.id}
-                                    name={workspace.name}
-                                    description={workspace.description}
-                                    ownerId={workspace.owner}
-                                    members={workspace.members}
-                                    boards={workspace.boards}
-                                    toggleStar={toggleStar}
-                                    favoriteBoards={favoriteBoards}
-                                />
-                            ))}
+                        {workspaces.map((workspace: any) => (
+                            <Workspace
+                                key={workspace.id}
+                                name={workspace.name}
+                                description={workspace.description}
+                                ownerId={workspace.owner}
+                                members={workspace.members}
+                                boards={workspace.boards || []}
+                                toggleStar={toggleStar}
+                                favoriteBoards={favoriteBoards}
+                            />
+                        ))}
                     </div>
                 </div>
             </div>
