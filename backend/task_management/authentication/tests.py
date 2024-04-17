@@ -1,7 +1,7 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
-from .models import CustomUser
+from .models import CustomUser, UserProfile
 
 # Register User Tests
 class APITestRegisterUser(APITestCase):
@@ -63,3 +63,29 @@ class APITests(APITestCase):
         url = reverse('logout')
         response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_user_profile(self):
+        # First, authenticate the user and obtain the access token
+        url_login = reverse('login')
+        login_data = {'email': 'test@example.com', 'password': 'password123'}
+        login_response = self.client.post(url_login, login_data, format='json')
+        self.assertEqual(login_response.status_code, status.HTTP_200_OK)
+        
+        # Extract the access token from the response content
+        login_content = login_response.json()
+        access_token = login_content.get('access_token')
+
+        # Next, make a request to the user profile endpoint using the obtained access token
+        url_profile = reverse('user-profile')
+        headers = {'Authorization': f'Bearer {access_token}'}
+        profile_response = self.client.get(url_profile, headers=headers)
+        
+        # Retrieve the user profile
+        profile = UserProfile.objects.get(user=self.test_user)
+
+        # Assert that the response status code is 200 (OK) indicating a successful request
+        self.assertEqual(profile_response.status_code, status.HTTP_200_OK)
+        # Check if the email field exists in the UserProfile model
+        self.assertTrue(hasattr(profile, 'email'), 'UserProfile model does not have an email field')
+        # Verify that the email field is populated with the user's email
+        self.assertEqual(profile.email, self.test_user.email, 'Email in UserProfile does not match user email')

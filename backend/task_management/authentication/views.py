@@ -2,6 +2,8 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, logout
+from django.shortcuts import get_object_or_404
+from django.db import transaction
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes
@@ -9,12 +11,12 @@ from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 import secrets
-from .models import CustomUser
+from authentication.models import CustomUser, UserProfile
+from authentication.serializers import UserProfileSerializer
 
 # Signup function
 @api_view(['POST'])
 def register_user(request):
-    # Extract email, password and password_confirmation from the request
     email = request.data.get('email')
     password = request.data.get('password')
     password_confirmation = request.data.get('password_confirmation')
@@ -25,12 +27,13 @@ def register_user(request):
     if password != password_confirmation:
         return Response({'error': 'Passwords do not match'}, status=status.HTTP_400_BAD_REQUEST)
     
-    # Check if the email is already in use
     if CustomUser.objects.filter(email=email).exists():
         return Response({'error': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
-    
-    # Create the user
-    CustomUser.objects.create_user(email=email, password=password)
+
+    with transaction.atomic():
+        # Create the user
+        CustomUser.objects.create_user(email=email, password=password)
+
     return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
 
 # Login function
@@ -113,6 +116,22 @@ def reset_password_confirm(request, user_id, reset_code=None):
         return Response({'message': 'Password reset successfully'}, status=status.HTTP_200_OK)
     except CustomUser.DoesNotExist:
         return Response({'error': 'User not found or invalid reset code.'}, status=status.HTTP_404_NOT_FOUND)
+    
+# Get the user profile
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+def get_profile(request):
+    # Access the authenticated user
+    user = request.user
+
+    # Retrieve the user profile associated with the authenticated user
+    profile = get_object_or_404(UserProfile, user=user)
+
+    # Serialize the user profile associated with the authenticated user
+    serializer = UserProfileSerializer(profile)
+
+    # Return the serialized user profile data as a JSON response
+    return Response(serializer.data)
 
 # Logout function
 @api_view(['POST'])
