@@ -6,6 +6,8 @@ import appSlice from './reducers/appSlice';
 import modalSlice from './reducers/modalSlice';
 import boardSlice from './reducers/boardSlice';
 import workspaceSlice from './reducers/workspaceSlice';
+import profileSlice from './reducers/profileSlice';
+import emojiSlice from './reducers/emojiSlice';
 
 const persistConfig = {
     key: 'root',
@@ -20,6 +22,8 @@ const rootReducer = combineReducers({
     modal: modalSlice,
     board: boardSlice,
     workspace: workspaceSlice,
+    profile: profileSlice,
+    emoji: emojiSlice,
 });
 
 // Persist the combined reducer

@@ -16,6 +16,8 @@ import { verifyAccessToken } from '../utils/apiUtils';
 import taskrize from '../images/taskrize.png';
 import { SlMagnifier } from 'react-icons/sl';
 import { MdAccountCircle } from 'react-icons/md';
+import { IoExitOutline } from 'react-icons/io5';
+import { IoMdPerson } from 'react-icons/io';
 import './PrivateNavbar.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
@@ -242,7 +244,8 @@ const PrivateNavbar: React.FC = () => {
                         aria-labelledby="dropdownMenuButton3"
                     >
                         <li>
-                            <a className="dropdown-item" href="#">
+                            <a className="dropdown-item" href="/profile">
+                                <IoMdPerson className="settings-dropdown-icons" />
                                 Profile
                             </a>
                         </li>
@@ -251,6 +254,7 @@ const PrivateNavbar: React.FC = () => {
                                 className="dropdown-item profile-dropdown-item"
                                 onClick={handleLogout}
                             >
+                                <IoExitOutline className="settings-dropdown-icons" />
                                 Logout
                             </a>
                         </li>
