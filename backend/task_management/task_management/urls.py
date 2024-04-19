@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path
-from authentication.views import register_user, login_user, logout_user, reset_password_request, reset_password_confirm, get_profile
+from authentication.views import register_user, login_user, logout_user, reset_password_request, reset_password_confirm, get_profile, update_profile
 from django.views.generic import RedirectView
 from workspaces.views import create_workspace, get_workspaces, update_workspace, delete_workspace, get_workspace_boards
 from boards.views import get_boards, create_board, update_board, toggle_favorite_board, delete_board
@@ -32,7 +32,8 @@ urlpatterns = [
     path('api/reset-password', reset_password_request, name='reset-password-request'),
     re_path(r'^api/reset-password-confirm/(?P<user_id>\d+)/?(?P<reset_code>\w+)?$', reset_password_confirm, name='reset-password-confirm'),
     # User
-    path('api/user/profile', get_profile, name='user-profile'),
+    path('api/user/profile', get_profile, name='user-profile-get'),
+    path('api/user/profile/update/<int:pk>/', update_profile, name='user-profile-update'),
     # Tokens
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

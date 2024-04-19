@@ -1,13 +1,10 @@
-body {
-    background-color: #33373a;
-    color: #9fadbc;
-}
-
 .profile-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    background-color: #33373a;
+    color: #9fadbc;
+    padding: 5rem;
 }
 
 .profile-title {
@@ -17,7 +14,7 @@ body {
 }
 
 .profile-content {
-    width: 30vw;
+    width: 35vw;
 }
 
 .profile-input {
@@ -46,22 +43,21 @@ body {
 .bio-input-wrapper {
     position: relative;
     display: flex;
-    align-items: center; /* Vertically align items */
+    align-items: center;
 }
 
 .emoji-toggle {
     position: absolute;
-    top: 1px; /* Adjust this value as needed */
-    right: 10px; /* Adjust this value as needed */
+    top: 1px;
+    right: 10px;
     cursor: pointer;
 }
 
 .emoji-picker {
     position: absolute;
-    top: 0; /* Align it with the top of the input */
-    left: calc(100% + 5px); /* Position it to the right of the input with a slight offset */
+    top: 0;
+    left: calc(100% + 5px);
     z-index: 1;
-    /* Additional styles for the emoji picker */
 }
 
 .emoji-picker-wrapper {
@@ -84,4 +80,35 @@ body {
 
 .danger-zone > h2 {
     margin-top: 1.2rem;
+}
+
+.danger-zone-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #ccc;
+}
+
+.danger-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border-bottom: 0.1px solid #9fadbc;
+    width: 100%;
+}
+
+.left-content {
+    flex-grow: 1;
+}
+
+.left-content p {
+    margin: 0;
+    padding: 0;
+    text-align: start;
+}
+
+.danger-button {
+    margin-left: 3rem;
 }

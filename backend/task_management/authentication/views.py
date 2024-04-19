@@ -117,21 +117,41 @@ def reset_password_confirm(request, user_id, reset_code=None):
     except CustomUser.DoesNotExist:
         return Response({'error': 'User not found or invalid reset code.'}, status=status.HTTP_404_NOT_FOUND)
     
-# Get the user profile
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 def get_profile(request):
-    # Access the authenticated user
     user = request.user
-
-    # Retrieve the user profile associated with the authenticated user
     profile = get_object_or_404(UserProfile, user=user)
-
-    # Serialize the user profile associated with the authenticated user
     serializer = UserProfileSerializer(profile)
+    profile_data = serializer.data
+    profile_data['id'] = profile.id  # Add the profile ID to the response
+    return Response(profile_data)
 
-    # Return the serialized user profile data as a JSON response
-    return Response(serializer.data)
+# Update the user profile
+@api_view(['PUT'])
+@authentication_classes([JWTAuthentication])
+def update_profile(request, pk):
+    try:
+        # Access the authenticated user
+        user = request.user
+
+        # Retrieve the data from the request
+        updated_data = request.data
+        print(f'updated_data: {updated_data}')
+
+        # Retrieve the user profile associated with the authenticated user
+        profile = get_object_or_404(UserProfile, user=user)
+
+        # Update the profile with the new data
+        for key, value in updated_data.items():
+            setattr(profile, key, value)
+        profile.save()
+
+        # Serialize and return the updated profile
+        serializer = UserProfileSerializer(profile)
+        return Response(serializer.data)
+    except UserProfile.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 # Logout function
 @api_view(['POST'])

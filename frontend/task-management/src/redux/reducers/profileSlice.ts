@@ -1,20 +1,26 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface UserProfile {
-    email: string;
-    name: string;
-    nickname: string;
-    bio: string;
+export interface UserProfile {
+    id?: number;
+    email?: string;
+    name?: string;
+    nickname?: string;
+    bio?: string;
+    [key: string]: number | string | undefined;
 }
 
 interface ProfileState {
     profile: UserProfile | null;
-    bio: string;
+    formProfileData: Partial<UserProfile>;
 }
 
 const initialState: ProfileState = {
     profile: null,
-    bio: '',
+    formProfileData: {
+        name: '',
+        nickname: '',
+        bio: '',
+    },
 };
 
 const profileSlice = createSlice({
@@ -24,11 +30,11 @@ const profileSlice = createSlice({
         setProfile(state, action: PayloadAction<UserProfile | null>) {
             state.profile = action.payload;
         },
-        setBio(state, action: PayloadAction<string>) {
-            state.bio = action.payload;
+        setFormProfileData(state, action: PayloadAction<UserProfile>) {
+            state.formProfileData = action.payload;
         },
     },
 });
 
-export const { setProfile, setBio } = profileSlice.actions;
+export const { setProfile, setFormProfileData } = profileSlice.actions;
 export default profileSlice.reducer;
