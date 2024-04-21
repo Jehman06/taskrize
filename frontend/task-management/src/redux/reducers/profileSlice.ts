@@ -9,15 +9,15 @@ export interface UserProfile {
     [key: string]: number | string | undefined;
 }
 
-interface DeleteAccountFormData {
+interface DangerZoneFormData {
     email: string;
     password: string;
 }
 
 export interface ProfileState {
     profile: UserProfile | null;
-    formProfileData: Partial<UserProfile>;
-    deleteAccountFormData: DeleteAccountFormData;
+    updateProfileFormData: Partial<UserProfile>;
+    dangerZoneFormData: DangerZoneFormData;
     updated_email: string;
     updated_password: string;
     updated_password_confirm: string;
@@ -25,12 +25,12 @@ export interface ProfileState {
 
 export const initialState: ProfileState = {
     profile: null,
-    formProfileData: {
+    updateProfileFormData: {
         name: '',
         nickname: '',
         bio: '',
     },
-    deleteAccountFormData: {
+    dangerZoneFormData: {
         email: '',
         password: '',
     },
@@ -46,11 +46,11 @@ const profileSlice = createSlice({
         setProfile(state, action: PayloadAction<UserProfile | null>) {
             state.profile = action.payload;
         },
-        setFormProfileData(state, action: PayloadAction<UserProfile>) {
-            state.formProfileData = action.payload;
+        setUpdateProfileFormData(state, action: PayloadAction<UserProfile>) {
+            state.updateProfileFormData = action.payload;
         },
-        setDeleteAccountFormData(state, action: PayloadAction<DeleteAccountFormData>) {
-            state.deleteAccountFormData = action.payload;
+        setDangerZoneFormData(state, action: PayloadAction<DangerZoneFormData>) {
+            state.dangerZoneFormData = action.payload;
         },
         setUpdatedEmail(state, action: PayloadAction<string>) {
             state.updated_email = action.payload;
@@ -66,8 +66,8 @@ const profileSlice = createSlice({
 
 export const {
     setProfile,
-    setFormProfileData,
-    setDeleteAccountFormData,
+    setUpdateProfileFormData,
+    setDangerZoneFormData,
     setUpdatedEmail,
     setUpdatedPassword,
     setUpdatedPasswordConfirm,

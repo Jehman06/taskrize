@@ -1,10 +1,11 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ProfileModal from '../../Components/Modals/Profile/ProfileModal';
 
 // Redux
 import {
-    setDeleteAccountFormData,
-    setFormProfileData,
+    setDangerZoneFormData,
+    setUpdateProfileFormData,
     setProfile,
     setUpdatedEmail,
     setUpdatedPassword,
@@ -13,7 +14,6 @@ import {
 } from '../../redux/reducers/profileSlice';
 import { setShowEmojiPicker } from '../../redux/reducers/emojiSlice';
 import {
-    setErrorImageMessage,
     setShowDeleteAccountModal,
     setShowUpdateEmailModal,
     setShowUpdatePasswordModal,
@@ -30,13 +30,22 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { FaRegFaceSmileBeam, FaFaceSmileBeam } from 'react-icons/fa6';
 import './Profile.css';
-import '../../Components/Modals/Modal.css';
-import '../../Components/Workspace/Workspace.css';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { logoutUser, resetAuthStates } from '../../redux/reducers/authSlice';
 import { resetAppStates, setErrorMessage, setLoading } from '../../redux/reducers/appSlice';
 import { spiral } from 'ldrs';
+
+// Lazy Loading imports
+const UpdateEmailModalContent = lazy(
+    () => import('../../Components/Modals/Profile/UpdateEmailModalContent')
+);
+const UpdatePasswordModalContent = lazy(
+    () => import('../../Components/Modals/Profile/UpdatePasswordModalContent')
+);
+const DeleteAccountModalContent = lazy(
+    () => import('../../Components/Modals/Profile/DeleteAccountModalContent')
+);
 
 // Initialize the loading spinner icon
 spiral.register();
@@ -45,10 +54,8 @@ const ProfilePage: React.FC = () => {
     // Redux state management
     // Profile
     const profile = useSelector((state: RootState) => state.profile.profile);
-    const formProfileData = useSelector((state: RootState) => state.profile.formProfileData);
-    const deleteAccountFormData = useSelector(
-        (state: RootState) => state.profile.deleteAccountFormData
-    );
+    const formProfileData = useSelector((state: RootState) => state.profile.updateProfileFormData);
+    const dangerZoneFormData = useSelector((state: RootState) => state.profile.dangerZoneFormData);
     const ShowEmojiPicker = useSelector((state: RootState) => state.emoji.showEmojiPicker);
     const updated_email = useSelector((state: RootState) => state.profile.updated_email);
     const updated_password = useSelector((state: RootState) => state.profile.updated_password);
@@ -82,7 +89,7 @@ const ProfilePage: React.FC = () => {
         // Set formProfileData fields to profile fields when the profile object changes
         if (profile) {
             memoizedDispatch(
-                setFormProfileData({
+                setUpdateProfileFormData({
                     ...formProfileData,
                     name: profile.name || '',
                     nickname: profile.nickname || '',
@@ -97,7 +104,7 @@ const ProfilePage: React.FC = () => {
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
         const { name, value } = e.target;
-        dispatch(setFormProfileData({ ...(formProfileData as UserProfile), [name]: value }));
+        dispatch(setUpdateProfileFormData({ ...(formProfileData as UserProfile), [name]: value }));
     };
 
     // Open/close the emoji picker for the bio
@@ -114,7 +121,7 @@ const ProfilePage: React.FC = () => {
         const updatedBio = bioBeforeCursor + emoji.native + bioAfterCursor;
 
         dispatch(
-            setFormProfileData({
+            setUpdateProfileFormData({
                 ...(formProfileData as UserProfile),
                 bio: updatedBio,
             })
@@ -188,7 +195,7 @@ const ProfilePage: React.FC = () => {
     // Cancel the account deletion and close the modal
     const cancelDeleteAccount = () => {
         dispatch(setShowDeleteAccountModal(false));
-        dispatch(setDeleteAccountFormData({ ...deleteAccountFormData, email: '', password: '' }));
+        dispatch(setDangerZoneFormData({ ...dangerZoneFormData, email: '', password: '' }));
         dispatch(setErrorMessage(''));
     };
 
@@ -201,7 +208,7 @@ const ProfilePage: React.FC = () => {
 
             // Send a delete request to the user API to delete the account
             await axios.delete('http://127.0.0.1:8000/api/user/delete', {
-                data: deleteAccountFormData,
+                data: dangerZoneFormData,
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                 },
@@ -233,7 +240,7 @@ const ProfilePage: React.FC = () => {
     // Cancel the email update and close the modal
     const cancelUpdateEmail = () => {
         dispatch(setShowUpdateEmailModal(false));
-        dispatch(setDeleteAccountFormData({ ...deleteAccountFormData, email: '', password: '' }));
+        dispatch(setDangerZoneFormData({ ...dangerZoneFormData, email: '', password: '' }));
         dispatch(setUpdatedEmail(''));
         dispatch(setErrorMessage(''));
     };
@@ -248,7 +255,7 @@ const ProfilePage: React.FC = () => {
 
             // Merge deleteAccountFormData with updated_email into a single object
             const requestData = {
-                ...deleteAccountFormData,
+                ...dangerZoneFormData,
                 updated_email,
             };
 
@@ -272,9 +279,7 @@ const ProfilePage: React.FC = () => {
                     }
                 );
                 // Reset form states
-                dispatch(
-                    setDeleteAccountFormData({ ...deleteAccountFormData, email: '', password: '' })
-                );
+                dispatch(setDangerZoneFormData({ ...dangerZoneFormData, email: '', password: '' }));
                 dispatch(setUpdatedEmail(''));
                 dispatch(setShowUpdateEmailModal(false));
                 dispatch(setUpdatedPassword(''));
@@ -326,7 +331,7 @@ const ProfilePage: React.FC = () => {
     // Cancel password update and close modal
     const cancelUpdatePassword = () => {
         dispatch(setShowUpdatePasswordModal(false));
-        dispatch(setDeleteAccountFormData({ ...deleteAccountFormData, email: '', password: '' }));
+        dispatch(setDangerZoneFormData({ ...dangerZoneFormData, email: '', password: '' }));
         dispatch(setUpdatedPassword(''));
         dispatch(setUpdatedPasswordConfirm(''));
         dispatch(setErrorMessage(''));
@@ -343,7 +348,7 @@ const ProfilePage: React.FC = () => {
             // Check if the password and confirmation entered match
             if (updated_password === updated_password_confirm) {
                 const requestData = {
-                    ...deleteAccountFormData,
+                    ...dangerZoneFormData,
                     updated_password,
                 };
 
@@ -368,8 +373,8 @@ const ProfilePage: React.FC = () => {
                     );
                     // Reset states and cookies
                     dispatch(
-                        setDeleteAccountFormData({
-                            ...deleteAccountFormData,
+                        setDangerZoneFormData({
+                            ...dangerZoneFormData,
                             email: '',
                             password: '',
                         })
@@ -486,100 +491,6 @@ const ProfilePage: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Update Email Modal */}
-                        <Modal
-                            show={showUpdateEmailModal}
-                            onHide={() => dispatch(setShowUpdateEmailModal(false))}
-                            backdrop="static"
-                            keyboard={false}
-                            style={{ borderRadius: '0.3rem' }}
-                            centered
-                        >
-                            <Modal.Body
-                                className="modal-body"
-                                style={{ backgroundColor: '#33373a', color: '#9fadbc' }}
-                            >
-                                <div className="modal-delete-text">
-                                    Are you sure you want to update your email address? You will
-                                    have to login again.{' '}
-                                </div>
-                                {loading && (
-                                    <div className="text-center mt-5 mb-5">
-                                        <l-spiral size="30" color="teal"></l-spiral>
-                                    </div>
-                                )}
-                                {errorMessage && (
-                                    <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
-                                        {errorMessage}
-                                    </div>
-                                )}
-                                <Form>
-                                    <Form.Group
-                                        className="mb-3"
-                                        controlId="exampleForm.ControlInput1"
-                                    >
-                                        <Form.Label>Email</Form.Label>
-                                        <Form.Control
-                                            type="email"
-                                            className="modal-input"
-                                            autoFocus
-                                            required
-                                            value={deleteAccountFormData.email}
-                                            onChange={(e) =>
-                                                dispatch(
-                                                    setDeleteAccountFormData({
-                                                        ...deleteAccountFormData,
-                                                        email: e.target.value,
-                                                    })
-                                                )
-                                            }
-                                        />
-                                        <Form.Label>Password</Form.Label>
-                                        <Form.Control
-                                            type="password"
-                                            className="modal-input"
-                                            required
-                                            value={deleteAccountFormData.password}
-                                            onChange={(e) =>
-                                                dispatch(
-                                                    setDeleteAccountFormData({
-                                                        ...deleteAccountFormData,
-                                                        password: e.target.value,
-                                                    })
-                                                )
-                                            }
-                                        />
-                                        <Form.Label>New Email</Form.Label>
-                                        <Form.Control
-                                            type="email"
-                                            className="modal-input"
-                                            required
-                                            value={updated_email}
-                                            onChange={(e) =>
-                                                dispatch(setUpdatedEmail(e.target.value))
-                                            }
-                                        />
-                                    </Form.Group>
-                                    <div className="modal-delete-buttons">
-                                        <Button
-                                            variant="success"
-                                            className="modal-delete-button"
-                                            onClick={confirmUpdateEmail}
-                                        >
-                                            Yes
-                                        </Button>
-                                        <Button
-                                            variant="danger"
-                                            className="modal-delete-button"
-                                            onClick={cancelUpdateEmail}
-                                        >
-                                            No
-                                        </Button>
-                                    </div>
-                                </Form>
-                            </Modal.Body>
-                        </Modal>
-
                         <div className="danger-section">
                             <div className="left-content">
                                 <b>
@@ -593,109 +504,6 @@ const ProfilePage: React.FC = () => {
                                 </Button>
                             </div>
                         </div>
-
-                        {/* Update Password Modal */}
-                        <Modal
-                            show={showUpdatePasswordModal}
-                            onHide={() => dispatch(setShowUpdatePasswordModal(false))}
-                            backdrop="static"
-                            style={{ borderRadius: '0.3rem' }}
-                            centered
-                        >
-                            <Modal.Body
-                                className="modal-body"
-                                style={{ backgroundColor: '#33373a', color: '#9fadbc' }}
-                            >
-                                <div className="modal-delete-text">
-                                    Are you sure you want to update your password? You will have to
-                                    login again.{' '}
-                                </div>
-                                {loading && (
-                                    <div className="text-center mt-5 mb-5">
-                                        <l-spiral size="30" color="teal"></l-spiral>
-                                    </div>
-                                )}
-                                {errorMessage && (
-                                    <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
-                                        {errorMessage}
-                                    </div>
-                                )}
-                                <Form>
-                                    <Form.Group
-                                        className="mb-3"
-                                        controlId="exampleForm.ControlInput1"
-                                    >
-                                        <Form.Label>Email</Form.Label>
-                                        <Form.Control
-                                            type="email"
-                                            className="modal-input"
-                                            autoFocus
-                                            required
-                                            value={deleteAccountFormData.email}
-                                            onChange={(e) =>
-                                                dispatch(
-                                                    setDeleteAccountFormData({
-                                                        ...deleteAccountFormData,
-                                                        email: e.target.value,
-                                                    })
-                                                )
-                                            }
-                                        />
-                                        <Form.Label>Password</Form.Label>
-                                        <Form.Control
-                                            type="password"
-                                            className="modal-input"
-                                            required
-                                            value={deleteAccountFormData.password}
-                                            onChange={(e) =>
-                                                dispatch(
-                                                    setDeleteAccountFormData({
-                                                        ...deleteAccountFormData,
-                                                        password: e.target.value,
-                                                    })
-                                                )
-                                            }
-                                        />
-                                        <Form.Label>New Password</Form.Label>
-                                        <Form.Control
-                                            type="password"
-                                            className="modal-input"
-                                            required
-                                            value={updated_password}
-                                            onChange={(e) =>
-                                                dispatch(setUpdatedPassword(e.target.value))
-                                            }
-                                        />
-                                        <Form.Label>Confirm New Password</Form.Label>
-                                        <Form.Control
-                                            type="password"
-                                            className="modal-input"
-                                            required
-                                            value={updated_password_confirm}
-                                            onChange={(e) =>
-                                                dispatch(setUpdatedPasswordConfirm(e.target.value))
-                                            }
-                                        />
-                                    </Form.Group>
-                                    <div className="modal-delete-buttons">
-                                        <Button
-                                            variant="success"
-                                            className="modal-delete-button"
-                                            onClick={confirmUpdatePassword}
-                                        >
-                                            Yes
-                                        </Button>
-                                        <Button
-                                            variant="danger"
-                                            className="modal-delete-button"
-                                            onClick={cancelUpdatePassword}
-                                        >
-                                            No
-                                        </Button>
-                                    </div>
-                                </Form>
-                            </Modal.Body>
-                        </Modal>
 
                         <div className="danger-section">
                             <div className="left-content">
@@ -711,88 +519,82 @@ const ProfilePage: React.FC = () => {
                             </div>
                         </div>
 
+                        {/* Update Email Modal */}
+                        <ProfileModal
+                            show={showUpdateEmailModal}
+                            onHide={() => dispatch(setShowUpdateEmailModal(false))}
+                        >
+                            <Suspense
+                                fallback={
+                                    <div className="text-center mt-5 mb-5">
+                                        <l-spiral size="30" color="teal"></l-spiral>
+                                    </div>
+                                }
+                            >
+                                <UpdateEmailModalContent
+                                    loading={loading}
+                                    errorMessage={errorMessage}
+                                    dangerZoneFormData={dangerZoneFormData}
+                                    updated_email={updated_email}
+                                    dispatch={dispatch}
+                                    setDangerZoneFormData={setDangerZoneFormData}
+                                    setUpdatedEmail={setUpdatedEmail}
+                                    confirmUpdateEmail={confirmUpdateEmail}
+                                    cancelUpdateEmail={cancelUpdateEmail}
+                                />
+                            </Suspense>
+                        </ProfileModal>
+
+                        {/* Update Password Modal */}
+                        <ProfileModal
+                            show={showUpdatePasswordModal}
+                            onHide={() => dispatch(setShowUpdatePasswordModal(false))}
+                        >
+                            <Suspense
+                                fallback={
+                                    <div className="text-center mt-5 mb-5">
+                                        <l-spiral size="30" color="teal"></l-spiral>
+                                    </div>
+                                }
+                            >
+                                <UpdatePasswordModalContent
+                                    loading={loading}
+                                    errorMessage={errorMessage}
+                                    dangerZoneFormData={dangerZoneFormData}
+                                    updated_password={updated_password}
+                                    updated_password_confirm={updated_password_confirm}
+                                    dispatch={dispatch}
+                                    setDangerZoneFormData={setDangerZoneFormData}
+                                    setUpdatedPassword={setUpdatedPassword}
+                                    setUpdatedPasswordConfirm={setUpdatedPasswordConfirm}
+                                    confirmUpdatePassword={confirmUpdatePassword}
+                                    cancelUpdatePassword={cancelUpdatePassword}
+                                />
+                            </Suspense>
+                        </ProfileModal>
+
                         {/* Delete Account Modal */}
-                        <Modal
+                        <ProfileModal
                             show={showDeleteAccountModal}
                             onHide={() => dispatch(setShowDeleteAccountModal(false))}
-                            backdrop="static"
-                            keyboard={false}
-                            style={{ borderRadius: '0.3rem' }}
-                            centered
                         >
-                            <Modal.Body
-                                className="modal-body"
-                                style={{ backgroundColor: '#33373a', color: '#9fadbc' }}
+                            <Suspense
+                                fallback={
+                                    <div className="text-center mt-5 mb-5">
+                                        <l-spiral size="30" color="teal"></l-spiral>
+                                    </div>
+                                }
                             >
-                                <div className="modal-delete-text">
-                                    Are you sure you want to delete your account?{' '}
-                                    <u style={{ color: '#b91919' }}>
-                                        <span style={{ color: '#b91919' }}>
-                                            There is no going back.
-                                        </span>
-                                    </u>
-                                </div>
-                                {errorMessage && (
-                                    <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
-                                        {errorMessage}
-                                    </div>
-                                )}
-                                <Form>
-                                    <Form.Group
-                                        className="mb-3"
-                                        controlId="exampleForm.ControlInput1"
-                                    >
-                                        <Form.Label>Email</Form.Label>
-                                        <Form.Control
-                                            type="email"
-                                            className="modal-input"
-                                            autoFocus
-                                            required
-                                            value={deleteAccountFormData.email}
-                                            onChange={(e) =>
-                                                dispatch(
-                                                    setDeleteAccountFormData({
-                                                        ...deleteAccountFormData,
-                                                        email: e.target.value,
-                                                    })
-                                                )
-                                            }
-                                        />
-                                        <Form.Label>Password</Form.Label>
-                                        <Form.Control
-                                            type="password"
-                                            className="modal-input"
-                                            required
-                                            value={deleteAccountFormData.password}
-                                            onChange={(e) =>
-                                                dispatch(
-                                                    setDeleteAccountFormData({
-                                                        ...deleteAccountFormData,
-                                                        password: e.target.value,
-                                                    })
-                                                )
-                                            }
-                                        />
-                                    </Form.Group>
-                                    <div className="modal-delete-buttons">
-                                        <Button
-                                            variant="success"
-                                            className="modal-delete-button"
-                                            onClick={confirmDeleteAccount}
-                                        >
-                                            Yes
-                                        </Button>
-                                        <Button
-                                            variant="danger"
-                                            className="modal-delete-button"
-                                            onClick={cancelDeleteAccount}
-                                        >
-                                            No
-                                        </Button>
-                                    </div>
-                                </Form>
-                            </Modal.Body>
-                        </Modal>
+                                <DeleteAccountModalContent
+                                    errorMessage={errorMessage}
+                                    dangerZoneFormData={dangerZoneFormData}
+                                    dispatch={dispatch}
+                                    setDangerZoneFormData={setDangerZoneFormData}
+                                    confirmDeleteAccount={confirmDeleteAccount}
+                                    cancelDeleteAccount={cancelDeleteAccount}
+                                />
+                            </Suspense>
+                        </ProfileModal>
                     </div>
                 </div>
             </div>

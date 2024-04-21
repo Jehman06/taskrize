@@ -65,7 +65,6 @@ const SignupPage: React.FC = () => {
 
         dispatch(setLoading(true)); // Update loading state to indicate request in progress
         try {
-            console.log('formData: ', formData);
             await axios.post('http://127.0.0.1:8000/api/user/register', formData, {
                 headers: { 'Content-Type': 'application/json' },
             });

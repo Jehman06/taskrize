@@ -80,8 +80,6 @@ const Workspace: React.FC<WorkspaceProps> = ({ name, boards, toggleStar, favorit
     const handleNameBlur = async () => {
         try {
             dispatch(setEditing(false));
-            console.log(`Start of handleNameBlur, editing is ${editing}`);
-
             // Trim whitespace from workspaceName
             const trimmedName = workspaceName.trim();
 
@@ -112,8 +110,6 @@ const Workspace: React.FC<WorkspaceProps> = ({ name, boards, toggleStar, favorit
                         },
                     }
                 );
-                console.log(`${trimmedName} successfully renamed!`);
-                console.log('Response: ', response.data);
             }
         } catch (error) {
             console.error('Error renaming workspace:', error);
@@ -163,7 +159,6 @@ const Workspace: React.FC<WorkspaceProps> = ({ name, boards, toggleStar, favorit
 
             // Check if the response is successful
             if (response.status === 204) {
-                console.log('Workspace deleted successfully');
                 window.location.reload();
             } else {
                 console.error('Error deleting workspace: ', response.data);

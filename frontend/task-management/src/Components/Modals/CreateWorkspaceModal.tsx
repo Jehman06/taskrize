@@ -41,7 +41,6 @@ const CreateWorkspaceModal: React.FC = () => {
                     },
                 }
             );
-            console.log('Workspace created successfully:', response.data);
             // Reset error message
             dispatch(resetModalStates());
             // Reload the page to fetch updated data
