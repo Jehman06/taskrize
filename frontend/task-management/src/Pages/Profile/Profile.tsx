@@ -38,15 +38,24 @@ import { logoutUser, resetAuthStates } from '../../redux/reducers/authSlice';
 import { resetAppStates, setErrorMessage, setLoading } from '../../redux/reducers/appSlice';
 import { spiral } from 'ldrs';
 
+// Initialize the loading spinner icon
 spiral.register();
 
 const ProfilePage: React.FC = () => {
+    // Redux state management
+    // Profile
     const profile = useSelector((state: RootState) => state.profile.profile);
     const formProfileData = useSelector((state: RootState) => state.profile.formProfileData);
     const deleteAccountFormData = useSelector(
         (state: RootState) => state.profile.deleteAccountFormData
     );
     const ShowEmojiPicker = useSelector((state: RootState) => state.emoji.showEmojiPicker);
+    const updated_email = useSelector((state: RootState) => state.profile.updated_email);
+    const updated_password = useSelector((state: RootState) => state.profile.updated_password);
+    const updated_password_confirm = useSelector(
+        (state: RootState) => state.profile.updated_password_confirm
+    );
+    // Modal
     const showDeleteAccountModal = useSelector(
         (state: RootState) => state.modal.showDeleteAccountModal
     );
@@ -56,16 +65,13 @@ const ProfilePage: React.FC = () => {
     const showUpdatePasswordModal = useSelector(
         (state: RootState) => state.modal.showUpdatePasswordModal
     );
-    const updated_email = useSelector((state: RootState) => state.profile.updated_email);
-    const updated_password = useSelector((state: RootState) => state.profile.updated_password);
-    const updated_password_confirm = useSelector(
-        (state: RootState) => state.profile.updated_password_confirm
-    );
+    // App
     const errorMessage = useSelector((state: RootState) => state.app.errorMessage);
     const loading = useSelector((state: RootState) => state.app.loading);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    // Fetch the user profile on component mount
     useEffect(() => {
         getUserProfile();
     }, [dispatch]);
@@ -86,6 +92,7 @@ const ProfilePage: React.FC = () => {
         }
     }, [dispatch, profile]);
 
+    // Handle the profile input changes
     const handleProfileInputChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
@@ -93,10 +100,12 @@ const ProfilePage: React.FC = () => {
         dispatch(setFormProfileData({ ...(formProfileData as UserProfile), [name]: value }));
     };
 
+    // Open/close the emoji picker for the bio
     const toggleEmojiPicker = () => {
         dispatch(setShowEmojiPicker(!ShowEmojiPicker));
     };
 
+    // Select emojis and add them to bio
     const handleEmojiSelect = (emoji: any) => {
         dispatch(
             setFormProfileData({
@@ -109,14 +118,16 @@ const ProfilePage: React.FC = () => {
     // Get the user information
     const getUserProfile = async () => {
         try {
+            // Verify the validity of the access token
             await verifyAccessToken();
-            const accessToken = Cookies.get('access_token');
+            const accessToken = Cookies.get('access_token'); // Access the access token from the cookies
+
+            // Send get request to user API to get user's information
             const response = await axios.get('http://127.0.0.1:8000/api/user/profile', {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                 },
             });
-            console.log('User Profile: ', response.data);
             dispatch(setProfile(response.data));
         } catch (error) {
             console.error('Error fetching profile information: ', error);
@@ -126,8 +137,9 @@ const ProfilePage: React.FC = () => {
     // Update profile function
     const updateProfile = async (): Promise<void> => {
         try {
+            // Verify the validity of the access token
             await verifyAccessToken();
-            const accessToken = Cookies.get('access_token');
+            const accessToken = Cookies.get('access_token'); // Access the access token from the cookies
 
             // Create a copy of the formProfileData
             const updatedData = { ...formProfileData };
@@ -141,10 +153,10 @@ const ProfilePage: React.FC = () => {
 
             // Check if there are any updates to send
             if (Object.keys(updatedData).length === 0) {
-                console.log('No updates to send');
                 return;
             }
 
+            // Send a put request to update the user profile
             const response: AxiosResponse = await axios.put(
                 `http://127.0.0.1:8000/api/user/profile/update/${profile?.id}/`,
                 updatedData,
@@ -155,34 +167,40 @@ const ProfilePage: React.FC = () => {
                     },
                 }
             );
-            console.log('Profile successfully updated', response.data);
+            // Reload the page to display the updated profile
             window.location.reload();
         } catch (error) {
             console.error('Error updating profile', error);
         }
     };
 
+    // Open/close the modal for account deletion
     const toggleDeleteAccountModal = () => {
         dispatch(setShowDeleteAccountModal(true));
     };
 
+    // Cancel the account deletion and close the modal
     const cancelDeleteAccount = () => {
         dispatch(setShowDeleteAccountModal(false));
         dispatch(setDeleteAccountFormData({ ...deleteAccountFormData, email: '', password: '' }));
         dispatch(setErrorMessage(''));
     };
 
+    // Function for account deletion
     const confirmDeleteAccount = async () => {
         try {
+            // Verify the validity of access token
             await verifyAccessToken();
-            const accessToken = Cookies.get('access_token');
+            const accessToken = Cookies.get('access_token'); // Access the access token from the cookies
 
+            // Send a delete request to the user API to delete the account
             await axios.delete('http://127.0.0.1:8000/api/user/delete', {
                 data: deleteAccountFormData,
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                 },
             });
+            // Navigate to homepage and reset states and cookies
             navigate('/');
             dispatch(resetAppStates());
             dispatch(resetAuthStates());
@@ -201,10 +219,12 @@ const ProfilePage: React.FC = () => {
         }
     };
 
+    // Open/close the modal for email update
     const toggleUpdateEmailModal = () => {
         dispatch(setShowUpdateEmailModal(true));
     };
 
+    // Cancel the email update and close the modal
     const cancelUpdateEmail = () => {
         dispatch(setShowUpdateEmailModal(false));
         dispatch(setDeleteAccountFormData({ ...deleteAccountFormData, email: '', password: '' }));
@@ -212,19 +232,21 @@ const ProfilePage: React.FC = () => {
         dispatch(setErrorMessage(''));
     };
 
+    // Function for email update
     const confirmUpdateEmail = async (): Promise<void> => {
         try {
             dispatch(setLoading(true));
+            // Verify the validity of access token
             await verifyAccessToken();
-            const accessToken = Cookies.get('access_token');
+            const accessToken = Cookies.get('access_token'); // Get access token from the cookies
 
-            // Merge the data into a single object
             // Merge deleteAccountFormData with updated_email into a single object
             const requestData = {
                 ...deleteAccountFormData,
                 updated_email,
             };
 
+            // Send a put request to the user API to update the email address
             const response = await axios.put(
                 'http://127.0.0.1:8000/api/user/email-update',
                 requestData,
@@ -262,9 +284,10 @@ const ProfilePage: React.FC = () => {
                 Cookies.remove('csrftoken');
                 Cookies.remove('sessionid');
 
-                // Navigate to the homepage
+                // Navigate to the login page
                 navigate('/login');
             } else {
+                // Error handling
                 dispatch(
                     setErrorMessage(
                         'Error updating the email address. Please refresh the page and try again.'
@@ -274,12 +297,14 @@ const ProfilePage: React.FC = () => {
                 return;
             }
         } catch (error: any) {
+            // Error handling
             console.error('Error updating email: ', error);
             if (error.response && error.response.data && error.response.data.error) {
                 dispatch(setErrorMessage(error.response.data.error));
                 dispatch(setLoading(false));
                 return;
             } else {
+                // Error handling
                 setErrorMessage('Failed to update email address. Please try again later.');
                 dispatch(setLoading(false));
                 return;
@@ -287,10 +312,12 @@ const ProfilePage: React.FC = () => {
         }
     };
 
+    // Open/close modal for password update
     const toggleUpdatePasswordModal = () => {
         dispatch(setShowUpdatePasswordModal(true));
     };
 
+    // Cancel password update and close modal
     const cancelUpdatePassword = () => {
         dispatch(setShowUpdatePasswordModal(false));
         dispatch(setDeleteAccountFormData({ ...deleteAccountFormData, email: '', password: '' }));
@@ -299,18 +326,22 @@ const ProfilePage: React.FC = () => {
         dispatch(setErrorMessage(''));
     };
 
+    // Function for password update
     const confirmUpdatePassword = async (): Promise<void> => {
         try {
             dispatch(setLoading(true));
+            // Verify the validity of access token
             await verifyAccessToken();
-            const accessToken = Cookies.get('access_token');
+            const accessToken = Cookies.get('access_token'); // Get access token from the cookies
 
+            // Check if the password and confirmation entered match
             if (updated_password === updated_password_confirm) {
                 const requestData = {
                     ...deleteAccountFormData,
                     updated_password,
                 };
 
+                // If it matches, send a PUT request to the user API to update password
                 const response = await axios.put(
                     'http://127.0.0.1:8000/api/user/password-update',
                     requestData,
@@ -320,6 +351,7 @@ const ProfilePage: React.FC = () => {
                         },
                     }
                 );
+                // If the request went through, log the user out
                 if (response.status === 200) {
                     await axios.post(
                         'http://127.0.0.1:8000/api/user/logout',
@@ -328,6 +360,7 @@ const ProfilePage: React.FC = () => {
                             headers: { Authorization: `Bearer ${accessToken}` },
                         }
                     );
+                    // Reset states and cookies
                     dispatch(
                         setDeleteAccountFormData({
                             ...deleteAccountFormData,
@@ -345,14 +378,17 @@ const ProfilePage: React.FC = () => {
                     Cookies.remove('refresh_token');
                     Cookies.remove('csrftoken');
                     Cookies.remove('sessionid');
+                    // Navigate to the login page
                     navigate('/login');
                 } else {
                     console.error('Unexpected response:', response);
+                    dispatch(setErrorMessage('Unexpected error. Please try again.'));
                     dispatch(setLoading(false));
                     return;
                 }
             } else {
-                dispatch(setErrorImageMessage("New passwords don't match"));
+                // Error handling
+                dispatch(setErrorMessage("New passwords don't match"));
                 dispatch(setLoading(false));
                 return;
             }
