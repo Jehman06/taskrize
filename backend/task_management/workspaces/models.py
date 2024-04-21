@@ -11,3 +11,19 @@ class Workspace(models.Model):
 
     def __str__(self):
         return self.name
+
+class Invitation(models.Model):
+    INVITATION_STATUS_CHOICES = {
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected')
+    }
+    
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='sent_invitations')
+    recipient = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='received_invitations')
+    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=INVITATION_STATUS_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Invitation from {self.sender} to {self.recipient} for {self.workspace}'

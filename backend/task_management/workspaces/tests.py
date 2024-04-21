@@ -1,4 +1,6 @@
 from django.urls import reverse
+from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from workspaces.models import Workspace
@@ -23,10 +25,11 @@ class WorkspaceAPITestCase(APITestCase):
 
         # Retrieve the user object
         self.user = CustomUser.objects.get(email='testuser@gmail.com')
+
+        # Create a test Workspace
+        self.workspace = Workspace.objects.create(name='Test Workspace', owner_id=self.user.id)
     
     def test_get_workspaces(self):
-        # Ensure no workspaces exist initially
-        self.assertFalse(Workspace.objects.filter(owner=self.user).exists())
         # Create some workspaces
         Workspace.objects.create(name='Workspace 1', owner=self.user)
         Workspace.objects.create(name='Workspace 2', owner=self.user)
@@ -36,11 +39,9 @@ class WorkspaceAPITestCase(APITestCase):
         # Check that the response status code is 200 OK
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Check that the response contains the created workspaces
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data), 3)
 
     def test_create_workspace(self):
-        # Ensure no workspaces exist initially
-        self.assertFalse(Workspace.objects.filter(owner=self.user).exists())
         # Send a POST request to create a workspace
         data = {'name': 'New Workspace'}
         url = reverse('workspace-create')
@@ -121,3 +122,20 @@ class WorkspaceAPITestCase(APITestCase):
         self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Workspace.objects.filter(id=workspace_id, name='Test').exists())
         self.assertFalse(Board.objects.filter(id=board_id, title='Board').exists())
+
+    def test_invite_members(self):
+        # Create 2 tests users to invite them to the workspace
+        user1 = CustomUser.objects.create(email='user1@test.com', password='password123')
+        user2 = CustomUser.objects.create(email='user2@test.com', password='password123')
+
+        # Define the data for the request payload
+        data = {
+            'workspace_id': self.workspace.id,
+            'selected_user_ids': [user1.id, user2.id]
+        }
+
+        # Make a POST request to invite members
+        invite_url = reverse('workspace-invite')
+        response = self.client.post(invite_url, data, format='json', HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['message'], 'Invitation sent successfully')

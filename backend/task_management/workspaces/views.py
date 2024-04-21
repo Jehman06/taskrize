@@ -4,9 +4,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
-from workspaces.models import Workspace
+from django.contrib.auth import get_user_model
+from workspaces.models import Workspace, Invitation
 from boards.models import Board
 from workspaces.serializers import WorkspaceSerializer
+from authentication.serializers import UserSerializer
 
 # Get the workspaces for the user
 @api_view(['GET'])
@@ -61,29 +63,39 @@ def create_workspace(request):
         print("Validation errors:", serializer.errors)  # Print validation errors for debugging
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-# Update workspace
 @api_view(['PUT'])
 @authentication_classes([JWTAuthentication])
 def update_workspace(request):
     # Retrieve the data from the request
     workspace_id = request.data.get('workspace_id')
     updated_data = request.data.get('updated_data', {})
+    
+    # Check if workspace_id is provided
     if not workspace_id:
         return Response({'error': 'Workspace ID is required'}, status=status.HTTP_400_BAD_REQUEST)
-    
+
     try:
         workspace = Workspace.objects.get(id=workspace_id)
+        
+        # Update individual fields if provided
         for key, value in updated_data.items():
-            setattr(workspace, key, value)
+            if hasattr(workspace, key):
+                setattr(workspace, key, value)
+            else:
+                return Response({'error': f'Field "{key}" does not exist in Workspace model'}, 
+                                status=status.HTTP_400_BAD_REQUEST)
+
         # Save the updated workspace
         workspace.save()
+
         # Serialize and update the workspace
         serializer = WorkspaceSerializer(workspace)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
     except Workspace.DoesNotExist:
         return Response({'error': 'Workspace not found'}, status=status.HTTP_404_NOT_FOUND)
     
-# Delete board
+# Delete workspace
 @api_view(['DELETE'])
 @authentication_classes([JWTAuthentication])
 def delete_workspace(request):
@@ -97,5 +109,47 @@ def delete_workspace(request):
         # Delete the workspace
         workspace.delete()
         return Response({'message': 'Workspace deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+    except Workspace.DoesNotExist:
+        return Response({'error': 'Workspace not found'}, status=status.HTTP_404_NOT_FOUND)
+
+# Invite members to workspace
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+def invite_members(request):
+    # Get the data from the request payload
+    data = request.data
+
+    # Extract the workspace and user IDs from the data
+    workspace_id = data.get('workspace_id')
+    selected_user_ids = data.get('selected_user_ids', [])
+
+    # Get the sender (authenticated user) from the request
+    sender = request.user
+
+    try:
+        # Get the workspace based on the provided ID
+        workspace = Workspace.objects.get(id=workspace_id)
+
+        # Check if the sender is the owner of the workspace
+        if sender != workspace.owner:
+            return Response({'error': 'Only the workspace owner can invite members'}, status=status.HTTP_403_FORBIDDEN)
+
+        # Create a list to hold the invitation objects
+        invitations = []
+
+        # Iterate over the selected user IDs
+        for user_id in selected_user_ids:
+            # Get the recipient (user being invited) based on the ID
+            recipient = get_user_model().objects.get(id=user_id)
+
+            # Create an Invitation object with sender, recipient and workspace
+            invitation = Invitation(sender=sender, recipient=recipient, workspace=workspace)
+
+            # Add the invitation to the list
+            invitations.append(invitation)
+
+        # Bulk create all invitations in the list and return the response
+        Invitation.objects.bulk_create(invitations)
+        return Response({'message': 'Invitation sent successfully'}, status=status.HTTP_200_OK)
     except Workspace.DoesNotExist:
         return Response({'error': 'Workspace not found'}, status=status.HTTP_404_NOT_FOUND)
