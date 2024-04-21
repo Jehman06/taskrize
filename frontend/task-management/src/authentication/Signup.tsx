@@ -1,16 +1,16 @@
 import React, { useEffect } from 'react';
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import axios, { AxiosError } from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 
 // Redux
 import { useDispatch, useSelector } from 'react-redux';
 import {
-    updateConfirmPassword,
-    updateFormData,
+    setConfirmPassword,
+    setAuthFormData,
     resetAuthStates,
-    updateShowPassword,
+    setShowPassword,
 } from '../redux/reducers/authSlice';
-import { updateErrorMessage, updateLoading, resetAppStates } from '../redux/reducers/appSlice';
+import { setErrorMessage, setLoading, resetAppStates } from '../redux/reducers/appSlice';
 import { RootState } from '../redux/store';
 
 // Styling
@@ -19,21 +19,13 @@ import './Auth.css';
 import taskrize from '../images/taskrize.png';
 import { Form } from 'react-bootstrap';
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
-import { errorMonitor } from 'events';
-
-// Define types for form data
-interface FormData {
-    email: string;
-    password: string;
-    password_confirmation: string;
-}
 
 const SignupPage: React.FC = () => {
     // State management
     const dispatch = useDispatch();
-    const formData: FormData = useSelector((state: RootState) => state.auth.formData);
+    const formData = useSelector((state: RootState) => state.auth.authFormData);
     const confirmPassword: string = useSelector(
-        (state: RootState) => state.auth.formData.password_confirmation
+        (state: RootState) => state.auth.authFormData.password_confirmation
     );
     const errorMessage: string = useSelector((state: RootState) => state.app.errorMessage);
     const loading: boolean = useSelector((state: RootState) => state.app.loading);
@@ -45,46 +37,46 @@ const SignupPage: React.FC = () => {
     useEffect(() => {
         dispatch(resetAppStates());
         dispatch(resetAuthStates());
-    }, []);
+    }, [dispatch]);
 
     // Handle input change event for form data
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const { name, value } = e.target;
         const updatedFormData = { ...formData, [name]: value };
-        dispatch(updateFormData(updatedFormData));
+        dispatch(setAuthFormData(updatedFormData));
     };
 
     // Handle input change event for confirm password
     const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-        dispatch(updateConfirmPassword(e.target.value));
+        dispatch(setConfirmPassword(e.target.value));
     };
 
     const togglePasswordVisibility = (): void => {
-        dispatch(updateShowPassword());
+        dispatch(setShowPassword());
     };
 
     // Handle form submission for sign up process
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
         if (formData.password !== confirmPassword) {
-            dispatch(updateErrorMessage("Passwords don't match."));
+            dispatch(setErrorMessage("Passwords don't match."));
             return;
         }
 
-        dispatch(updateLoading(true)); // Update loading state to indicate request in progress
+        dispatch(setLoading(true)); // Update loading state to indicate request in progress
         try {
             console.log('formData: ', formData);
-            await axios.post('http://127.0.0.1:8000/api/register', formData, {
+            await axios.post('http://127.0.0.1:8000/api/user/register', formData, {
                 headers: { 'Content-Type': 'application/json' },
             });
-            dispatch(updateErrorMessage(''), updateLoading(false));
+            dispatch(setErrorMessage(''), setLoading(false));
             navigate('/login'); // Redirect user to the login page
         } catch (error: any) {
             console.error('Error registering user:', error);
             const errorMessage: string =
                 (error as AxiosError<any>)?.response?.data?.error ||
                 'An error occurred during registration.';
-            dispatch(updateErrorMessage(errorMessage), dispatch(updateLoading(false)));
+            dispatch(setErrorMessage(errorMessage), dispatch(setLoading(false)));
         }
     };
 

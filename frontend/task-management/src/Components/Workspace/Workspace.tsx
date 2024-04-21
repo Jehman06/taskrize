@@ -5,9 +5,9 @@ import { RootState } from '../../redux/store';
 import {
     setEditing,
     setEditingWorkspaceId,
-    setShowDeleteModal,
     setWorkspaceName,
 } from '../../redux/reducers/workspaceSlice';
+import { setShowDeleteWorkspaceModal } from '../../redux/reducers/modalSlice';
 // Component
 import Board from '../Board/Board';
 // API related
@@ -63,7 +63,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ name, boards, toggleStar, favorit
     const editingWorkspaceId = useSelector(
         (state: RootState) => state.workspace.editingWorkspaceId
     );
-    const showDeleteModal = useSelector((state: RootState) => state.workspace.showDeleteModal);
+    const showDeleteModal = useSelector((state: RootState) => state.modal.showDeleteWorkspaceModal);
     const dispatch = useDispatch();
 
     // Calculate the starFilled property for each board
@@ -137,14 +137,14 @@ const Workspace: React.FC<WorkspaceProps> = ({ name, boards, toggleStar, favorit
     // Delete Workspace
     const handleDelete = () => {
         // Open the Modal to confirm deletion
-        dispatch(setShowDeleteModal(true));
+        dispatch(setShowDeleteWorkspaceModal(true));
     };
 
     const confirmDelete = () => {
         // Call the onDelete function to delete the workspace
         onDelete(id); // Pass the workspaceId as a parameter
         // Close the modal
-        dispatch(setShowDeleteModal(false));
+        dispatch(setShowDeleteWorkspaceModal(false));
     };
 
     const onDelete = async (workspaceId: number): Promise<void> => {
@@ -175,7 +175,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ name, boards, toggleStar, favorit
 
     const cancelDelete = () => {
         // Close the modal without deleting the workspace
-        dispatch(setShowDeleteModal(false));
+        dispatch(setShowDeleteWorkspaceModal(false));
     };
 
     return (
@@ -239,7 +239,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ name, boards, toggleStar, favorit
                     {/* Confirm-Delete-Modal */}
                     <Modal
                         show={showDeleteModal}
-                        onHide={() => dispatch(setShowDeleteModal(false))}
+                        onHide={() => dispatch(setShowDeleteWorkspaceModal(false))}
                         backdrop="static"
                         keyboard={false}
                         style={{ borderRadius: '0.3rem' }}

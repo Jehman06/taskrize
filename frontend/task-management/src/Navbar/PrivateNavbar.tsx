@@ -39,7 +39,7 @@ const PrivateNavbar: React.FC = () => {
 
             // Once the token has been validated, log the user out
             await axios.post(
-                'http://127.0.0.1:8000/api/logout',
+                'http://127.0.0.1:8000/api/user/logout',
                 {},
                 {
                     headers: { Authorization: `Bearer ${accessToken}` },

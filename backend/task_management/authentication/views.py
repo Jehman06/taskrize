@@ -4,12 +4,13 @@ from django.http import JsonResponse
 from django.contrib.auth import authenticate, logout
 from django.shortcuts import get_object_or_404
 from django.db import transaction
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes
-from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.exceptions import NotFound, APIException
 import secrets
 from authentication.models import CustomUser, UserProfile
 from authentication.serializers import UserProfileSerializer
@@ -117,15 +118,104 @@ def reset_password_confirm(request, user_id, reset_code=None):
     except CustomUser.DoesNotExist:
         return Response({'error': 'User not found or invalid reset code.'}, status=status.HTTP_404_NOT_FOUND)
     
+# Update user password
+@api_view(['PUT'])
+@authentication_classes([JWTAuthentication])
+def update_user_password(request):
+    try:
+        # Extract the email and user from the request
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        if not email or not password:
+            return JsonResponse({'error': 'Email and password required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Authenticate the user
+        user = authenticate(request, email=email, password=password)
+
+        # Check if authentication is successful
+        if user is not None:
+            # Proceed with the password change operation
+            updated_password = request.data.get('updated_password')
+
+            # Check if the updated password is provided
+            if not updated_password:
+                return JsonResponse({'error': 'New password required'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Retrieve the corresponding CustomUser instance
+            custom_user = CustomUser.objects.get(email=email)
+            
+            # Update the user's password
+            custom_user.set_password(updated_password)
+            custom_user.save()
+            return JsonResponse({'message': 'Password updated successfully'}, status=status.HTTP_200_OK)
+        else:
+            # Invalid credentials
+            return JsonResponse({'error': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# Change email function
+@api_view(['PUT'])
+@authentication_classes([JWTAuthentication])
+def update_user_email(request):
+    try:
+        # Get user credentials from request
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        # Check if email and password are provided
+        if not email or not password:
+            return JsonResponse({'error': 'Email and password required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Authenticate user
+        user = authenticate(request, email=email, password=password)
+
+        # Check if authentication is successful
+        if user is not None:
+            # Proceed with email change operation
+            updated_email = request.data.get('updated_email')
+
+            # Check if the updated email address is provided
+            if not updated_email:
+                return JsonResponse({'error': 'New email address required'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Retrieve the corresponding CustomUser instance
+            custom_user = CustomUser.objects.get(email=email)
+
+            # Check if the provided email is unique
+            if CustomUser.objects.exclude(pk=user.pk).filter(email=updated_email).exists():
+                return JsonResponse({'error': 'This email address is already in use.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Update the user's email address
+            custom_user.email = updated_email
+            custom_user.save()
+
+            return JsonResponse({'message': 'Email address updated successfully'}, status=status.HTTP_200_OK)
+        else:
+            # Invalid credentials
+            return JsonResponse({'error': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 def get_profile(request):
-    user = request.user
-    profile = get_object_or_404(UserProfile, user=user)
-    serializer = UserProfileSerializer(profile)
-    profile_data = serializer.data
-    profile_data['id'] = profile.id  # Add the profile ID to the response
-    return Response(profile_data)
+    try:
+        # Retrieve the UserProfile instance
+        profile = get_object_or_404(UserProfile, user=request.user)
+
+        # Serialize the profile data
+        serializer = UserProfileSerializer(profile)
+
+        # Construct the response
+        profile_data = serializer.data
+        profile_data['id'] = profile.id
+        return Response(profile_data)
+    except ObjectDoesNotExist:
+        raise NotFound('User profile not found')
+    except Exception as e:
+        raise APIException(str(e))
 
 # Update the user profile
 @api_view(['PUT'])
@@ -137,7 +227,6 @@ def update_profile(request, pk):
 
         # Retrieve the data from the request
         updated_data = request.data
-        print(f'updated_data: {updated_data}')
 
         # Retrieve the user profile associated with the authenticated user
         profile = get_object_or_404(UserProfile, user=user)
@@ -149,7 +238,7 @@ def update_profile(request, pk):
 
         # Serialize and return the updated profile
         serializer = UserProfileSerializer(profile)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     except UserProfile.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -159,3 +248,22 @@ def update_profile(request, pk):
 def logout_user(request):
     logout(request)
     return Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
+
+@api_view(['DELETE'])
+@authentication_classes([JWTAuthentication])
+def delete_account(request):
+    if request.method == 'DELETE':
+        # Retrieve the user's email and password from the request
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        # Authenticate the user using the provided credentials
+        user = authenticate(request, email=email, password=password)
+
+        if user is not None:
+            # User is authenticated, proceed with deleting the account
+            user.delete()
+            return JsonResponse({'message': 'Account deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            # Authentication failed, return error response
+            return JsonResponse({'error': 'Invalid email or password'}, status=status.HTTP_400_BAD_REQUEST)

@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface EmojiState {
+export interface EmojiState {
     data: any;
     showEmojiPicker: boolean;
 }
 
-const initialState: EmojiState = {
+export const initialState: EmojiState = {
     data: null,
     showEmojiPicker: false,
 };

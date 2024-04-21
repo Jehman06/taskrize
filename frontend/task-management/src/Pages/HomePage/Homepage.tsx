@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import PublicNavbar from '../../Navbar/PublicNavbar';
 import './Homepage.css';
 
 // Redux
-import { useDispatch, useSelector } from 'react-redux';
-import { resetAuthStates, updateResetCode } from '../../redux/reducers/authSlice';
+import { useDispatch } from 'react-redux';
+import { resetAuthStates, setResetCode } from '../../redux/reducers/authSlice';
 import { resetAppStates } from '../../redux/reducers/appSlice';
-import { RootState } from '../../redux/store';
 
 const HomePage: React.FC = () => {
     // State management
@@ -17,8 +16,8 @@ const HomePage: React.FC = () => {
 
     useEffect(() => {
         dispatch(resetAppStates(), resetAuthStates());
-        dispatch(updateResetCode(''));
-    }, []);
+        dispatch(setResetCode(''));
+    }, [dispatch]);
 
     const handleSignupRedirect = (): void => {
         navigate('/signup');
@@ -43,7 +42,7 @@ const HomePage: React.FC = () => {
                 </div>
                 <div className="right-content">
                     {/* Placeholder for image */}
-                    <img src="image-path.jpg" alt="image" />
+                    <img src="image-path.jpg" alt="placeholderimage" />
                 </div>
             </div>
             {/* Bottom shape */}

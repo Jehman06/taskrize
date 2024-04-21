@@ -5,23 +5,13 @@ interface Workspace {
     name: string;
 }
 
-interface ModalState {
+export interface ModalState {
     createBoardModal: boolean;
     createWorkspaceModal: boolean;
-    boardFormData: {
-        title: string;
-        description: string;
-        workspace: {
-            name: string | null;
-        };
-        custom_image: File | string | null;
-        default_image: string | null;
-    };
-    workspaceFormData: {
-        name: string;
-        description: string;
-    };
-    workspaces: Workspace[];
+    showDeleteAccountModal: boolean;
+    showUpdateEmailModal: boolean;
+    showDeleteWorkspaceModal: boolean;
+    showUpdatePasswordModal: boolean;
     selectedWorkspace: Workspace | null;
     selectedDefaultImage: string | null;
     selectedCustomImage: File | null;
@@ -30,23 +20,13 @@ interface ModalState {
     errorWorkspaceMessage: string | null;
 }
 
-const initialState: ModalState = {
+export const initialState: ModalState = {
     createBoardModal: false,
     createWorkspaceModal: false,
-    boardFormData: {
-        title: '',
-        description: '',
-        custom_image: null,
-        default_image: null,
-        workspace: {
-            name: '',
-        },
-    },
-    workspaceFormData: {
-        name: '',
-        description: '',
-    },
-    workspaces: [],
+    showDeleteAccountModal: false,
+    showUpdateEmailModal: false,
+    showDeleteWorkspaceModal: false,
+    showUpdatePasswordModal: false,
     selectedWorkspace: null,
     selectedDefaultImage: null,
     selectedCustomImage: null,
@@ -65,49 +45,42 @@ const modalSlice = createSlice({
         updateCreateWorkspaceModal(state) {
             state.createWorkspaceModal = !state.createWorkspaceModal;
         },
-        updateBoardFormData(state, action: PayloadAction<Partial<ModalState['boardFormData']>>) {
-            state.boardFormData = { ...state.boardFormData, ...action.payload };
+        setShowDeleteAccountModal(state, action: PayloadAction<boolean>) {
+            state.showDeleteAccountModal = action.payload;
         },
-        updateWorkspaceFormData(
-            state,
-            action: PayloadAction<Partial<ModalState['workspaceFormData']>>
-        ) {
-            state.workspaceFormData = { ...state.workspaceFormData, ...action.payload };
+        setShowUpdateEmailModal(state, action: PayloadAction<boolean>) {
+            state.showUpdateEmailModal = action.payload;
         },
-        updateSelectedWorkspace(state, action: PayloadAction<Workspace | null>) {
+        setShowDeleteWorkspaceModal(state, action: PayloadAction<boolean>) {
+            state.showDeleteWorkspaceModal = action.payload;
+        },
+        setShowUpdatePasswordModal(state, action: PayloadAction<boolean>) {
+            state.showUpdatePasswordModal = action.payload;
+        },
+        setSelectedWorkspace(state, action: PayloadAction<Workspace | null>) {
             state.selectedWorkspace = action.payload;
         },
-        updateSelectedDefaultImage(state, action: PayloadAction<string | null>) {
+        setSelectedDefaultImage(state, action: PayloadAction<string | null>) {
             state.selectedDefaultImage = action.payload;
         },
-        updateSelectedCustomImage(state, action: PayloadAction<File | null>) {
+        setSelectedCustomImage(state, action: PayloadAction<File | null>) {
             state.selectedCustomImage = action.payload;
         },
-        updateErrorTitleMessage(state, action: PayloadAction<string | null>) {
+        setErrorTitleMessage(state, action: PayloadAction<string | null>) {
             state.errorTitleMessage = action.payload;
         },
-        updateErrorImageMessage(state, action: PayloadAction<string | null>) {
+        setErrorImageMessage(state, action: PayloadAction<string | null>) {
             state.errorImageMessage = action.payload;
         },
-        updateErrorWorkspaceMessage(state, action: PayloadAction<string | null>) {
+        setErrorWorkspaceMessage(state, action: PayloadAction<string | null>) {
             state.errorWorkspaceMessage = action.payload;
         },
         resetModalStates(state) {
-            const { boardFormData } = state;
-            const { workspaceFormData } = state;
             state.errorImageMessage = '';
             state.errorTitleMessage = '';
             state.errorWorkspaceMessage = '';
             state.selectedWorkspace = null;
             state.selectedDefaultImage = null;
-            // Reset the board form data properties
-            boardFormData.default_image = '';
-            boardFormData.description = '';
-            boardFormData.title = '';
-            boardFormData.workspace.name = '';
-            // Reset the workspace data properties
-            workspaceFormData.name = '';
-            workspaceFormData.description = '';
         },
     },
 });
@@ -115,14 +88,16 @@ const modalSlice = createSlice({
 export const {
     updateCreateBoardModal,
     updateCreateWorkspaceModal,
-    updateBoardFormData,
-    updateWorkspaceFormData,
-    updateSelectedWorkspace,
-    updateSelectedDefaultImage,
-    updateSelectedCustomImage,
-    updateErrorTitleMessage,
-    updateErrorImageMessage,
-    updateErrorWorkspaceMessage,
+    setShowDeleteAccountModal,
+    setShowUpdateEmailModal,
+    setShowDeleteWorkspaceModal,
+    setShowUpdatePasswordModal,
+    setSelectedWorkspace,
+    setSelectedDefaultImage,
+    setSelectedCustomImage,
+    setErrorTitleMessage,
+    setErrorImageMessage,
+    setErrorWorkspaceMessage,
     resetModalStates,
 } = modalSlice.actions;
 

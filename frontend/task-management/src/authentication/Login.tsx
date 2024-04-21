@@ -7,10 +7,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     loginUser,
     resetAuthStates,
-    updateFormData,
-    updateShowPassword,
+    setAuthFormData,
+    setShowPassword,
 } from '../redux/reducers/authSlice';
-import { updateLoading, updateErrorMessage, resetAppStates } from '../redux/reducers/appSlice';
+import { setLoading, setErrorMessage, resetAppStates } from '../redux/reducers/appSlice';
 import { RootState } from '../redux/store';
 
 // Styling
@@ -22,19 +22,13 @@ import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
 import { spiral } from 'ldrs';
 import Cookies from 'js-cookie';
 
-// Define types for formData
-interface formData {
-    email: string;
-    password: string;
-}
-
 // Loading icon
 spiral.register();
 
 const LoginPage: React.FC = () => {
     // State management
     const dispatch = useDispatch();
-    const formData: formData = useSelector((state: RootState) => state.auth.formData);
+    const formData = useSelector((state: RootState) => state.auth.authFormData);
     const loading: boolean = useSelector((state: RootState) => state.app.loading);
     const errorMessage: string = useSelector((state: RootState) => state.app.errorMessage);
     const showPassword: boolean = useSelector((state: RootState) => state.auth.showPassword);
@@ -48,29 +42,29 @@ const LoginPage: React.FC = () => {
     useEffect(() => {
         dispatch(resetAppStates());
         dispatch(resetAuthStates());
-    }, []);
+    }, [dispatch]);
 
     // Handle input change event
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const { name, value } = e.target;
-        const updatedFormData: formData = { ...formData, [name]: value };
-        dispatch(updateFormData(updatedFormData));
+        const updatedFormData = { ...formData, [name]: value };
+        dispatch(setAuthFormData(updatedFormData));
     };
 
     // Handle the password visibility event
     const togglePasswordVisibility = (): void => {
-        dispatch(updateShowPassword());
+        dispatch(setShowPassword());
     };
 
     // Handle form submission for login
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
-        dispatch(updateLoading(true)); // Update loading state to indicate request in progress
+        dispatch(setLoading(true)); // Update loading state to indicate request in progress
 
         try {
             // Send login request to the backend API
             const response: AxiosResponse = await axios.post(
-                'http://127.0.0.1:8000/api/login',
+                'http://127.0.0.1:8000/api/user/login',
                 formData
             );
 
@@ -98,7 +92,7 @@ const LoginPage: React.FC = () => {
             handleRequestError(error);
         } finally {
             // Update loading state after login attempt
-            dispatch(updateLoading(false));
+            dispatch(setLoading(false));
         }
     };
 
@@ -108,20 +102,20 @@ const LoginPage: React.FC = () => {
             // Server responded with an error message
             if (error.response.status === 401 || error.response.status === 400) {
                 // Incorrect email/password error
-                dispatch(updateErrorMessage('Invalid credentials. Please try again.'));
+                dispatch(setErrorMessage('Invalid credentials. Please try again.'));
             } else {
                 // Other error from the server
-                dispatch(updateErrorMessage('An error occurred during login. Please try again.'));
+                dispatch(setErrorMessage('An error occurred during login. Please try again.'));
             }
         } else {
             // Network error or other unexpected error
-            dispatch(updateErrorMessage('An unexpected error occurred. Please try again later.'));
+            dispatch(setErrorMessage('An unexpected error occurred. Please try again later.'));
         }
     };
 
     // Handle server errors
     const handleServerError = (message: string): void => {
-        dispatch(updateErrorMessage(message));
+        dispatch(setErrorMessage(message));
     };
 
     return (

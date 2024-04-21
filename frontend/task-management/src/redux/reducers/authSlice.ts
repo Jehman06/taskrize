@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface AuthState {
+export interface AuthState {
     user: {
         isAuthenticated: boolean;
         id: number | null;
@@ -8,14 +8,14 @@ interface AuthState {
     resetCode: string | null;
     stage: string;
     showPassword: boolean;
-    formData: {
+    authFormData: {
         email: string;
         password: string;
         password_confirmation: string;
     };
 }
 
-const initialState: AuthState = {
+export const initialState: AuthState = {
     user: {
         isAuthenticated: false,
         id: null,
@@ -23,7 +23,7 @@ const initialState: AuthState = {
     resetCode: '',
     stage: 'resetCode',
     showPassword: false,
-    formData: {
+    authFormData: {
         email: '',
         password: '',
         password_confirmation: '',
@@ -43,20 +43,20 @@ const authSlice = createSlice({
             state.user.isAuthenticated = false;
             state.user.id = null;
         },
-        updateFormData(state, action: PayloadAction<any>) {
-            state.formData = action.payload;
+        setAuthFormData(state, action: PayloadAction<any>) {
+            state.authFormData = action.payload;
         },
-        updateResetCode(state, action: PayloadAction<any>) {
+        setResetCode(state, action: PayloadAction<string>) {
             state.resetCode = action.payload;
         },
-        updateStage(state, action: PayloadAction<'resetCode' | 'reset' | 'complete'>) {
+        setStage(state, action: PayloadAction<'resetCode' | 'reset' | 'complete'>) {
             state.stage = action.payload;
         },
-        updateConfirmPassword(state, action: PayloadAction<string>) {
-            state.formData.password_confirmation = action.payload;
+        setConfirmPassword(state, action: PayloadAction<string>) {
+            state.authFormData.password_confirmation = action.payload;
         },
         resetAuthStates(state) {
-            state.formData = {
+            state.authFormData = {
                 email: '',
                 password: '',
                 password_confirmation: '',
@@ -64,7 +64,7 @@ const authSlice = createSlice({
             state.showPassword = false;
             state.stage = 'resetCode';
         },
-        updateShowPassword(state) {
+        setShowPassword(state) {
             state.showPassword = !state.showPassword;
         },
     },
@@ -73,11 +73,11 @@ const authSlice = createSlice({
 export const {
     loginUser,
     logoutUser,
-    updateFormData,
-    updateResetCode,
-    updateStage,
-    updateConfirmPassword,
+    setAuthFormData,
+    setResetCode,
+    setStage,
+    setConfirmPassword,
     resetAuthStates,
-    updateShowPassword,
+    setShowPassword,
 } = authSlice.actions;
 export default authSlice.reducer;

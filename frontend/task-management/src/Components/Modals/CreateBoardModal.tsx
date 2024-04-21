@@ -2,15 +2,15 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
     updateCreateBoardModal,
-    updateBoardFormData,
-    updateSelectedCustomImage,
-    updateSelectedDefaultImage,
-    updateSelectedWorkspace,
-    updateErrorTitleMessage,
-    updateErrorImageMessage,
+    setSelectedCustomImage,
+    setSelectedDefaultImage,
+    setSelectedWorkspace,
+    setErrorTitleMessage,
+    setErrorImageMessage,
     resetModalStates,
-    updateErrorWorkspaceMessage,
+    setErrorWorkspaceMessage,
 } from '../../redux/reducers/modalSlice';
+import { setBoardFormData } from '../../redux/reducers/boardSlice';
 import { RootState } from '../../redux/store';
 import './Modal.css';
 import { Modal, Form, Button, DropdownButton, ButtonGroup, Dropdown } from 'react-bootstrap';
@@ -25,21 +25,6 @@ import bigSur from '../../images/bigSur.jpg';
 import yellowstone from '../../images/yellowstone.jpg';
 import monumentValley from '../../images/monumentValley.jpg';
 import { verifyAccessToken } from '../../utils/apiUtils';
-
-interface Workspace {
-    id: number;
-    name: string;
-}
-
-interface BoardFormData {
-    title: string;
-    description: string;
-    workspace: {
-        name: string | null;
-    };
-    custom_image: File | string | null; // Feature to implement later
-    default_image: string | null;
-}
 
 const images = [
     cherryBlossom,
@@ -57,14 +42,9 @@ const CreateBoardModal: React.FC = () => {
     const createBoardShow: boolean = useSelector(
         (state: RootState) => state.modal.createBoardModal
     );
-    const boardFormData: BoardFormData = useSelector(
-        (state: RootState) => state.modal.boardFormData
-    );
+    const boardFormData = useSelector((state: RootState) => state.board.boardFormData);
     const workspaces = useSelector((state: RootState) => state.workspace.workspaces);
-    // const workspaces: Workspace[] = useSelector((state: RootState) => state.modal.workspaces);
-    const selectedWorkspace: Workspace | null = useSelector(
-        (state: RootState) => state.modal.selectedWorkspace
-    );
+    const selectedWorkspace = useSelector((state: RootState) => state.modal.selectedWorkspace);
     const selectedDefaultImage: string | null = useSelector(
         (state: RootState) => state.modal.selectedDefaultImage
     );
@@ -96,16 +76,20 @@ const CreateBoardModal: React.FC = () => {
     const handleImageSelect = (image: string | File) => {
         if (typeof image === 'string') {
             // If the selected image is one of the default images, set it as the selectedDefaultImage
-            dispatch(updateSelectedDefaultImage(image));
-            dispatch(updateSelectedCustomImage(null));
+            dispatch(setSelectedDefaultImage(image));
+            dispatch(setSelectedCustomImage(null));
             // Update board form data with default image
-            dispatch(updateBoardFormData({ custom_image: null, default_image: image }));
+            dispatch(
+                setBoardFormData({ ...boardFormData, custom_image: null, default_image: image })
+            );
         } else {
             // If the selected image is a custom image, set it as the selectedCustomImage
-            dispatch(updateSelectedCustomImage(image));
-            dispatch(updateSelectedDefaultImage(null));
+            dispatch(setSelectedCustomImage(image));
+            dispatch(setSelectedDefaultImage(null));
             // Update board form data with custom image
-            dispatch(updateBoardFormData({ custom_image: image, default_image: null }));
+            dispatch(
+                setBoardFormData({ ...boardFormData, custom_image: image, default_image: null })
+            );
         }
     };
 
@@ -125,12 +109,12 @@ const CreateBoardModal: React.FC = () => {
     useEffect(() => {
         // Set the first workspace as the default selected workspace when workspaces change
         if (workspaces.length > 0) {
-            dispatch(updateSelectedWorkspace(workspaces[0]));
-            dispatch(updateBoardFormData({ workspace: workspaces[0] }));
+            dispatch(setSelectedWorkspace(workspaces[0]));
+            dispatch(setBoardFormData({ ...boardFormData, workspace: workspaces[0] }));
         }
     }, [workspaces, dispatch]);
 
-    const createBoard = async (boardFormData: BoardFormData) => {
+    const createBoard = async (boardFormData: any) => {
         // Get the access token from cookies
         const accessToken = Cookies.get('access_token');
         try {
@@ -158,22 +142,22 @@ const CreateBoardModal: React.FC = () => {
         }
     };
 
-    const handleWorkspaceSelect = (workspace: Workspace) => {
-        dispatch(updateSelectedWorkspace(workspace));
-        dispatch(updateBoardFormData({ workspace: workspace })); // Dispatch action to update workspace in board form data
+    const handleWorkspaceSelect = (workspace: any) => {
+        dispatch(setSelectedWorkspace(workspace));
+        dispatch(setBoardFormData({ ...boardFormData, workspace: workspace })); // Dispatch action to update workspace in board form data
     };
 
     const handleFormSubmit = () => {
         if (!selectedDefaultImage) {
-            dispatch(updateErrorImageMessage('Please select a background image.'));
+            dispatch(setErrorImageMessage('Please select a background image.'));
             return;
         }
         if (!boardFormData.title) {
-            dispatch(updateErrorTitleMessage('Please provide a title for your board.'));
+            dispatch(setErrorTitleMessage('Please provide a title for your board.'));
             return;
         }
         if (!boardFormData.workspace.name) {
-            dispatch(updateErrorWorkspaceMessage('Please create a workspace for your board.'));
+            dispatch(setErrorWorkspaceMessage('Please create a workspace for your board.'));
             return;
         }
         // Dispatch action to create board with form data
@@ -302,7 +286,9 @@ const CreateBoardModal: React.FC = () => {
                             required
                             value={boardFormData.title}
                             onChange={(e) =>
-                                dispatch(updateBoardFormData({ title: e.target.value }))
+                                dispatch(
+                                    setBoardFormData({ ...boardFormData, title: e.target.value })
+                                )
                             }
                         />
                         {errorTitleMessage && (
@@ -326,7 +312,8 @@ const CreateBoardModal: React.FC = () => {
                                 }
                                 onChange={(e) =>
                                     dispatch(
-                                        updateBoardFormData({
+                                        setBoardFormData({
+                                            ...boardFormData,
                                             workspace: {
                                                 name: e.target.value,
                                             },
@@ -368,7 +355,12 @@ const CreateBoardModal: React.FC = () => {
                             className="modal-input"
                             value={boardFormData.description}
                             onChange={(e) =>
-                                dispatch(updateBoardFormData({ description: e.target.value }))
+                                dispatch(
+                                    setBoardFormData({
+                                        ...boardFormData,
+                                        description: e.target.value,
+                                    })
+                                )
                             }
                         />
                     </Form.Group>

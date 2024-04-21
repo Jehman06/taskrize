@@ -19,8 +19,6 @@ class CustomUser(AbstractUser):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    email = models.EmailField()
     name = models.CharField(max_length=50, blank=True)
-    last_name = models.CharField(max_length=50, blank=True)
     nickname = models.CharField(max_length=50, blank=True)
     bio = models.TextField(max_length=1000, blank=True)

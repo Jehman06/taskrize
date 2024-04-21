@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path
-from authentication.views import register_user, login_user, logout_user, reset_password_request, reset_password_confirm, get_profile, update_profile
+from authentication.views import register_user, login_user, logout_user, reset_password_request, reset_password_confirm, get_profile, update_profile, delete_account, update_user_email, update_user_password
 from django.views.generic import RedirectView
 from workspaces.views import create_workspace, get_workspaces, update_workspace, delete_workspace, get_workspace_boards
 from boards.views import get_boards, create_board, update_board, toggle_favorite_board, delete_board
@@ -26,11 +26,14 @@ urlpatterns = [
     # Authentication
     path('', RedirectView.as_view(url='/admin/')), # Redirect to the admin page
     path('admin/', admin.site.urls),
-    path('api/register', register_user, name='register'),
-    path('api/login', login_user, name='login'),
-    path('api/logout', logout_user, name='logout'),
-    path('api/reset-password', reset_password_request, name='reset-password-request'),
-    re_path(r'^api/reset-password-confirm/(?P<user_id>\d+)/?(?P<reset_code>\w+)?$', reset_password_confirm, name='reset-password-confirm'),
+    path('api/user/register', register_user, name='register'),
+    path('api/user/login', login_user, name='login'),
+    path('api/user/logout', logout_user, name='logout'),
+    path('api/user/reset-password', reset_password_request, name='reset-password-request'),
+    re_path(r'^api/user/reset-password-confirm/(?P<user_id>\d+)/?(?P<reset_code>\w+)?$', reset_password_confirm, name='reset-password-confirm'),
+    path('api/user/email-update', update_user_email, name='email-update'),
+    path('api/user/password-update', update_user_password, name='password-update'),
+    path('api/user/delete', delete_account, name='account-delete'),
     # User
     path('api/user/profile', get_profile, name='user-profile-get'),
     path('api/user/profile/update/<int:pk>/', update_profile, name='user-profile-update'),

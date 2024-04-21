@@ -65,32 +65,6 @@ class APITests(APITestCase):
         response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_get_user_profile(self):
-        # First, authenticate the user and obtain the access token
-        url_login = reverse('login')
-        login_data = {'email': 'test@example.com', 'password': 'password123'}
-        login_response = self.client.post(url_login, login_data, format='json')
-        self.assertEqual(login_response.status_code, status.HTTP_200_OK)
-        
-        # Extract the access token from the response content
-        login_content = login_response.json()
-        access_token = login_content.get('access_token')
-
-        # Next, make a request to the user profile endpoint using the obtained access token
-        url_profile = reverse('user-profile-get')
-        headers = {'Authorization': f'Bearer {access_token}'}
-        profile_response = self.client.get(url_profile, headers=headers)
-        
-        # Retrieve the user profile
-        profile = UserProfile.objects.get(user=self.test_user)
-
-        # Assert that the response status code is 200 (OK) indicating a successful request
-        self.assertEqual(profile_response.status_code, status.HTTP_200_OK)
-        # Check if the email field exists in the UserProfile model
-        self.assertTrue(hasattr(profile, 'email'), 'UserProfile model does not have an email field')
-        # Verify that the email field is populated with the user's email
-        self.assertEqual(profile.email, self.test_user.email, 'Email in UserProfile does not match user email')
-
     def test_update_user_profile(self):
         # Authenticate the user
         login_url = reverse('login')
@@ -105,8 +79,11 @@ class APITests(APITestCase):
 
         # Retrieve the user profile
         profile_url = reverse('user-profile-get')
-        profile_response = self.client.get(profile_url, headers=headers)
+        profile_response = self.client.get(profile_url, headers=headers, format='json')
+
+        # Assert the status code
         self.assertEqual(profile_response.status_code, status.HTTP_200_OK)
+
         profile_data = profile_response.json()
 
         # Get the user profile ID
@@ -115,7 +92,6 @@ class APITests(APITestCase):
         # Make a PUT request to update the user profile
         update_profile_url = reverse('user-profile-update', kwargs={'pk': profile_id})
         update_data = {
-            'email': 'hello@world.com',
             'name': 'New name',
             'nickname': 'New Nickname',
             'bio': 'New Bio'
@@ -129,10 +105,86 @@ class APITests(APITestCase):
         updated_profile = UserProfile.objects.get(pk=profile_id)
 
         # Check if all fields have been updated
-        self.assertEqual(updated_profile.email, update_data['email'])
         self.assertEqual(updated_profile.name, update_data['name'])
         self.assertEqual(updated_profile.nickname, update_data['nickname'])
         self.assertEqual(updated_profile.bio, update_data['bio'])
 
-        # Check that the CustomUser object has also been updated with the new email
-        self.assertEqual(CustomUser.objects.get(email=update_data['email']).email, update_data['email'])
+    def test_update_email(self):
+        # Create an account to test if email is already in use
+        sign_up_url = reverse('register')
+        sign_up_data = {'email': 'hello@world.com', 'password': 'helloworld', 'password_confirmation': 'helloworld'}
+        sign_up_response = self.client.post(sign_up_url, sign_up_data, format='json')
+        self.assertEqual(sign_up_response.status_code, status.HTTP_201_CREATED)
+        
+        # Log in user that will update their email
+        login_url = reverse('login')
+        login_data = {'email': 'test@example.com', 'password': 'password123'}
+        login_response = self.client.post(login_url, login_data, format='json')
+        self.assertEqual(login_response.status_code, status.HTTP_200_OK)
+        login_content = login_response.json()
+        access_token = login_content.get('access_token')
+
+        self.assertTrue(CustomUser.objects.filter(email='test@example.com').exists())
+
+        # Change user's email to a unique email address using PUT request
+        update_email_url = reverse('email-update')
+        headers = {'Authorization': f'Bearer {access_token}'}
+        unique_email_update_data = {'email': 'test@example.com', 'password': 'password123', 'updated_email': 'world@hello.com'}
+        unique_email_update_response = self.client.put(update_email_url, unique_email_update_data, headers=headers, format='json')
+
+        self.assertEqual(unique_email_update_response.status_code, status.HTTP_200_OK)
+
+        # Verify that the updated email address exists and the old one does not
+        self.assertTrue(CustomUser.objects.filter(email='world@hello.com').exists())
+        self.assertFalse(CustomUser.objects.filter(email='test@example.com').exists())
+
+    def test_update_password(self):
+        # Log the user in
+        login_url = reverse('login')
+        login_data = {'email': 'test@example.com', 'password': 'password123'}
+        login_response = self.client.post(login_url, login_data, format='json')
+        self.assertEqual(login_response.status_code, status.HTTP_200_OK)
+        login_content = login_response.json()
+        access_token = login_content.get('access_token')
+
+        # Update the password
+        update_password_url = reverse('password-update')
+        update_password_data = {'email': 'test@example.com', 'password': 'password123', 'updated_password': '123password'}
+        headers = {'Authorization': f'Bearer {access_token}'}
+        update_password_response = self.client.put(update_password_url, update_password_data, headers=headers, format='json')
+        self.assertEqual(update_password_response.status_code, status.HTTP_200_OK)
+        updated_user = CustomUser.objects.get(email='test@example.com')
+        self.assertTrue(updated_user.check_password('123password'))
+        
+        # Log the user out to make sure they can log back in with their updated password
+        logout_url = reverse('logout')
+        logout_response = self.client.post(logout_url, headers=headers, format='json')
+        self.assertEqual(logout_response.status_code, status.HTTP_200_OK)
+
+        # Log the user back in
+        updated_login_data = {'email': 'test@example.com', 'password': '123password'}
+        updated_login_response = self.client.post(login_url, updated_login_data, format='json')
+        self.assertEqual(updated_login_response.status_code, status.HTTP_200_OK)
+
+    def test_delete_account(self):
+        # Login the user
+        login_url = reverse('login')
+        login_data = login_data = {'email': 'test@example.com', 'password': 'password123'}
+        login_response = self.client.post(login_url, login_data, format='json')
+        self.assertEqual(login_response.status_code, status.HTTP_200_OK)
+        login_content = login_response.json()
+        access_token = login_content.get('access_token')
+
+        # Delete the account with wrong credentials
+        delete_url = reverse('account-delete')
+        unsuccessful_delete_data = {'email': 'example@test.com', 'password': 'wrongpassword'}
+        # Set authentication headers
+        headers = {'Authorization': f'Bearer {access_token}'}
+        unsuccessful_delete_response = self.client.delete(delete_url, unsuccessful_delete_data, headers=headers, format='json')
+        self.assertEqual(unsuccessful_delete_response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Delete account with the right credentials
+        successful_delete_data = {'email': 'test@example.com', 'password': 'password123'}
+        successful_delete_response = self.client.delete(delete_url, successful_delete_data, headers=headers, format='json')
+        self.assertEqual(successful_delete_response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(CustomUser.objects.filter(email='test@example.com').exists())

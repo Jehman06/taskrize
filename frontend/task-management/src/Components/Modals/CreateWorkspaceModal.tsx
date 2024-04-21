@@ -7,31 +7,24 @@ import Cookies from 'js-cookie';
 import {
     resetModalStates,
     updateCreateWorkspaceModal,
-    updateErrorTitleMessage,
-    updateWorkspaceFormData,
+    setErrorTitleMessage,
 } from '../../redux/reducers/modalSlice';
+import { setWorkspaceFormData } from '../../redux/reducers/workspaceSlice';
 import { verifyAccessToken } from '../../utils/apiUtils';
-
-interface WorkspaceFormData {
-    name: string;
-    description: string;
-}
 
 const CreateWorkspaceModal: React.FC = () => {
     // Redux state management
     const createWorkspaceShow: boolean = useSelector(
         (state: RootState) => state.modal.createWorkspaceModal
     );
-    const workspaceFormData: WorkspaceFormData = useSelector(
-        (state: RootState) => state.modal.workspaceFormData
-    );
+    const workspaceFormData = useSelector((state: RootState) => state.workspace.workspaceFormData);
     const errorTitleMessage: string | null = useSelector(
         (state: RootState) => state.modal.errorTitleMessage
     );
     const dispatch = useDispatch();
 
     // Send a POST request to the workspace API to create a new workspace
-    const createWorkspace = async (workspaceFormData: WorkspaceFormData) => {
+    const createWorkspace = async (workspaceFormData: any) => {
         try {
             // Verify the validity of JWT token, and refresh it if invalid (See utils/apiUtils.ts)
             await verifyAccessToken();
@@ -60,7 +53,7 @@ const CreateWorkspaceModal: React.FC = () => {
 
     const handleFormSubmit = async (): Promise<void> => {
         if (!workspaceFormData.name) {
-            dispatch(updateErrorTitleMessage('Please provide a name for your workspace.'));
+            dispatch(setErrorTitleMessage('Please provide a name for your workspace.'));
             return;
         }
         // Dispatch action to create workspace with form data
@@ -93,7 +86,7 @@ const CreateWorkspaceModal: React.FC = () => {
                             required
                             value={workspaceFormData.name}
                             onChange={(e) =>
-                                dispatch(updateWorkspaceFormData({ name: e.target.value }))
+                                dispatch(setWorkspaceFormData({ name: e.target.value }))
                             }
                         />
                         {errorTitleMessage && (
@@ -110,7 +103,7 @@ const CreateWorkspaceModal: React.FC = () => {
                             className="modal-input"
                             value={workspaceFormData.description}
                             onChange={(e) =>
-                                dispatch(updateWorkspaceFormData({ description: e.target.value }))
+                                dispatch(setWorkspaceFormData({ description: e.target.value }))
                             }
                         />
                     </Form.Group>

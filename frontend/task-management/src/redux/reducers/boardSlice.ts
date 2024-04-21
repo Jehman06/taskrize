@@ -11,14 +11,32 @@ interface Board {
     starFilled: any;
 }
 
-interface boardState {
+export interface BoardState {
     boards: Board[];
     favoriteBoards: Board[];
+    boardFormData: {
+        title: string;
+        description: string;
+        workspace: {
+            name: string | null;
+        };
+        custom_image: File | string | null;
+        default_image: string | null;
+    };
 }
 
-const initialState: boardState = {
+export const initialState: BoardState = {
     boards: [],
     favoriteBoards: [],
+    boardFormData: {
+        title: '',
+        description: '',
+        custom_image: null,
+        default_image: null,
+        workspace: {
+            name: '',
+        },
+    },
 };
 
 const boardSlice = createSlice({
@@ -31,8 +49,11 @@ const boardSlice = createSlice({
         setFavoriteBoards(state, action: PayloadAction<Board[]>) {
             state.favoriteBoards = action.payload;
         },
+        setBoardFormData(state, action: PayloadAction<Partial<BoardState>['boardFormData']>) {
+            state.boardFormData = { ...state.boardFormData, ...action.payload };
+        },
     },
 });
 
-export const { setBoards, setFavoriteBoards } = boardSlice.actions;
+export const { setBoards, setFavoriteBoards, setBoardFormData } = boardSlice.actions;
 export default boardSlice.reducer;

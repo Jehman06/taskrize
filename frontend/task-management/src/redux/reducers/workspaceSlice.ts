@@ -1,5 +1,4 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from '../store';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface Workspace {
     id: number;
@@ -19,24 +18,31 @@ interface Board {
     workspace: number;
     workspace_name: string;
     starFilled: any;
+    workspaces: Workspace[];
 }
 
-interface workspaceState {
+export interface WorkspaceState {
     workspaces: Workspace[];
     boards: Board[];
     workspaceName: string;
     editing: boolean;
     editingWorkspaceId: number | null;
-    showDeleteModal: boolean;
+    workspaceFormData: {
+        name: string;
+        description: string;
+    };
 }
 
-const initialState: workspaceState = {
+export const initialState: WorkspaceState = {
     workspaces: [],
     boards: [],
     workspaceName: '',
     editing: false,
     editingWorkspaceId: null,
-    showDeleteModal: false,
+    workspaceFormData: {
+        name: '',
+        description: '',
+    },
 };
 
 const workspaceSLice = createSlice({
@@ -55,8 +61,11 @@ const workspaceSLice = createSlice({
         setEditingWorkspaceId(state, action: PayloadAction<number | null>) {
             state.editingWorkspaceId = action.payload;
         },
-        setShowDeleteModal(state, action: PayloadAction<boolean>) {
-            state.showDeleteModal = action.payload;
+        setWorkspaceFormData(
+            state,
+            action: PayloadAction<Partial<WorkspaceState['workspaceFormData']>>
+        ) {
+            state.workspaceFormData = { ...state.workspaceFormData, ...action.payload };
         },
     },
 });
@@ -66,6 +75,6 @@ export const {
     setWorkspaceName,
     setEditing,
     setEditingWorkspaceId,
-    setShowDeleteModal,
+    setWorkspaceFormData,
 } = workspaceSLice.actions;
 export default workspaceSLice.reducer;
