@@ -107,10 +107,16 @@ const ProfilePage: React.FC = () => {
 
     // Select emojis and add them to bio
     const handleEmojiSelect = (emoji: any) => {
+        const textarea = document.getElementById('bio-textarea') as HTMLTextAreaElement;
+        const cursorPos = textarea.selectionStart;
+        const bioBeforeCursor = formProfileData.bio ? formProfileData.bio.slice(0, cursorPos) : '';
+        const bioAfterCursor = formProfileData.bio ? formProfileData.bio.slice(cursorPos) : '';
+        const updatedBio = bioBeforeCursor + emoji.native + bioAfterCursor;
+
         dispatch(
             setFormProfileData({
                 ...(formProfileData as UserProfile),
-                bio: formProfileData.bio + emoji.native,
+                bio: updatedBio,
             })
         );
     };
@@ -409,6 +415,9 @@ const ProfilePage: React.FC = () => {
 
     return (
         <div className="profile-container">
+            <Button className="back-button" variant="secondary" onClick={() => navigate('/home')}>
+                Back to DashBoard
+            </Button>
             <div className="profile-content">
                 <div className="profile-title">
                     <h1>Profile</h1>
@@ -434,9 +443,10 @@ const ProfilePage: React.FC = () => {
                     <div className="bio-input-wrapper">
                         <Form.Control
                             as="textarea"
-                            rows={8}
+                            rows={10}
                             className="profile-input"
                             name="bio"
+                            id="bio-textarea"
                             value={formProfileData.bio || ''}
                             onChange={handleProfileInputChange}
                         />

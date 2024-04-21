@@ -7,6 +7,13 @@
     padding: 5rem;
 }
 
+.back-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+}
+
 .profile-title {
     text-align: center;
     border-bottom: 0.1px solid #9fadbc;
@@ -87,7 +94,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    border: 1px solid #ccc;
+    border: 0.3px solid #b91919;
 }
 
 .danger-section {
@@ -95,8 +102,12 @@
     align-items: center;
     justify-content: space-between;
     padding: 20px;
-    border-bottom: 0.1px solid #9fadbc;
     width: 100%;
+}
+
+/* Apply border bottom to all elements except the last one */
+.danger-section:not(:last-child) {
+    border-bottom: 0.1px solid #9fadbc;
 }
 
 .left-content {
@@ -111,4 +122,9 @@
 
 .danger-button {
     margin-left: 3rem;
+}
+
+/* Hide the scrollbar */
+::-webkit-scrollbar {
+    display: none;
 }
