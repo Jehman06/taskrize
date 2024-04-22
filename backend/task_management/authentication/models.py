@@ -18,6 +18,7 @@ class CustomUser(AbstractUser):
         return self.email
 
 class UserProfile(models.Model):
+    email = models.EmailField(unique=True)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, blank=True)
     nickname = models.CharField(max_length=50, blank=True)

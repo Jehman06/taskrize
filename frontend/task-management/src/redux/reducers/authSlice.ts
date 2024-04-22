@@ -63,10 +63,6 @@ const authSlice = createSlice({
             };
             state.showPassword = false;
             state.stage = 'resetCode';
-            state.user = {
-                id: null,
-                isAuthenticated: false,
-            };
         },
         setShowPassword(state) {
             state.showPassword = !state.showPassword;

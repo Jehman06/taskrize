@@ -3,11 +3,15 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import {
+    Member,
     setEditing,
     setEditingWorkspaceId,
     setWorkspaceName,
 } from '../../redux/reducers/workspaceSlice';
-import { setShowDeleteWorkspaceModal } from '../../redux/reducers/modalSlice';
+import {
+    setShowDeleteWorkspaceModal,
+    setShowWorkspaceMembersModal,
+} from '../../redux/reducers/modalSlice';
 // Component
 import Board from '../Board/Board';
 // API related
@@ -32,13 +36,14 @@ import palmTrees from '../../images/palmTrees.jpg';
 import bigSur from '../../images/bigSur.jpg';
 import yellowstone from '../../images/yellowstone.jpg';
 import monumentValley from '../../images/monumentValley.jpg';
+import WorkspaceMembersModal from '../Modals/Workspace/WorkspaceMembersModal';
 
 interface WorkspaceProps {
     id: number;
     name: string;
     description: string;
     ownerId: number;
-    members: number[];
+    members: Member[];
     boards: any[];
     toggleStar: (boardId: number) => Promise<void>;
     favoriteBoards: any[];
@@ -56,7 +61,14 @@ const imageMapping: { [key: string]: string } = {
     goldenGate: goldenGate,
 };
 
-const Workspace: React.FC<WorkspaceProps> = ({ name, boards, toggleStar, favoriteBoards, id }) => {
+const Workspace: React.FC<WorkspaceProps> = ({
+    name,
+    boards,
+    toggleStar,
+    favoriteBoards,
+    id,
+    members,
+}) => {
     // Redux state management
     const editing = useSelector((state: RootState) => state.workspace.editing);
     const workspaceName = useSelector((state: RootState) => state.workspace.workspaceName);
@@ -64,6 +76,9 @@ const Workspace: React.FC<WorkspaceProps> = ({ name, boards, toggleStar, favorit
         (state: RootState) => state.workspace.editingWorkspaceId
     );
     const showDeleteModal = useSelector((state: RootState) => state.modal.showDeleteWorkspaceModal);
+    const showMembersModal = useSelector(
+        (state: RootState) => state.modal.showWorkspaceMembersModal
+    );
     const dispatch = useDispatch();
 
     // Calculate the starFilled property for each board
@@ -173,6 +188,10 @@ const Workspace: React.FC<WorkspaceProps> = ({ name, boards, toggleStar, favorit
         dispatch(setShowDeleteWorkspaceModal(false));
     };
 
+    const toggleWorkspaceMembersModal = () => {
+        dispatch(setShowWorkspaceMembersModal(true));
+    };
+
     return (
         <div className="workspace">
             <div className="workspace-settings">
@@ -197,9 +216,15 @@ const Workspace: React.FC<WorkspaceProps> = ({ name, boards, toggleStar, favorit
                     )}
                 </div>
                 <div className="workspace-buttons">
-                    <button className="btn button">
+                    <button className="btn button" onClick={toggleWorkspaceMembersModal}>
                         <BsFillPeopleFill className="settings-icon" /> Members
                     </button>
+
+                    <WorkspaceMembersModal
+                        show={showMembersModal}
+                        onHide={() => dispatch(setShowWorkspaceMembersModal(false))}
+                        members={members}
+                    />
                     <button
                         className="btn button"
                         id="dropdownSettingsButton"

@@ -1,11 +1,9 @@
-import React from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // Redux
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser, resetAuthStates } from '../redux/reducers/authSlice';
 import { resetAppStates } from '../redux/reducers/appSlice';
-import CreateBoardModal from '../Components/Modals/CreateBoardModal';
-import CreateWorkspaceModal from '../Components/Modals/CreateWorkspaceModal';
 import { updateCreateBoardModal, updateCreateWorkspaceModal } from '../redux/reducers/modalSlice';
 import { RootState } from '../redux/store';
 // API
@@ -22,6 +20,10 @@ import './PrivateNavbar.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
 
+// Lazy loading Modal imports
+const CreateBoardModal = lazy(() => import('../Components/Modals/Create/CreateBoardModal'));
+const CreateWorkspaceModal = lazy(() => import('../Components/Modals/Create/CreateWorkspaceModal'));
+
 const PrivateNavbar: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -29,6 +31,12 @@ const PrivateNavbar: React.FC = () => {
     const favoriteBoards = useSelector((state: RootState) => state.board.favoriteBoards);
     const boards = useSelector((state: RootState) => state.board.boards);
     const workspaces = useSelector((state: RootState) => state.workspace.workspaces);
+
+    // Preload the image
+    useEffect(() => {
+        const img = new Image();
+        img.src = taskrize;
+    }, []);
 
     const handleLogout = async (): Promise<void> => {
         try {
@@ -72,7 +80,7 @@ const PrivateNavbar: React.FC = () => {
             <div className="d-flex align-items-center">
                 <img
                     src={taskrize}
-                    alt="logo"
+                    alt="TaskRize logo"
                     className="mr-3 private-logo"
                     onClick={handleLogoClick}
                 />
@@ -195,7 +203,15 @@ const PrivateNavbar: React.FC = () => {
                                 </p>
                             </a>
                         </li>
-                        <CreateBoardModal />
+                        <Suspense
+                            fallback={
+                                <div className="text-center mt-5 mb-5">
+                                    <l-spiral size="30" color="teal"></l-spiral>
+                                </div>
+                            }
+                        >
+                            <CreateBoardModal />
+                        </Suspense>
                         <li>
                             <a className="dropdown-item" href="#">
                                 <p className="create-title">Start from a template</p>
@@ -216,7 +232,15 @@ const PrivateNavbar: React.FC = () => {
                                 </p>
                             </a>
                         </li>
-                        <CreateWorkspaceModal />
+                        <Suspense
+                            fallback={
+                                <div className="text-center mt-5 mb-5">
+                                    <l-spiral size="30" color="teal"></l-spiral>
+                                </div>
+                            }
+                        >
+                            <CreateWorkspaceModal />
+                        </Suspense>
                     </ul>
                 </div>
             </div>

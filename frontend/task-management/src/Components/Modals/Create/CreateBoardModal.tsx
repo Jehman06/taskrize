@@ -9,22 +9,22 @@ import {
     setErrorImageMessage,
     resetModalStates,
     setErrorWorkspaceMessage,
-} from '../../redux/reducers/modalSlice';
-import { setBoardFormData } from '../../redux/reducers/boardSlice';
-import { RootState } from '../../redux/store';
-import './Modal.css';
+} from '../../../redux/reducers/modalSlice';
+import { setBoardFormData } from '../../../redux/reducers/boardSlice';
+import { RootState } from '../../../redux/store';
+import '../Modal.css';
 import { Modal, Form, Button, DropdownButton, ButtonGroup, Dropdown } from 'react-bootstrap';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import cherryBlossom from '../../images/cherryblossom.jpg';
-import mountainLake from '../../images/mountainlake.jpg';
-import newYork from '../../images/newYork.jpg';
-import goldenGate from '../../images/goldenGate.jpg';
-import palmTrees from '../../images/palmTrees.jpg';
-import bigSur from '../../images/bigSur.jpg';
-import yellowstone from '../../images/yellowstone.jpg';
-import monumentValley from '../../images/monumentValley.jpg';
-import { verifyAccessToken } from '../../utils/apiUtils';
+import cherryBlossom from '../../../images/cherryblossom.jpg';
+import mountainLake from '../../../images/mountainlake.jpg';
+import newYork from '../../../images/newYork.jpg';
+import goldenGate from '../../../images/goldenGate.jpg';
+import palmTrees from '../../../images/palmTrees.jpg';
+import bigSur from '../../../images/bigSur.jpg';
+import yellowstone from '../../../images/yellowstone.jpg';
+import monumentValley from '../../../images/monumentValley.jpg';
+import { verifyAccessToken } from '../../../utils/apiUtils';
 
 const images = [
     cherryBlossom,

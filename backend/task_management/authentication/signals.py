@@ -3,14 +3,16 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import UserProfile
 
-@receiver(post_save, sender=get_user_model())
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        UserProfile.objects.create(user=instance)
+User = get_user_model()
 
-@receiver(post_save, sender=get_user_model())
-def save_user_profile(sender, instance, **kwargs):
-    try:
-        instance.userprofile.save()
-    except UserProfile.DoesNotExist:
-        raise Exception('error: UserProfile does not exist')
+@receiver(post_save, sender=User)
+def create_or_update_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance, email=instance.email)
+    else:
+        try:
+            profile = instance.userprofile
+            profile.email = instance.email
+            profile.save()
+        except UserProfile.DoesNotExist:
+            raise Exception('UserProfile does not exist')

@@ -12,6 +12,7 @@ export interface ModalState {
     showUpdateEmailModal: boolean;
     showDeleteWorkspaceModal: boolean;
     showUpdatePasswordModal: boolean;
+    showWorkspaceMembersModal: boolean;
     selectedWorkspace: Workspace | null;
     selectedDefaultImage: string | null;
     selectedCustomImage: File | null;
@@ -27,6 +28,7 @@ export const initialState: ModalState = {
     showUpdateEmailModal: false,
     showDeleteWorkspaceModal: false,
     showUpdatePasswordModal: false,
+    showWorkspaceMembersModal: false,
     selectedWorkspace: null,
     selectedDefaultImage: null,
     selectedCustomImage: null,
@@ -56,6 +58,9 @@ const modalSlice = createSlice({
         },
         setShowUpdatePasswordModal(state, action: PayloadAction<boolean>) {
             state.showUpdatePasswordModal = action.payload;
+        },
+        setShowWorkspaceMembersModal(state, action: PayloadAction<boolean>) {
+            state.showWorkspaceMembersModal = action.payload;
         },
         setSelectedWorkspace(state, action: PayloadAction<Workspace | null>) {
             state.selectedWorkspace = action.payload;
@@ -92,6 +97,7 @@ export const {
     setShowUpdateEmailModal,
     setShowDeleteWorkspaceModal,
     setShowUpdatePasswordModal,
+    setShowWorkspaceMembersModal,
     setSelectedWorkspace,
     setSelectedDefaultImage,
     setSelectedCustomImage,

@@ -12,9 +12,18 @@ class WorkspaceSerializer(serializers.ModelSerializer):
     def get_members(self, obj):
         # Get the user profiles of all members
         member_profiles = UserProfile.objects.filter(user__in=obj.members.all())
-        # Extract names or emails from the profiles
-        member_names = [profile.name or profile.user.email for profile in member_profiles]
-        return member_names
+        
+        # Extract information for each member
+        members_data = []
+        for profile in member_profiles:
+            member_info = {
+                'email': profile.user.email,
+                'name': profile.name if profile.name else None,
+                'nickname': profile.nickname if profile.nickname else None,
+            }
+            members_data.append(member_info)
+        
+        return members_data
 
     def create(self, validated_data):
         # Extract and remove members data from validated data

@@ -33,12 +33,9 @@ const rootReducer = combineReducers({
 // Persist the combined reducer
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-// Create the immutable state invariant middleware
-const immutableStateInvariantMiddleware = createImmutableStateInvariantMiddleware();
-
 export type RootState = ReturnType<typeof rootReducer>;
 
-const reduxPersistActions = [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER];
+const reduxPersistActions = [FLUSH, REHYDRATE, PAUSE, PURGE, REGISTER];
 
 // Create the Redux store with the persisted reducer
 const store = configureStore({

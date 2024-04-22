@@ -125,6 +125,7 @@ const Home: React.FC = () => {
                         };
                     })
                 );
+                console.log('updatedWorkspaces: ', updatedWorkspaces);
                 dispatch(setWorkspaces(updatedWorkspaces));
                 // setWorkspaces(updatedWorkspaces);
             } else {

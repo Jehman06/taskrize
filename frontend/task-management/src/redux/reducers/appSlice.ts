@@ -4,12 +4,14 @@ export interface AppState {
     loading: boolean;
     message: string;
     errorMessage: string;
+    query: string;
 }
 
 export const initialState: AppState = {
     loading: false,
     message: '',
     errorMessage: '',
+    query: '',
 };
 
 const appSlice = createSlice({
@@ -25,6 +27,12 @@ const appSlice = createSlice({
         setErrorMessage(state, action: PayloadAction<string>) {
             state.errorMessage = action.payload;
         },
+        setSearchQuery(state, action: PayloadAction<string>) {
+            state.query = action.payload;
+        },
+        clearSearchQuery(state) {
+            state.query = '';
+        },
         resetAppStates(state) {
             state.loading = false;
             state.message = '';
@@ -33,5 +41,12 @@ const appSlice = createSlice({
     },
 });
 
-export const { setLoading, setMessage, setErrorMessage, resetAppStates } = appSlice.actions;
+export const {
+    setLoading,
+    setMessage,
+    setErrorMessage,
+    resetAppStates,
+    setSearchQuery,
+    clearSearchQuery,
+} = appSlice.actions;
 export default appSlice.reducer;

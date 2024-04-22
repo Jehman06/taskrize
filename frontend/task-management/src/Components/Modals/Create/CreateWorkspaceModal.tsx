@@ -1,16 +1,16 @@
 import React from 'react';
 import { Modal, Form, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
+import { RootState } from '../../../redux/store';
 import axios, { AxiosResponse } from 'axios';
 import Cookies from 'js-cookie';
 import {
     resetModalStates,
     updateCreateWorkspaceModal,
     setErrorTitleMessage,
-} from '../../redux/reducers/modalSlice';
-import { setWorkspaceFormData } from '../../redux/reducers/workspaceSlice';
-import { verifyAccessToken } from '../../utils/apiUtils';
+} from '../../../redux/reducers/modalSlice';
+import { setWorkspaceFormData } from '../../../redux/reducers/workspaceSlice';
+import { verifyAccessToken } from '../../../utils/apiUtils';
 
 const CreateWorkspaceModal: React.FC = () => {
     // Redux state management

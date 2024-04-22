@@ -5,8 +5,15 @@ interface Workspace {
     name: string;
     description: string;
     owner: number;
-    members: number[];
+    members: Member[];
     boards: Board[];
+}
+
+export interface Member {
+    id: number;
+    email: string;
+    name: string;
+    nickname: string;
 }
 
 interface Board {
@@ -31,6 +38,7 @@ export interface WorkspaceState {
         name: string;
         description: string;
     };
+    members: Member[];
 }
 
 export const initialState: WorkspaceState = {
@@ -43,6 +51,7 @@ export const initialState: WorkspaceState = {
         name: '',
         description: '',
     },
+    members: [],
 };
 
 const workspaceSLice = createSlice({
@@ -67,6 +76,9 @@ const workspaceSLice = createSlice({
         ) {
             state.workspaceFormData = { ...state.workspaceFormData, ...action.payload };
         },
+        setMembers(state, action: PayloadAction<Member[]>) {
+            state.members = action.payload;
+        },
     },
 });
 
@@ -76,5 +88,6 @@ export const {
     setEditing,
     setEditingWorkspaceId,
     setWorkspaceFormData,
+    setMembers,
 } = workspaceSLice.actions;
 export default workspaceSLice.reducer;
