@@ -153,3 +153,30 @@ def invite_members(request):
         return Response({'message': 'Invitation sent successfully'}, status=status.HTTP_200_OK)
     except Workspace.DoesNotExist:
         return Response({'error': 'Workspace not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+def accept_invitation(request):
+    # Extract the invitation ID from the request payload
+    invitation_id = request.data.get('invitation_id')
+
+    try:
+        # Retrieve the invitation object from the database
+        invitation = Invitation.objects.get(id=invitation_id)
+
+        # Ensure that the authenticated user is the recipient of the invitation
+        if invitation.recipient != request.user:
+            return Response({'error': 'You are not authorized to accept this invitation'}, status=status.HTTP_403_FORBIDDEN)
+        
+        # Update the invitation status to 'accepted'
+        invitation.status = 'accepted'
+        invitation.save()
+
+        # Add the recipient user to the workspace
+        invitation.workspace.members.add(request.user)
+
+        return Response({'message': 'Invitation accepted successfully'}, status=status.HTTP_200_OK)
+    except Invitation.DoesNotExist:
+        return Response({'error': 'Invitation not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -18,8 +18,9 @@ from django.contrib import admin
 from django.urls import path, re_path
 from authentication.views import register_user, login_user, logout_user, reset_password_request, reset_password_confirm, get_profile, update_profile, delete_account, update_user_email, update_user_password, search_profiles
 from django.views.generic import RedirectView
-from workspaces.views import create_workspace, get_workspaces, update_workspace, delete_workspace, get_workspace_boards, invite_members
+from workspaces.views import create_workspace, get_workspaces, update_workspace, delete_workspace, get_workspace_boards, invite_members, accept_invitation
 from boards.views import get_boards, create_board, update_board, toggle_favorite_board, delete_board
+from notifications.views import send_notification, get_notifications
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 urlpatterns = [
@@ -49,10 +50,14 @@ urlpatterns = [
     path('api/workspaces/update', update_workspace, name='workspace-update'),
     path('api/workspaces/delete', delete_workspace, name='workspace-delete'),
     path('api/workspaces/members/invite', invite_members, name='workspace-invite'),
+    path('api/workspaces/members/accept-invite', accept_invitation, name='workspace-invite-accept'),
     # Boards
     path('api/boards/', get_boards, name='board-list'),
     path('api/boards/create', create_board, name='board-create'),
     path('api/boards/update', update_board, name='board-update'),
     path('api/boards/toggle-favorite', toggle_favorite_board, name='toggle-favorite-board'),
     path('api/boards/delete', delete_board, name='board-delete'),
+    # Notifications
+    path('api/notifications', get_notifications, name='notifications'),
+    path('api/notifications/send/', send_notification, name='notification-send'),
 ]

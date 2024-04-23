@@ -103,6 +103,7 @@ INSTALLED_APPS = [
     'cards.apps.CardsConfig',
     'comments.apps.CommentsConfig',
     'attachments.apps.AttachmentsConfig',
+    'notifications.apps.NotificationsConfig',
     'rest_framework',
     'corsheaders'
 ]

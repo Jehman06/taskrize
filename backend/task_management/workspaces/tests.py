@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
-from workspaces.models import Workspace
+from workspaces.models import Workspace, Invitation
 from boards.models import Board
 from authentication.models import CustomUser
 
@@ -139,3 +139,37 @@ class WorkspaceAPITestCase(APITestCase):
         response = self.client.post(invite_url, data, format='json', HTTP_AUTHORIZATION=f'Bearer {self.token}')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['message'], 'Invitation sent successfully')
+
+    def test_only_owner_can_invite(self):
+        # create a workspace
+        workspace = Workspace.objects.create(name='Test Workspace', owner=self.user)
+        # Create another user
+        self.client.post(reverse('register'), {'email': 'abc@def.com', 'password': 'abc123', 'password_confirmation': 'abc123'})
+        login_response = self.client.post(reverse('login'), {'email': 'abc@def.com', 'password': 'abc123'})
+        login_response_content = login_response.json()
+        access_token = login_response_content.get('access_token')
+
+        # Send a POST request to invite somebody as a member of the workspace != owner
+        response = self.client.post(reverse('workspace-invite'), {'workspace_id': workspace.id, 'selected_user_ids': [self.user.id]}, headers={'Authorization': f'Bearer {access_token}'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.data['error'], 'Only the workspace owner can invite members')
+
+    def test_accept_invite(self):
+        # Create a workspace
+        workspace = Workspace.objects.create(name='Test Workspace', owner=self.user)
+        
+        # Create a test user
+        self.client.post(reverse('register'), {'email': 'abc@def.com', 'password': 'abc123', 'password_confirmation': 'abc123'})
+        test_user = CustomUser.objects.get(email='abc@def.com')
+        login_response = self.client.post(reverse('login'), {'email': 'abc@def.com', 'password': 'abc123'})
+        login_response_content = login_response.json()
+        access_token = login_response_content.get('access_token')
+
+        # Invite the user
+        self.client.post(reverse('workspace-invite'), {'workspace_id': workspace.id, 'selected_user_ids': [test_user.id]}, headers={'Authorization': f'Bearer {self.token}'}, format='json')
+        invitation = Invitation.objects.get(workspace_id=workspace.id)
+
+        # Accept the invite
+        response = self.client.post(reverse('workspace-invite-accept'), {'invitation_id': invitation.id}, headers={'Authorization': f'Bearer {access_token}'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['message'], 'Invitation accepted successfully')
