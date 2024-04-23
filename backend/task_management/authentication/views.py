@@ -4,7 +4,9 @@ from django.http import JsonResponse
 from django.contrib.auth import authenticate, logout
 from django.shortcuts import get_object_or_404
 from django.db import transaction
+from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.cache import cache
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes
@@ -216,6 +218,42 @@ def get_profile(request):
         raise NotFound('User profile not found')
     except Exception as e:
         raise APIException(str(e))
+    
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+def search_profiles(request):
+    try:
+        search_query = request.GET.get('q', '') # Get the search query from the request query parameters
+
+        # Check if the query is present in the cache
+        cached_results = cache.get(search_query)
+        if cached_results:
+            return Response(cached_results)
+        
+        # If not cached, perform the search and apply pagination
+        profiles = UserProfile.objects.filter(
+            Q(email__icontains=search_query) |
+            Q(name__icontains=search_query) |
+            Q(nickname__icontains=search_query)
+        )
+        
+        # Serialize the profiles data
+        serializer = UserProfileSerializer(profiles, many=True)
+
+        # Extract serialized data as a list
+        serialized_data = serializer.data
+        
+        # Construct response data with 'results' as a list
+        response_data = {
+            'results': serialized_data
+        }
+
+        # Cache the search results for future requests
+        cache.set(search_query, serializer.data)
+
+        return Response(serializer.data)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # Update the user profile
 @api_view(['PUT'])

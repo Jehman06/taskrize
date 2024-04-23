@@ -9,7 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ['name', 'nickname', 'bio']
+        fields = ['email', 'name', 'nickname', 'bio']
 
     def update(self, instance, validated_data):
         # Update only the fields provided in the validated data

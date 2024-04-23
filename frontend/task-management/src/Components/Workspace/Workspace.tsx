@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 // Redux
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
@@ -36,7 +36,7 @@ import palmTrees from '../../images/palmTrees.jpg';
 import bigSur from '../../images/bigSur.jpg';
 import yellowstone from '../../images/yellowstone.jpg';
 import monumentValley from '../../images/monumentValley.jpg';
-import WorkspaceMembersModal from '../Modals/Workspace/WorkspaceMembersModal';
+const WorkspaceMembersModal = lazy(() => import('../Modals/Workspace/WorkspaceMembersModal'));
 
 interface WorkspaceProps {
     id: number;
@@ -220,11 +220,19 @@ const Workspace: React.FC<WorkspaceProps> = ({
                         <BsFillPeopleFill className="settings-icon" /> Members
                     </button>
 
-                    <WorkspaceMembersModal
-                        show={showMembersModal}
-                        onHide={() => dispatch(setShowWorkspaceMembersModal(false))}
-                        members={members}
-                    />
+                    <Suspense
+                        fallback={
+                            <div className="text-center mt-5 mb-5">
+                                <l-spiral size="30" color="teal"></l-spiral>
+                            </div>
+                        }
+                    >
+                        <WorkspaceMembersModal
+                            show={showMembersModal}
+                            onHide={() => dispatch(setShowWorkspaceMembersModal(false))}
+                            members={members}
+                        />
+                    </Suspense>
                     <button
                         className="btn button"
                         id="dropdownSettingsButton"

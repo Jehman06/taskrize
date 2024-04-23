@@ -1,0 +1,10 @@
+.query-dropdown-menu {
+    background-color: white !important; /* Set background color to white */
+    color: black !important; /* Set text color to black */
+    border: none !important; /* Remove border */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1) !important; /* Add a subtle box shadow */
+}
+
+.query-dropdown-item {
+    color: black !important; /* Set text color to black */
+}

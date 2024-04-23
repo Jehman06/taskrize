@@ -20,9 +20,12 @@ class APITestRegisterUser(APITestCase):
 
 # Other Authentication API tests
 class APITests(APITestCase):
-
     def setUp(self):
+        # Create a sample user
         self.test_user = CustomUser.objects.create_user(email='test@example.com', password='password123')
+        response = self.client.post(reverse('login'), {'email': 'test@example.com', 'password': 'password123'})
+        login_content = response.json()
+        self.token = login_content.get('access_token')
 
     def test_register_user_existing_email(self):
         url = reverse('register')
@@ -72,10 +75,10 @@ class APITests(APITestCase):
         login_response = self.client.post(login_url, login_data, format='json')
         self.assertEqual(login_response.status_code, status.HTTP_200_OK)
         login_content = login_response.json()
-        access_token = login_content.get('access_token')
+        self.access_token = login_content.get('access_token')
 
         # Set authentication headers
-        headers = {'Authorization': f'Bearer {access_token}'}
+        headers = {'Authorization': f'Bearer {self.access_token}'}
 
         # Retrieve the user profile
         profile_url = reverse('user-profile-get')
@@ -188,3 +191,27 @@ class APITests(APITestCase):
         successful_delete_response = self.client.delete(delete_url, successful_delete_data, headers=headers, format='json')
         self.assertEqual(successful_delete_response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(CustomUser.objects.filter(email='test@example.com').exists())
+
+    def test_search_profile(self):
+        # Create sample user profiles if they don't exist
+        # John Doe 
+        self.client.post(reverse('register'), {'email': 'john@doe.com', 'password': 'test123', 'password_confirmation': 'test123'})
+        # Assuming you have already registered and logged in John Doe
+        johndoe_login_response = self.client.post(reverse('login'), {'email': 'john@doe.com', 'password': 'test123'})
+        self.assertEqual(johndoe_login_response.status_code, status.HTTP_200_OK)
+        johndoe_token = johndoe_login_response.json().get('access_token')
+        profile_response = self.client.get(reverse('user-profile-get'), HTTP_AUTHORIZATION=f'Bearer {johndoe_token}', format='json')
+        self.assertEqual(profile_response.status_code, status.HTTP_200_OK)
+        johndoe_profile_data = profile_response.json()
+        johndoe_profile_id = johndoe_profile_data['id']
+        johndoe_update_profile_response = self.client.put(reverse('user-profile-update', kwargs={'pk': johndoe_profile_id}), {'name': 'John Doe', 'nickname': 'Johnny'}, HTTP_AUTHORIZATION=f'Bearer {johndoe_token}', format='json')
+        self.assertEqual(johndoe_update_profile_response.status_code, status.HTTP_200_OK)
+
+        # Search for the user John Doe
+        response = self.client.get(reverse('search-profiles') + '?q=Doe', HTTP_AUTHORIZATION=f'Bearer {johndoe_token}')
+        # Assert that the response status code is 200 OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Assert that the response contains the profiles matching the search query
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['name'], 'John Doe')
