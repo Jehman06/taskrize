@@ -37,3 +37,10 @@ TaskRize implements a JWT-based authentication system, providing secure access t
 - JWT tokens are securely stored on the client-side in http-only cookies and sent with each subsequent request to authenticate the user's identity.
 - JWT tokens have an expiration time to enhance security. Users must refresh their tokens periodically to maintain access.
 - Users can invalidate their JWT token by logging out, ensuring that unauthorized access is prevented.
+
+## Workspaces
+
+- Users have the ability to create workspaces to organize their boards and collaborate effectively.
+- Within a workspace, users can create, update, and delete boards as needed.
+- Collaboration is facilitated through the invitation of other users to the workspace, enabling seamless teamwork.
+- Workspace administrators have the option to remove users from the workspace if necessary.
