@@ -20,7 +20,7 @@ from authentication.views import register_user, login_user, logout_user, reset_p
 from django.views.generic import RedirectView
 from workspaces.views import create_workspace, get_workspaces, update_workspace, delete_workspace, get_workspace_boards, invite_members, accept_invitation
 from boards.views import get_boards, create_board, update_board, toggle_favorite_board, delete_board
-from notifications.views import send_notification, get_notifications
+from notifications.views import send_notification, get_notifications, read_notification
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 urlpatterns = [
@@ -59,5 +59,6 @@ urlpatterns = [
     path('api/boards/delete', delete_board, name='board-delete'),
     # Notifications
     path('api/notifications', get_notifications, name='notifications'),
-    path('api/notifications/send/', send_notification, name='notification-send'),
+    path('api/notifications/send', send_notification, name='notification-send'),
+    path('api/notifications/read', read_notification, name='notification-read'),
 ]

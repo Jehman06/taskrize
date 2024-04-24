@@ -69,3 +69,13 @@
 .modal-delete-button {
     min-width: 5rem;
 }
+
+.members-workspace-member-items {
+    margin: 0;
+    padding: 0;
+}
+
+.members-workspace-member {
+    border-bottom: 0.5px solid black;
+    margin-bottom: 1rem;
+}

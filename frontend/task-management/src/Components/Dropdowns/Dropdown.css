@@ -7,4 +7,10 @@
 
 .query-dropdown-item {
     color: black !important; /* Set text color to black */
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.query-dropdown-items:hover {
+    background-color: #b2b2b2 !important;
 }

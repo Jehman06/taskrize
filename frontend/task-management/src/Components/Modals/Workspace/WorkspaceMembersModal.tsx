@@ -87,19 +87,16 @@ const WorkspaceMembersModal: React.FC<WorkspaceMembersModalProps> = ({ show, onH
                 </Modal.Header>
                 <Modal.Body style={{ backgroundColor: '#33373a', color: '#9fadbc' }}>
                     {members.map((member, index) => (
-                        <div key={index}>
-                            {member.name && member.nickname ? (
-                                <p>
-                                    {member.name}, {member.nickname}
-                                </p>
-                            ) : (
-                                <p>{member.email}</p>
-                            )}
+                        <div key={index} className="members-workspace-member">
+                            <p className="members-workspace-member-items">
+                                {member.name} {`(${member.nickname})`}
+                            </p>
+                            <p className="members-workspace-member-items">{member.email}</p>
                         </div>
                     ))}
                     <input
                         type="text"
-                        placeholder="Search users..."
+                        placeholder="Invite users..."
                         value={searchQuery}
                         onChange={(e) => {
                             handleChange(e);

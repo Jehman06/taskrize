@@ -16,13 +16,15 @@ const UserQueryDropdown: React.FC<UserQueryDropdownProps> = ({ searchResults }) 
 
     return (
         <Dropdown show={showDropdown}>
-            <Dropdown.Menu>
+            <Dropdown.Menu className="query-dropdown-menu">
                 {Array.isArray(searchResults) && searchResults.length > 0 ? ( // Check if searchResults is defined and not empty
                     searchResults.map((searchResult, index) => (
-                        <Dropdown.Item key={index}>
-                            <p>{searchResult.email}</p>
-                            <p>{searchResult.name ? searchResult.name : ''}</p>
-                            <p>{searchResult.nickname ? searchResult.nickname : ''}</p>
+                        <Dropdown.Item key={index} className="query-dropdown-items">
+                            <p className="query-dropdown-item">
+                                {searchResult.name ? searchResult.name : ''}{' '}
+                                {searchResult.nickname ? `(${searchResult.nickname})` : ''}
+                            </p>
+                            <p className="query-dropdown-item">{searchResult.email}</p>
                         </Dropdown.Item>
                     ))
                 ) : (

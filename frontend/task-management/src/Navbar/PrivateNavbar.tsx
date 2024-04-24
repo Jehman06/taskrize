@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect } from 'react';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // Redux
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,9 +16,16 @@ import { SlMagnifier } from 'react-icons/sl';
 import { MdAccountCircle } from 'react-icons/md';
 import { IoExitOutline } from 'react-icons/io5';
 import { IoMdPerson } from 'react-icons/io';
+import { FaRegBell, FaBell } from 'react-icons/fa';
 import './PrivateNavbar.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
+import {
+    setNewNotifications,
+    setNotifications,
+    setNotificationsFetched,
+} from '../redux/reducers/notificationSlice';
+import { Button } from 'react-bootstrap';
 
 // Lazy loading Modal imports
 const CreateBoardModal = lazy(() => import('../Components/Modals/Create/CreateBoardModal'));
@@ -31,12 +38,47 @@ const PrivateNavbar: React.FC = () => {
     const favoriteBoards = useSelector((state: RootState) => state.board.favoriteBoards);
     const boards = useSelector((state: RootState) => state.board.boards);
     const workspaces = useSelector((state: RootState) => state.workspace.workspaces);
+    const newNotifications = useSelector((state: RootState) => state.notification.newNotifications);
+    const notifications = useSelector((state: RootState) => state.notification.notifications);
+    const notificationsFetched = useSelector(
+        (state: RootState) => state.notification.notificationsFetched
+    );
 
     // Preload the image
     useEffect(() => {
         const img = new Image();
         img.src = taskrize;
     }, []);
+
+    useEffect(() => {
+        if (!notificationsFetched) {
+            fetchNotifications();
+            dispatch(setNotificationsFetched(true));
+        }
+    }, [notificationsFetched]);
+
+    const fetchNotifications = async (): Promise<void> => {
+        try {
+            await verifyAccessToken();
+            const accessToken = Cookies.get('access_token');
+
+            const response = await axios.get('http://127.0.0.1:8000/api/notifications', {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+            const unreadNotificationExist = response.data.some(
+                (notification: any) => !notification.read
+            );
+            // Update the state based on unread notifications
+            dispatch(setNewNotifications(unreadNotificationExist));
+
+            // Update state with notifications
+            dispatch(setNotifications(response.data));
+        } catch (error) {
+            console.error('Error fetching notifications');
+        }
+    };
 
     const handleLogout = async (): Promise<void> => {
         try {
@@ -247,11 +289,49 @@ const PrivateNavbar: React.FC = () => {
 
             {/* Right-aligned section */}
             <div className="d-flex align-items-center">
+                <div className="dropdown notifications">
+                    <button
+                        className="dropdown-btn dropdown-notifications dropdown-toggle no-arrow"
+                        type="button"
+                        id="notificationsDropdownMenu"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
+                        {newNotifications ? (
+                            <FaBell style={{ color: 'red' }} />
+                        ) : (
+                            <FaRegBell style={{ color: 'white' }} />
+                        )}
+                    </button>
+                    <ul
+                        className="dropdown-menu dropdown-menu-end"
+                        aria-labelledby="notificationsDropdownMenu"
+                    >
+                        {notifications &&
+                            notifications.map((notification) => (
+                                <li key={notification.id}>
+                                    <div className="notification-container">
+                                        <a
+                                            className="dropdown-item notifications-dropdown-item"
+                                            href="#"
+                                        >
+                                            {notification.content} to {notification.workspace_name}{' '}
+                                            from {notification.sender_name}
+                                        </a>
+                                        <div className="button-container">
+                                            <Button variant="success">Accept</Button>
+                                            <Button variant="danger">Refuse</Button>
+                                        </div>
+                                    </div>
+                                </li>
+                            ))}
+                    </ul>
+                </div>
                 <div className="search-container mr-3">
-                    <div className="search-icon-container">
+                    {/* <div className="search-icon-container">
                         <SlMagnifier className="magnifier" />
                     </div>
-                    <input className="search" placeholder="Search" />
+                    <input className="search" placeholder="Search" /> */}
                 </div>
                 <div className="dropdown profile">
                     <button

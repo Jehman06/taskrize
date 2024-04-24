@@ -147,3 +147,15 @@
 .profile-dropdown-item {
     cursor: pointer;
 }
+
+.notification-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px; /* Adjust as needed */
+}
+
+.button-container {
+    display: flex;
+    gap: 10px; /* Adjust as needed */
+}
