@@ -21,63 +21,26 @@ interface Member {
 }
 
 interface WorkspaceMembersModalProps {
+    id: number;
     show: boolean;
     onHide: () => void;
     members: Member[];
 }
 
-const WorkspaceMembersModal: React.FC<WorkspaceMembersModalProps> = ({ show, onHide, members }) => {
-    const searchQuery = useSelector((state: RootState) => state.app.query);
-    const searchResults = useSelector((state: RootState) => state.app.searchResults);
-    const dispatch = useDispatch();
+const WorkspaceMembersModal: React.FC<WorkspaceMembersModalProps> = ({
+    show,
+    onHide,
+    members,
+    id,
+}) => {
+    const workspaceIdToShowModal = useSelector(
+        (state: RootState) => state.modal.workspaceIdToShowModal
+    );
 
-    useEffect(() => {
-        console.log('searchResults:', searchResults); // Add this line to check searchResults
-    }, [searchResults]);
-
-    const debounceSearchUsers = debounce(async (query: string) => {
-        try {
-            await verifyAccessToken();
-            const accessToken = Cookies.get('access_token');
-
-            const response = await axios.get(
-                `http://127.0.0.1:8000/api/user/profiles/?q=${query}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                }
-            );
-            dispatch(fetchSearchResults(response.data)); // Assuming response.data contains search results
-        } catch (error) {
-            console.error('Error searching for users:', error);
-        }
-    }, 300); // Adjust debounce delay to 300 milliseconds
-
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const query = e.target.value;
-        dispatch(setSearchQuery(query));
-        if (query.trim() === '') {
-            dispatch(resetSearchResults()); // Reset search results if query is empty
-        } else {
-            debounceSearchUsers(query);
-        }
-    };
-
-    const handleInputFocus = () => {
-        dispatch(setInputFocus(true));
-    };
-
-    // Function to handle input blur
-    const handleInputBlur = () => {
-        dispatch(setInputFocus(false)); // Call handleInputChange with false when input is blurred
-    };
-
-    useEffect(() => {
-        return () => {
-            debounceSearchUsers.cancel(); // Cleanup debounce function on unmount
-        };
-    }, []);
+    if (id != workspaceIdToShowModal) {
+        console.log('Wrong workspace ID');
+        return null;
+    }
 
     return (
         <>
@@ -86,26 +49,15 @@ const WorkspaceMembersModal: React.FC<WorkspaceMembersModalProps> = ({ show, onH
                     <Modal.Title>*Workspace name* members</Modal.Title>
                 </Modal.Header>
                 <Modal.Body style={{ backgroundColor: '#33373a', color: '#9fadbc' }}>
-                    {members.map((member, index) => (
-                        <div key={index} className="members-workspace-member">
+                    {members.map((member) => (
+                        <div key={member.email} className="members-workspace-member">
                             <p className="members-workspace-member-items">
                                 {member.name} {`(${member.nickname})`}
                             </p>
                             <p className="members-workspace-member-items">{member.email}</p>
                         </div>
                     ))}
-                    <input
-                        type="text"
-                        placeholder="Invite users..."
-                        value={searchQuery}
-                        onChange={(e) => {
-                            handleChange(e);
-                        }}
-                        onFocus={handleInputFocus}
-                        onBlur={handleInputBlur}
-                    />
-                    <UserQueryDropdown searchResults={searchResults} />
-                    {/* Button that sends an invite to all these people */}
+                    <UserQueryDropdown id={id} />
                 </Modal.Body>
             </Modal>
         </>

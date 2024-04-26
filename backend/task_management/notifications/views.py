@@ -11,30 +11,31 @@ from workspaces.models import Workspace
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 def send_notification(request):
-    user = request.user
-    # Extract the data from the request payload
-    recipient_id = request.data.get('recipient_id')
+    # Get the data from the request
+    recipient_ids = request.data.get('recipient_ids')
     content = request.data.get('content')
     workspace_id = request.data.get('workspace_id')
+    user = request.user
+
+    if not recipient_ids or not isinstance(recipient_ids, list):
+        return Response({'error': 'Recipient IDs required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if not workspace_id:
+        return Response({'error': 'Workspace ID required'}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        if not recipient_id:
-            return Response({'error': 'Recipient ID required'}, status=status.HTTP_400_BAD_REQUEST)
-        
+        # Get the workspace instance
+        workspace = Workspace.objects.get(id=workspace_id)
+    except Workspace.DoesNotExist:
+        return Response({'error': 'Workspace not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    notifications = []
+    for recipient_id in recipient_ids:
         try:
             # Get the recipient user instance
             recipient = CustomUser.objects.get(id=recipient_id)
         except CustomUser.DoesNotExist:
-            return Response({'error': 'Recipient not found'}, status=status.HTTP_404_NOT_FOUND)
-
-        if not workspace_id:
-            return Response({'error': 'Workspace ID required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            # Get the workspace instance
-            workspace = Workspace.objects.get(id=workspace_id)
-        except Workspace.DoesNotExist:
-            return Response({'error': 'Workspace not found'}, status=status.HTTP_404_NOT_FOUND)
+            continue  # Skip this recipient if not found
 
         # Create a new notification object
         notification = Notifications(recipient=recipient, content=content, sender=user, workspace=workspace)
@@ -42,15 +43,15 @@ def send_notification(request):
         # Save the notification to the database
         notification.save()
 
-        # Serialize the notification data
-        serializer = NotificationsSerializer(notification)
+        # Add the notification to the list
+        notifications.append(notification)
 
-        # Return a success response
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    except Exception as e:
-        # Return error response
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+    # Serialize the notification data
+    serializer = NotificationsSerializer(notifications, many=True)
+
+    # Return a success response
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 # Get notifications
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
@@ -75,8 +76,6 @@ def get_notifications(request):
 @api_view(['PUT'])
 @authentication_classes([JWTAuthentication])
 def read_notification(request):
-    # Extract the user ID from the authenticated user
-    user_id = request.user.id
     # Extract the notification ID from the request
     notification_id = request.data.get('notification_id')
 

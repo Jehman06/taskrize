@@ -14,3 +14,7 @@
 .query-dropdown-items:hover {
     background-color: #b2b2b2 !important;
 }
+
+.query-dropdown-items {
+    cursor: pointer;
+}

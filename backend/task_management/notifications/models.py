@@ -1,6 +1,6 @@
 from django.db import models
 from authentication.models import CustomUser
-from workspaces.models import Workspace
+from workspaces.models import Workspace, Invitation
 
 class Notifications(models.Model):
     # Define choices for notification types
@@ -10,6 +10,7 @@ class Notifications(models.Model):
 
     recipient = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='notifications_received')
     sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='notifications_sent', null=True, blank=True)
+    invitation = models.ForeignKey(Invitation, on_delete=models.CASCADE, null=True, blank=True)
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, null=True, blank=True)
     notification_type = models.CharField(max_length=50, choices=NOTIFICATION_TYPES)
     content = models.TextField(max_length=255)

@@ -14,9 +14,11 @@ from .serializers import BoardSerializer
 def get_boards(request):
     # Access the authenticated user
     user = request.user
+    # Get workspaces where the user is a member or an owner
+    workspaces = Workspace.objects.filter(Q(owner=user) | Q(members=user))
     # Query the database for relevant boards
-    # Include boards where the user is the creator or a member
-    boards = Board.objects.filter(Q(creator=user) | Q(members=user))
+    # Include boards where the user is the creator or the workspace is in the user's workspaces
+    boards = Board.objects.filter(Q(creator=user) | Q(workspace__in=workspaces))
     # Serialize the list of boards into JSON format, allowing multiple instances
     serializer = BoardSerializer(boards, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)

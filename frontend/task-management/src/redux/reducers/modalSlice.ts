@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface Workspace {
-    id: number;
+    id: number | null;
     name: string;
 }
 
@@ -13,6 +13,7 @@ export interface ModalState {
     showDeleteWorkspaceModal: boolean;
     showUpdatePasswordModal: boolean;
     showWorkspaceMembersModal: boolean;
+    workspaceIdToShowModal: number | null;
     selectedWorkspace: Workspace | null;
     selectedDefaultImage: string | null;
     selectedCustomImage: File | null;
@@ -29,6 +30,7 @@ export const initialState: ModalState = {
     showDeleteWorkspaceModal: false,
     showUpdatePasswordModal: false,
     showWorkspaceMembersModal: false,
+    workspaceIdToShowModal: null,
     selectedWorkspace: null,
     selectedDefaultImage: null,
     selectedCustomImage: null,
@@ -59,8 +61,12 @@ const modalSlice = createSlice({
         setShowUpdatePasswordModal(state, action: PayloadAction<boolean>) {
             state.showUpdatePasswordModal = action.payload;
         },
-        setShowWorkspaceMembersModal(state, action: PayloadAction<boolean>) {
-            state.showWorkspaceMembersModal = action.payload;
+        setShowWorkspaceMembersModal: (
+            state,
+            action: PayloadAction<{ show: boolean; id: number | null }>
+        ) => {
+            state.showWorkspaceMembersModal = action.payload.show;
+            state.workspaceIdToShowModal = action.payload.id;
         },
         setSelectedWorkspace(state, action: PayloadAction<Workspace | null>) {
             state.selectedWorkspace = action.payload;

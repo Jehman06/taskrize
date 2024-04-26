@@ -13,6 +13,7 @@ class Workspace(models.Model):
         return self.name
 
 class Invitation(models.Model):
+    id = models.AutoField(primary_key=True)
     INVITATION_STATUS_CHOICES = {
         ('pending', 'Pending'),
         ('accepted', 'Accepted'),

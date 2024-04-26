@@ -189,7 +189,7 @@ const Workspace: React.FC<WorkspaceProps> = ({
     };
 
     const toggleWorkspaceMembersModal = () => {
-        dispatch(setShowWorkspaceMembersModal(true));
+        dispatch(setShowWorkspaceMembersModal({ show: true, id: id }));
     };
 
     return (
@@ -228,8 +228,11 @@ const Workspace: React.FC<WorkspaceProps> = ({
                         }
                     >
                         <WorkspaceMembersModal
+                            id={id}
                             show={showMembersModal}
-                            onHide={() => dispatch(setShowWorkspaceMembersModal(false))}
+                            onHide={() =>
+                                dispatch(setShowWorkspaceMembersModal({ show: false, id: null }))
+                            }
                             members={members}
                         />
                     </Suspense>

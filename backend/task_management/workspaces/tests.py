@@ -170,6 +170,26 @@ class WorkspaceAPITestCase(APITestCase):
         invitation = Invitation.objects.get(workspace_id=workspace.id)
 
         # Accept the invite
-        response = self.client.post(reverse('workspace-invite-accept'), {'invitation_id': invitation.id}, headers={'Authorization': f'Bearer {access_token}'}, format='json')
+        response = self.client.put(reverse('workspace-invite-accept'), {'invitation_id': invitation.id}, headers={'Authorization': f'Bearer {access_token}'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['message'], 'Invitation accepted successfully')
+
+    def test_reject_invite(self):
+        # Create a workspace
+        workspace = Workspace.objects.create(name='Test Workspace', owner=self.user)
+
+        # Create a test user
+        self.client.post(reverse('register'), {'email': 'abc@def.com', 'password': 'abc123', 'password_confirmation': 'abc123'})
+        test_user = CustomUser.objects.get(email='abc@def.com')
+        login_response = self.client.post(reverse('login'), {'email': 'abc@def.com', 'password': 'abc123'})
+        login_response_content = login_response.json()
+        access_token = login_response_content.get('access_token')
+
+        # Invite the user
+        self.client.post(reverse('workspace-invite'), {'workspace_id': workspace.id, 'selected_user_ids': [test_user.id]}, headers={'Authorization': f'Bearer {self.token}'}, format='json')
+        invitation = Invitation.objects.get(workspace_id=workspace.id)
+
+        # Reject the invite
+        response = self.client.put(reverse('workspace-invite-reject'), {'invitation_id': invitation.id}, headers={'Authorization': f'Bearer {access_token}'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['message'], 'Invitation rejected successfully')

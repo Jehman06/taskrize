@@ -15,6 +15,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.exceptions import NotFound, APIException
 import secrets
 from authentication.models import CustomUser, UserProfile
+from workspaces.models import Workspace
 from authentication.serializers import UserProfileSerializer
 
 # Signup function
@@ -224,9 +225,13 @@ def get_profile(request):
 def search_profiles(request):
     try:
         search_query = request.GET.get('q', '') # Get the search query from the request query parameters
+        workspace_id = request.GET.get('workspace_id') # Get the workspace ID from the query parameters
+
+        if not workspace_id:
+            return Response({'error': 'Workspace ID required'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Check if the query is present in the cache
-        cached_results = cache.get(search_query)
+        cached_results = cache.get(f'{search_query}_{workspace_id}')
         if cached_results:
             return Response(cached_results)
         
@@ -236,23 +241,22 @@ def search_profiles(request):
             Q(name__icontains=search_query) |
             Q(nickname__icontains=search_query)
         )
+
+        if workspace_id:
+            # Filter out users who are already members of the workspace
+            workspace = Workspace.objects.get(id=workspace_id)
+            members_of_workspace = workspace.members.all()
+            profiles = profiles.exclude(user__in=members_of_workspace)
         
         # Serialize the profiles data
         serializer = UserProfileSerializer(profiles, many=True)
 
-        # Extract serialized data as a list
-        serialized_data = serializer.data
-        
-        # Construct response data with 'results' as a list
-        response_data = {
-            'results': serialized_data
-        }
-
         # Cache the search results for future requests
-        cache.set(search_query, serializer.data)
+        cache.set(f'{search_query}_{workspace_id}', serializer.data)
 
         return Response(serializer.data)
     except Exception as e:
+        print(f'Error: {e}')
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # Update the user profile

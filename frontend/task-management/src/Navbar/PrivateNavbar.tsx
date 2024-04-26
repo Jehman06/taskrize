@@ -67,14 +67,14 @@ const PrivateNavbar: React.FC = () => {
                     Authorization: `Bearer ${accessToken}`,
                 },
             });
-            const unreadNotificationExist = response.data.some(
+            const unreadNotifications = response.data.filter(
                 (notification: any) => !notification.read
             );
             // Update the state based on unread notifications
-            dispatch(setNewNotifications(unreadNotificationExist));
+            dispatch(setNewNotifications(unreadNotifications.length > 0));
 
             // Update state with notifications
-            dispatch(setNotifications(response.data));
+            dispatch(setNotifications(unreadNotifications));
         } catch (error) {
             console.error('Error fetching notifications');
         }
@@ -114,6 +114,67 @@ const PrivateNavbar: React.FC = () => {
 
     const handleLogoClick = (): void => {
         navigate('/home');
+    };
+
+    const acceptWorkspaceInvitation = async (
+        invitationId: number,
+        notificationId: number
+    ): Promise<void> => {
+        try {
+            await verifyAccessToken();
+            const accessToken = Cookies.get('access_token');
+
+            const response = await axios.put(
+                'http://127.0.0.1:8000/api/workspaces/members/accept-invite',
+                {
+                    invitation_id: invitationId,
+                    notification_id: notificationId,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                }
+            );
+            if (response.status === 200) {
+                console.log('Invitation accepted!');
+                window.location.reload();
+            } else {
+                console.error(response.data);
+            }
+        } catch (error) {
+            console.error('Error accepting invite: ', error);
+        }
+    };
+
+    const rejectWorkspaceInvitation = async (
+        invitationId: number,
+        notificationId: number
+    ): Promise<void> => {
+        try {
+            await verifyAccessToken();
+            const accessToken = Cookies.get('access_token');
+
+            const response = await axios.put(
+                'http://127.0.0.1:8000/api/workspaces/members/reject-invite',
+                {
+                    invitation_id: invitationId,
+                    notification_id: notificationId,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                }
+            );
+            if (response.status === 200) {
+                console.log('Invitation rejected successfully');
+            } else {
+                console.log(response.data);
+            }
+        } catch (error) {
+            console.error('Error rejecting invitation: ', error);
+        }
     };
 
     return (
@@ -303,29 +364,63 @@ const PrivateNavbar: React.FC = () => {
                             <FaRegBell style={{ color: 'white' }} />
                         )}
                     </button>
-                    <ul
-                        className="dropdown-menu dropdown-menu-end"
-                        aria-labelledby="notificationsDropdownMenu"
-                    >
-                        {notifications &&
-                            notifications.map((notification) => (
+                    {notifications.length === 0 && (
+                        <ul
+                            className="dropdown-menu dropdown-menu-end"
+                            aria-labelledby="notificationsDropdownMenu"
+                        >
+                            <li>
+                                <div className="notification-container">
+                                    <p className="dropdown-item notifications-dropdown-item">
+                                        You don't have any notifications.
+                                    </p>
+                                </div>
+                            </li>
+                        </ul>
+                    )}
+                    {notifications && notifications.length > 0 && (
+                        <ul
+                            className="dropdown-menu dropdown-menu-end"
+                            aria-labelledby="notificationsDropdownMenu"
+                        >
+                            {notifications.map((notification) => (
                                 <li key={notification.id}>
                                     <div className="notification-container">
                                         <a
                                             className="dropdown-item notifications-dropdown-item"
                                             href="#"
                                         >
-                                            {notification.content} to {notification.workspace_name}{' '}
-                                            from {notification.sender_name}
+                                            {notification.content}
                                         </a>
                                         <div className="button-container">
-                                            <Button variant="success">Accept</Button>
-                                            <Button variant="danger">Refuse</Button>
+                                            <Button
+                                                variant="success"
+                                                onClick={() =>
+                                                    acceptWorkspaceInvitation(
+                                                        notification.invitation,
+                                                        notification.id
+                                                    )
+                                                }
+                                            >
+                                                Accept
+                                            </Button>
+                                            <Button
+                                                variant="danger"
+                                                onClick={() =>
+                                                    rejectWorkspaceInvitation(
+                                                        notification.invitation,
+                                                        notification.id
+                                                    )
+                                                }
+                                            >
+                                                Refuse
+                                            </Button>
                                         </div>
                                     </div>
                                 </li>
                             ))}
-                    </ul>
+                        </ul>
+                    )}
                 </div>
                 <div className="search-container mr-3">
                     {/* <div className="search-icon-container">

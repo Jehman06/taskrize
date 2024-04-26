@@ -9,6 +9,7 @@ interface Notification {
     content: string;
     created_at: Date;
     read: boolean;
+    invitation: number;
 }
 
 interface NotificationsState {

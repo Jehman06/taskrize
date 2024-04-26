@@ -1,18 +1,14 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-export interface SearchResults {
-    email: string;
-    name?: string;
-    nickname?: string;
-}
+import { createSlice, PayloadAction, createReducer } from '@reduxjs/toolkit';
+import { Member } from './workspaceSlice';
 
 export interface AppState {
     loading: boolean;
     message: string;
     errorMessage: string;
     query: string;
-    searchResults: SearchResults[];
+    searchResults: Member[];
     isInputFocused: boolean;
+    selectedUsers: Member[];
 }
 
 export const initialState: AppState = {
@@ -22,6 +18,7 @@ export const initialState: AppState = {
     query: '',
     searchResults: [],
     isInputFocused: false,
+    selectedUsers: [] as Member[],
 };
 
 const appSlice = createSlice({
@@ -43,7 +40,7 @@ const appSlice = createSlice({
         clearSearchQuery(state) {
             state.query = '';
         },
-        fetchSearchResults(state, action: PayloadAction<SearchResults[]>) {
+        fetchSearchResults(state, action: PayloadAction<Member[]>) {
             console.log('Received search results:', action.payload);
             state.searchResults = action.payload;
         },
@@ -52,6 +49,9 @@ const appSlice = createSlice({
         },
         setInputFocus(state, action: PayloadAction<boolean>) {
             state.isInputFocused = action.payload;
+        },
+        setSelectedUsers(state, action: PayloadAction<Member[]>) {
+            state.selectedUsers = action.payload;
         },
         resetAppStates(state) {
             state.loading = false;
@@ -71,5 +71,7 @@ export const {
     fetchSearchResults,
     resetSearchResults,
     setInputFocus,
+    setSelectedUsers,
 } = appSlice.actions;
+
 export default appSlice.reducer;

@@ -5,11 +5,10 @@ from authentication.models import UserProfile
 class NotificationsSerializer(serializers.ModelSerializer):
     recipient = serializers.PrimaryKeyRelatedField(read_only=True)
     workspace_name = serializers.SerializerMethodField()
-    sender_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Notifications
-        fields = ['id', 'recipient', 'sender', 'sender_name', 'workspace', 'workspace_name', 'notification_type', 'content', 'created_at', 'read']
+        fields = ['id', 'recipient', 'workspace', 'workspace_name', 'notification_type', 'content', 'created_at', 'read', 'invitation']
 
     def get_workspace_name(self, obj):
         """
