@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaStar, FaRegStar } from 'react-icons/fa';
 import './Board.css';
 
@@ -24,8 +25,14 @@ const Board: React.FC<BoardProps> = ({
     starFilled,
     showWorkspaceName = true, // Show the Workspace name if Board isn't in the Workspace section, for clarity
 }) => {
+    const navigate = useNavigate();
+
+    const navigateToBoardPage = () => {
+        navigate(`/board/${id}`);
+    };
+
     return (
-        <div className="board-wrapper">
+        <div className="board-wrapper" onClick={navigateToBoardPage}>
             <div className="board">
                 <img src={default_image} alt="Board image" className="board-img" />
                 <div className="board-title">{title}</div>

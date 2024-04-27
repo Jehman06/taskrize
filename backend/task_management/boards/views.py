@@ -23,6 +23,23 @@ def get_boards(request):
     serializer = BoardSerializer(boards, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+# Get a single board
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+def get_board(request, board_id):
+    # Access the authenticated user
+    user = request.user
+    
+    try:
+        # Query the database for the board
+        board = Board.objects.get(id=board_id)
+    except Board.DoesNotExist:
+        return Response({'error': 'Board not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    # Serialize the board into a JSON format
+    serializer = BoardSerializer(board)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
 def create_default_workspace_for_user(user):
     # Check if a default workspace already exists for the user
     default_workspace = Workspace.objects.filter(owner=user).first()
@@ -128,6 +145,8 @@ def toggle_favorite_board(request):
     # Retrieve the board ID from the query parameters
     board_id = request.query_params.get('board_id')
 
+    print(f'board_id: {board_id}')
+
     if not board_id:
         return Response({'error': 'Board ID is required'}, status=status.HTTP_400_BAD_REQUEST)
     
@@ -153,6 +172,8 @@ def toggle_favorite_board(request):
 @api_view(['DELETE'])
 @authentication_classes([JWTAuthentication])
 def delete_board(request):
+    # Retrieve the user from the request
+    user = request.user
     # Retrieve the board ID from the request
     board_id = request.data.get('board_id')
     # Check if the board is provided
@@ -162,6 +183,11 @@ def delete_board(request):
     try:
         # Retrieve the board object
         board = Board.objects.get(id=board_id)
+        # Retrieve the Workspace object in which the board is
+        workspace = board.workspace
+
+        if user != workspace.owner:
+            return Response({'error': 'Only workspace owners can delete boards'}, status=status.HTTP_403_FORBIDDEN)
         # Delete the board from the database
         board.delete()
         return Response({'message': 'Board deleted successfully'}, status=status.HTTP_204_NO_CONTENT)

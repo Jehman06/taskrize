@@ -23,6 +23,7 @@ export interface BoardState {
         custom_image: File | string | null;
         default_image: string | null;
     };
+    board: Board | null;
 }
 
 export const initialState: BoardState = {
@@ -37,6 +38,7 @@ export const initialState: BoardState = {
             name: '',
         },
     },
+    board: null,
 };
 
 const boardSlice = createSlice({
@@ -52,8 +54,11 @@ const boardSlice = createSlice({
         setBoardFormData(state, action: PayloadAction<Partial<BoardState>['boardFormData']>) {
             state.boardFormData = { ...state.boardFormData, ...action.payload };
         },
+        setBoard(state, action: PayloadAction<Board | null>) {
+            state.board = action.payload;
+        },
     },
 });
 
-export const { setBoards, setFavoriteBoards, setBoardFormData } = boardSlice.actions;
+export const { setBoards, setFavoriteBoards, setBoardFormData, setBoard } = boardSlice.actions;
 export default boardSlice.reducer;

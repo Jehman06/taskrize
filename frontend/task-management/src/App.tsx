@@ -6,6 +6,7 @@ import LoginPage from './authentication/Login';
 import ForgotPassword from './authentication/ForgotPassword';
 import ResetPassword from './authentication/ResetPassword';
 import ProfilePage from './Pages/Profile/Profile';
+import BoardPage from './Pages/Board/BoardPage';
 
 function App() {
     return (
@@ -17,6 +18,7 @@ function App() {
             <Route path="/resetpassword/:user_id/:reset_code" element={<ResetPassword />} />
             <Route path="home" element={<Home />} />
             <Route path="profile" element={<ProfilePage />} />
+            <Route path="/board/:id" element={<BoardPage />} />
         </Routes>
     );
 }

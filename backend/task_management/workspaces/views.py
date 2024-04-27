@@ -221,9 +221,7 @@ def accept_invitation(request):
         invitation.save()
 
         # Add the recipient user to the workspace
-        print(invitation.workspace)
         invitation.workspace.members.add(request.user)
-        print(invitation.workspace)
 
         try:
             notification = Notifications.objects.get(id=notification_id)       
