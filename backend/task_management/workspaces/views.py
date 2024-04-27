@@ -271,3 +271,24 @@ def reject_invitation(request):
         return Response({'error': 'Invitation not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+@api_view(['PUT'])
+@authentication_classes([JWTAuthentication])
+def leave_workspace(request):
+    user = request.user
+    # Retrieve the workspace ID from the request
+    workspace_id = request.data.get('workspace_id')
+
+    if not workspace_id:
+        return Response({'error': 'Workspace ID required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        workspace = Workspace.objects.get(id=workspace_id)
+        if workspace.owner == user:
+            return Response({'error': 'Cannot leave a workspace your the owner of. Please delete it instead'}, status=status.HTTP_403_FORBIDDEN)
+        workspace.members.remove(user)
+    except Workspace.DoesNotExist:
+        return Response({'error': 'Workspace not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return Response({'message': 'Successfully left the workspace'}, status=status.HTTP_200_OK)

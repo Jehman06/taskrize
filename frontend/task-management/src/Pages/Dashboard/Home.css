@@ -13,14 +13,7 @@
 
 .home-sidebar {
     display: flex;
-    flex-direction: column;
-    justify-content: flex-start; /* Align items to the start vertically */
-    align-items: center; /* Center items horizontally */
-    flex: 0 0 15%;
-    margin: 0;
-    margin-right: 0;
-    font-size: 18px;
-    color: #9fadbc;
+    width: 10vw; /* Change this */
 }
 
 .home-sidebar > p {
@@ -130,6 +123,11 @@
 
 .star-full:hover {
     font-size: 20px;
+}
+
+.workspaces > :not(:last-child, :first-child) {
+    border-bottom: 0.1px solid #9fadbc;
+    margin-bottom: 1rem;
 }
 
 .workspace {

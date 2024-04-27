@@ -196,20 +196,7 @@ const Home: React.FC = () => {
         <div className="home">
             <PrivateNavbar />
             <div className="home-container">
-                <div className="container home-sidebar">
-                    <p
-                        className={selectedItem === 'board' ? 'selected' : ''}
-                        onClick={() => handleItemClick('board')}
-                    >
-                        Boards
-                    </p>
-                    <p
-                        className={selectedItem === 'templates' ? 'selected' : ''}
-                        onClick={() => handleItemClick('templates')}
-                    >
-                        Templates
-                    </p>
-                </div>
+                <div className="container home-sidebar"></div>
 
                 {/* BOARDS */}
                 <div className="container home-content">

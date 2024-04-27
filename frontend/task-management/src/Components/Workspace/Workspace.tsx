@@ -22,8 +22,6 @@ import axios from 'axios';
 // Styling
 
 import './Workspace.css';
-import '../Board/Board.css';
-import '../Modals/Modal.css';
 import { Button, Modal } from 'react-bootstrap';
 import { BsFillPeopleFill } from 'react-icons/bs';
 import { IoSettingsSharp, IoExitOutline } from 'react-icons/io5';
@@ -211,6 +209,31 @@ const Workspace: React.FC<WorkspaceProps> = ({
         dispatch(setShowWorkspaceMembersModal({ show: true, id: id }));
     };
 
+    const leaveWorkspace = async (workspaceId: number): Promise<void> => {
+        try {
+            await verifyAccessToken();
+            const accessToken = Cookies.get('access_token');
+
+            const response = await axios.put(
+                'http://127.0.0.1:8000/api/workspaces/leave',
+                {
+                    workspace_id: workspaceId,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                }
+            );
+            console.log(response.data);
+            if (response.status === 200) {
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error('Error leaving workspace', error);
+        }
+    };
+
     return (
         <div className="workspace">
             <div className="workspace-settings">
@@ -281,7 +304,11 @@ const Workspace: React.FC<WorkspaceProps> = ({
                             <MdDelete className="settings-dropdown-icons" />
                             Delete
                         </li>
-                        <li className="dropdown-item" style={{ cursor: 'pointer' }}>
+                        <li
+                            className="dropdown-item"
+                            onClick={() => leaveWorkspace(id)}
+                            style={{ cursor: 'pointer' }}
+                        >
                             <IoExitOutline className="settings-dropdown-icons" />
                             Leave workspace
                         </li>

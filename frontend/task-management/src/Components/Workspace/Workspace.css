@@ -6,7 +6,9 @@
 .workspace-settings {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 100%;
 }
 
 .workspace-title {
@@ -18,7 +20,7 @@
 .workspace-buttons {
     display: flex;
     flex-direction: row;
-    margin-right: 150px;
+    margin-right: 0;
 }
 
 .button {
