@@ -19,9 +19,12 @@ def get_workspaces(request):
     user = request.user
     # Query the database for relevant workspaces
     # Include workspaces where the user is the owner or a member
-    workspaces = Workspace.objects.filter(Q(owner=user) | Q(members=user))
+    owned_workspaces = Workspace.objects.filter(owner=user)
+    member_workspaces = Workspace.objects.filter(members=user)
+    # Combine the querysets into a single list of unique workspaces
+    workspaces = owned_workspaces | member_workspaces
     # Serialize the list of workspaces into JSON format, allowing multiple instances
-    serializer = WorkspaceSerializer(workspaces, many=True)
+    serializer = WorkspaceSerializer(workspaces.distinct(), many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 # Get boards associated with a workspace
@@ -103,6 +106,7 @@ def update_workspace(request):
 @api_view(['DELETE'])
 @authentication_classes([JWTAuthentication])
 def delete_workspace(request):
+    user = request.user
     # Retrieve the workspace ID from the request
     workspace_id = request.data.get('workspace_id')
     if not workspace_id:
@@ -110,6 +114,10 @@ def delete_workspace(request):
     
     try:
         workspace = Workspace.objects.get(id=workspace_id)
+        print(f'workspace.owner = {workspace.owner}')
+        # Check whether the user is the workspace's owner
+        if user != workspace.owner:
+            return Response({'error': 'You are not authorized to delete the workspace'}, status=status.HTTP_403_FORBIDDEN)
         # Delete the workspace
         workspace.delete()
         return Response({'message': 'Workspace deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
@@ -126,7 +134,6 @@ def invite_members(request):
     # Extract the workspace and user IDs from the data
     workspace_id = data.get('workspace_id')
     selected_user_ids = data.get('selected_user_ids', [])
-    print(f'selected_user_ids: {selected_user_ids}')
 
     if not workspace_id:
         return Response({'error': 'Workspace ID required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -214,7 +221,9 @@ def accept_invitation(request):
         invitation.save()
 
         # Add the recipient user to the workspace
+        print(invitation.workspace)
         invitation.workspace.members.add(request.user)
+        print(invitation.workspace)
 
         try:
             notification = Notifications.objects.get(id=notification_id)       
