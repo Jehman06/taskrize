@@ -11,6 +11,7 @@ import {
 import {
     setShowDeleteWorkspaceModal,
     setShowWorkspaceMembersModal,
+    setWorkspaceIdToDelete,
 } from '../../redux/reducers/modalSlice';
 // Component
 import Board from '../Board/Board';
@@ -79,6 +80,7 @@ const Workspace: React.FC<WorkspaceProps> = ({
     const showMembersModal = useSelector(
         (state: RootState) => state.modal.showWorkspaceMembersModal
     );
+    const workspaceIdToDelete = useSelector((state: RootState) => state.modal.workspaceIdToDelete);
     const dispatch = useDispatch();
 
     // Calculate the starFilled property for each board
@@ -146,16 +148,19 @@ const Workspace: React.FC<WorkspaceProps> = ({
     };
 
     // Delete Workspace
-    const handleDelete = () => {
+    const handleDelete = (workspaceId: number) => {
         // Open the Modal to confirm deletion
+        dispatch(setWorkspaceIdToDelete(workspaceId));
         dispatch(setShowDeleteWorkspaceModal(true));
     };
 
-    const confirmDelete = () => {
-        // Call the onDelete function to delete the workspace
-        onDelete(id); // Pass the workspaceId as a parameter
-        // Close the modal
-        dispatch(setShowDeleteWorkspaceModal(false));
+    const confirmDelete = async () => {
+        if (workspaceIdToDelete !== null) {
+            // Call the onDelete function to delete the workspace
+            await onDelete(workspaceIdToDelete); // Pass the workspaceIdToDelete as a parameter
+            // Close the modal
+            await dispatch(setShowDeleteWorkspaceModal(false));
+        }
     };
 
     const onDelete = async (workspaceId: number): Promise<void> => {
@@ -175,11 +180,25 @@ const Workspace: React.FC<WorkspaceProps> = ({
             // Check if the response is successful
             if (response.status === 204) {
                 window.location.reload();
+                window.alert('Workspace deleted successfully');
             } else {
-                console.error('Error deleting workspace: ', response.data);
+                console.error('Error deleting workspace');
             }
-        } catch (error) {
-            console.error('Error deleting the workspace: ', error);
+        } catch (error: any) {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.log(error.response.data);
+                window.alert(error.response.data.error);
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.log(error.request);
+                window.alert('No response received from server.');
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error', error.message);
+                window.alert(error.message);
+            }
         }
     };
 
@@ -234,6 +253,7 @@ const Workspace: React.FC<WorkspaceProps> = ({
                                 dispatch(setShowWorkspaceMembersModal({ show: false, id: null }))
                             }
                             members={members}
+                            workspaceName={name}
                         />
                     </Suspense>
                     <button
@@ -255,7 +275,7 @@ const Workspace: React.FC<WorkspaceProps> = ({
                         </li>
                         <li
                             className="dropdown-item"
-                            onClick={handleDelete}
+                            onClick={() => handleDelete(id)}
                             style={{ cursor: 'pointer' }}
                         >
                             <MdDelete className="settings-dropdown-icons" />

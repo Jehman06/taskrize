@@ -76,6 +76,12 @@
 }
 
 .members-workspace-member {
+    margin: 0;
+    padding: 0;
+}
+
+.members-workspace-member {
+    padding: 0.6rem 0 0.6rem 0;
     border-bottom: 0.5px solid black;
-    margin-bottom: 1rem;
+    /* margin-bottom: 1rem; */
 }

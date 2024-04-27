@@ -1,20 +1,7 @@
-.query-dropdown-menu {
-    background-color: white !important; /* Set background color to white */
-    color: black !important; /* Set text color to black */
-    border: none !important; /* Remove border */
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1) !important; /* Add a subtle box shadow */
+.async-select {
+    margin-top: 1rem;
 }
 
-.query-dropdown-item {
-    color: black !important; /* Set text color to black */
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-.query-dropdown-items:hover {
-    background-color: #b2b2b2 !important;
-}
-
-.query-dropdown-items {
-    cursor: pointer;
+.invite-button {
+    margin: 1rem 0 0 0;
 }

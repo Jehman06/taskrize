@@ -1,12 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Dropdown } from 'react-bootstrap';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { Member } from '../../redux/reducers/workspaceSlice';
 import './Dropdown.css';
-import { fetchSearchResults, setSelectedUsers } from '../../redux/reducers/appSlice';
+import { setSelectedUsers } from '../../redux/reducers/appSlice';
 import AsyncSelect from 'react-select/async';
-import debounce from 'lodash.debounce';
 import { verifyAccessToken } from '../../utils/apiUtils';
 import Cookies from 'js-cookie';
 import axios from 'axios';
@@ -21,11 +19,13 @@ const UserQueryDropdown: React.FC<UserQueryDropdownProps> = ({ id }) => {
     const selectedUsers = useSelector((state: RootState) => state.app.selectedUsers);
     const dispatch = useDispatch();
 
-    const loadOptions = debounce(async (inputValue: string) => {
+    // Function to query through the database to search members
+    const loadOptions = async (inputValue: string) => {
         try {
             verifyAccessToken();
             const accessToken = Cookies.get('access_token');
 
+            // Send a GET request to search for users
             const response = await axios.get(
                 `http://127.0.0.1:8000/api/user/profiles/?search=${inputValue}&workspace_id=${id}`,
                 {
@@ -35,6 +35,7 @@ const UserQueryDropdown: React.FC<UserQueryDropdownProps> = ({ id }) => {
                 }
             );
             const users = response.data;
+            // Map though users and set the values and labels
             const options = users.map((user: Member) => ({
                 value: {
                     id: user.id,
@@ -49,7 +50,7 @@ const UserQueryDropdown: React.FC<UserQueryDropdownProps> = ({ id }) => {
             console.error('Error searching for users:', error);
             return [];
         }
-    }, 300);
+    };
 
     const handleChange = (selectedOptions: any) => {
         const selectedUsers = selectedOptions.map((option: any) => ({
@@ -63,8 +64,7 @@ const UserQueryDropdown: React.FC<UserQueryDropdownProps> = ({ id }) => {
         dispatch(setSelectedUsers(selectedUsers));
     };
 
-    console.log('workspaceId: ', id);
-
+    // Function to send the invite and notifications to the selected users
     const inviteUsers = async (): Promise<void> => {
         try {
             verifyAccessToken();
@@ -76,6 +76,7 @@ const UserQueryDropdown: React.FC<UserQueryDropdownProps> = ({ id }) => {
 
             const workspaceId = id;
 
+            // Send a POST request to send invite and notifications to selected users
             const response = await axios.post(
                 'http://127.0.0.1:8000/api/workspaces/members/invite',
                 {
@@ -88,15 +89,12 @@ const UserQueryDropdown: React.FC<UserQueryDropdownProps> = ({ id }) => {
                     },
                 }
             );
+            // TODO: Better error handling
             console.log(response.data);
         } catch (error) {
             console.error('Error inviting users:', error);
         }
     };
-
-    useEffect(() => {
-        console.log('Workspace ID changed: ', id);
-    }, [id]);
 
     return (
         <div>
@@ -106,8 +104,9 @@ const UserQueryDropdown: React.FC<UserQueryDropdownProps> = ({ id }) => {
                 isClearable
                 isSearchable
                 onChange={handleChange}
+                className="async-select"
             />
-            <Button variant="secondary" onClick={inviteUsers}>
+            <Button variant="secondary" onClick={inviteUsers} className="invite-button">
                 Invite users
             </Button>
         </div>

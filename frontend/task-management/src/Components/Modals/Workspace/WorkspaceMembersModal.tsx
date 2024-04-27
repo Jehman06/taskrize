@@ -13,6 +13,7 @@ import { verifyAccessToken } from '../../../utils/apiUtils';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import UserQueryDropdown from '../../Dropdowns/UserQuery';
+import '../Modal.css';
 
 interface Member {
     email: string;
@@ -25,6 +26,7 @@ interface WorkspaceMembersModalProps {
     show: boolean;
     onHide: () => void;
     members: Member[];
+    workspaceName: string;
 }
 
 const WorkspaceMembersModal: React.FC<WorkspaceMembersModalProps> = ({
@@ -32,11 +34,13 @@ const WorkspaceMembersModal: React.FC<WorkspaceMembersModalProps> = ({
     onHide,
     members,
     id,
+    workspaceName,
 }) => {
     const workspaceIdToShowModal = useSelector(
         (state: RootState) => state.modal.workspaceIdToShowModal
     );
 
+    // Make sure it's the correct selected workspace
     if (id != workspaceIdToShowModal) {
         console.log('Wrong workspace ID');
         return null;
@@ -46,7 +50,7 @@ const WorkspaceMembersModal: React.FC<WorkspaceMembersModalProps> = ({
         <>
             <Modal show={show} onHide={onHide} centered>
                 <Modal.Header closeButton style={{ backgroundColor: '#33373a', color: '#9fadbc' }}>
-                    <Modal.Title>*Workspace name* members</Modal.Title>
+                    <Modal.Title>{workspaceName}'s members</Modal.Title>
                 </Modal.Header>
                 <Modal.Body style={{ backgroundColor: '#33373a', color: '#9fadbc' }}>
                     {members.map((member) => (
