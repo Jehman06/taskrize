@@ -51,10 +51,6 @@ const Home: React.FC = () => {
     const workspaces = useSelector((state: RootState) => state.workspace.workspaces);
     const favoriteBoards = useSelector((state: RootState) => state.board.favoriteBoards);
 
-    const handleItemClick = (item: any) => {
-        setSelectedItem(item);
-    };
-
     // Preload images for improved performance
     useEffect(() => {
         // Preload images when the component mounts
@@ -67,75 +63,6 @@ const Home: React.FC = () => {
             img.src = url;
         });
     };
-
-    // Fetch boards and workspaces
-    const fetchData = async (url: string): Promise<any> => {
-        // Verify the validity of access token
-        try {
-            await verifyAccessToken();
-            const accessToken = Cookies.get('access_token');
-            const response: AxiosResponse = await axios.get(url, {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            });
-            return response.data;
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            return null;
-        }
-    };
-
-    // Fetch the boards and workspaces for the user
-    const getBoardsAndWorkspaces = useCallback(async (): Promise<void> => {
-        const boardsUrl = 'http://127.0.0.1:8000/api/boards/';
-        const workspacesUrl = 'http://127.0.0.1:8000/api/workspaces/';
-        console.log('getBoardsAndWorkspaces is called.');
-
-        try {
-            const [boardsResponse, workspacesResponse] = await Promise.all([
-                fetchData(boardsUrl),
-                fetchData(workspacesUrl),
-            ]);
-
-            if (boardsResponse && workspacesResponse) {
-                // Process boards data
-                const fetchedBoards = boardsResponse.map((board: any) => ({
-                    ...board,
-                    starFilled: board.favorite.includes(userId),
-                }));
-                dispatch(setBoards(fetchedBoards));
-
-                // Filter favorite boards
-                const initialFavoriteBoards = fetchedBoards.filter(
-                    (board: any) => board.starFilled
-                );
-                setFavoriteBoards(initialFavoriteBoards);
-
-                // Process workspaces data
-                const updatedWorkspaces = await Promise.all(
-                    workspacesResponse.map(async (workspace: any) => {
-                        const boardsData = await fetchData(
-                            `${workspacesUrl}${workspace.id}/boards`
-                        );
-
-                        // Merge the fetched boards data with the workspace object
-                        return {
-                            ...workspace,
-                            boards: boardsData,
-                        };
-                    })
-                );
-                console.log('updatedWorkspaces: ', updatedWorkspaces);
-                dispatch(setWorkspaces(updatedWorkspaces));
-                // setWorkspaces(updatedWorkspaces);
-            } else {
-                console.error('Error fetching boards or workspaces.');
-            }
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    }, [dispatch, userId]);
 
     // Add board to favorite
     const toggleStar = async (boardId: number) => {
@@ -175,16 +102,6 @@ const Home: React.FC = () => {
             console.error('Error toggling star:', error);
         }
     };
-
-    // Fetch the data on component mount
-    useEffect(() => {
-        const fetchDataAndInitialize = async () => {
-            await getBoardsAndWorkspaces();
-            dispatch(resetAppStates());
-        };
-
-        fetchDataAndInitialize();
-    }, [dispatch, getBoardsAndWorkspaces]);
 
     // Allow to have favorite boards displayed in the favorite section dynamically (on component mount)
     useEffect(() => {

@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.db.models import Q
-from django.contrib.auth import get_user_model
 from workspaces.models import Workspace
 from boards.models import Board
 from .serializers import BoardSerializer
@@ -23,33 +22,19 @@ def get_boards(request):
     serializer = BoardSerializer(boards, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
-# Get a single board
+# Get a single board and its lists
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-def get_board(request, board_id):
-    # Access the authenticated user
-    user = request.user
-    
+def get_board_and_lists(request, board_id):
     try:
         # Query the database for the board
         board = Board.objects.get(id=board_id)
     except Board.DoesNotExist:
         return Response({'error': 'Board not found'}, status=status.HTTP_404_NOT_FOUND)
-    
+
     # Serialize the board into a JSON format
-    serializer = BoardSerializer(board)
+    serializer = BoardSerializer(board, context={'include_lists': True})
     return Response(serializer.data, status=status.HTTP_200_OK)
-
-def create_default_workspace_for_user(user):
-    # Check if a default workspace already exists for the user
-    default_workspace = Workspace.objects.filter(owner=user).first()
-    if default_workspace:
-        return default_workspace
-
-    # If no default workspace exists, create a new one
-    default_workspace = Workspace.objects.create(name='My First Workspace', owner=user)
-    default_workspace.members.add(user)
-    return default_workspace
 
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])

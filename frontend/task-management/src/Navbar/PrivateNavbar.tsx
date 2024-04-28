@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect, useState } from 'react';
+import React, { Suspense, lazy, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // Redux
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,7 +7,7 @@ import { resetAppStates } from '../redux/reducers/appSlice';
 import { updateCreateBoardModal, updateCreateWorkspaceModal } from '../redux/reducers/modalSlice';
 import { RootState } from '../redux/store';
 // API
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import Cookies from 'js-cookie';
 import { verifyAccessToken } from '../utils/apiUtils';
 // Styling
@@ -26,15 +26,22 @@ import {
     setNotificationsFetched,
 } from '../redux/reducers/notificationSlice';
 import { Button } from 'react-bootstrap';
+import { setWorkspaces } from '../redux/reducers/workspaceSlice';
+import { setBoards, setFavoriteBoards } from '../redux/reducers/boardSlice';
 
 // Lazy loading Modal imports
 const CreateBoardModal = lazy(() => import('../Components/Modals/Create/CreateBoardModal'));
 const CreateWorkspaceModal = lazy(() => import('../Components/Modals/Create/CreateWorkspaceModal'));
 
 const PrivateNavbar: React.FC = () => {
+    // UseState
+    const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
+
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
+    // Redux
+    const userId = useSelector((state: RootState) => state.auth.user.id);
     const favoriteBoards = useSelector((state: RootState) => state.board.favoriteBoards);
     const boards = useSelector((state: RootState) => state.board.boards);
     const workspaces = useSelector((state: RootState) => state.workspace.workspaces);
@@ -50,18 +57,110 @@ const PrivateNavbar: React.FC = () => {
         img.src = taskrize;
     }, []);
 
+    // Fetch boards and workspaces
+    const fetchData = async (url: string, accessToken: string): Promise<any> => {
+        try {
+            const response: AxiosResponse = await axios.get(url, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            return null;
+        }
+    };
+
+    // Fetch the boards and workspaces for the user
+    const getBoardsAndWorkspaces = useCallback(
+        async (accessToken: string): Promise<void> => {
+            const boardsUrl = 'http://127.0.0.1:8000/api/boards/';
+            const workspacesUrl = 'http://127.0.0.1:8000/api/workspaces/';
+            console.log('getBoardsAndWorkspaces is called.');
+
+            try {
+                const [boardsResponse, workspacesResponse] = await Promise.all([
+                    fetchData(boardsUrl, accessToken),
+                    fetchData(workspacesUrl, accessToken),
+                ]);
+
+                if (boardsResponse && workspacesResponse) {
+                    // Process boards data
+                    const fetchedBoards = boardsResponse.map((board: any) => ({
+                        ...board,
+                        starFilled: board.favorite.includes(userId),
+                    }));
+                    dispatch(setBoards(fetchedBoards));
+
+                    // Filter favorite boards
+                    const initialFavoriteBoards = fetchedBoards.filter(
+                        (board: any) => board.starFilled
+                    );
+                    setFavoriteBoards(initialFavoriteBoards);
+
+                    // Process workspaces data
+                    const updatedWorkspaces = await Promise.all(
+                        workspacesResponse.map(async (workspace: any) => {
+                            const boardsData = await fetchData(
+                                `${workspacesUrl}${workspace.id}/boards`,
+                                accessToken
+                            );
+
+                            // Merge the fetched boards data with the workspace object
+                            return {
+                                ...workspace,
+                                boards: boardsData,
+                            };
+                        })
+                    );
+                    console.log('updatedWorkspaces: ', updatedWorkspaces);
+                    dispatch(setWorkspaces(updatedWorkspaces));
+                    // setWorkspaces(updatedWorkspaces);
+                } else {
+                    console.error('Error fetching boards or workspaces.');
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        },
+        [dispatch, userId]
+    );
+
+    // Fetch the data on component mount
     useEffect(() => {
-        if (!notificationsFetched) {
-            fetchNotifications();
+        const fetchDataAndInitialize = async () => {
+            try {
+                await verifyAccessToken();
+                const token = Cookies.get('access_token');
+                if (token) {
+                    setAccessToken(token);
+                    await getBoardsAndWorkspaces(token);
+                    dispatch(resetAppStates());
+                } else {
+                    console.error('Access token is undefined');
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            } finally {
+                setAccessToken(undefined);
+            }
+        };
+
+        fetchDataAndInitialize();
+    }, [dispatch, getBoardsAndWorkspaces]);
+
+    // Fetch notifications on mount
+    useEffect(() => {
+        if (!notificationsFetched && accessToken) {
+            fetchNotifications(accessToken);
             dispatch(setNotificationsFetched(true));
         }
-    }, [notificationsFetched]);
+    }, [notificationsFetched, accessToken]);
 
-    const fetchNotifications = async (): Promise<void> => {
+    // Fetch notifications for the user
+    const fetchNotifications = async (accessToken: string): Promise<void> => {
         try {
-            await verifyAccessToken();
-            const accessToken = Cookies.get('access_token');
-
             const response = await axios.get('http://127.0.0.1:8000/api/notifications', {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
@@ -77,6 +176,69 @@ const PrivateNavbar: React.FC = () => {
             dispatch(setNotifications(unreadNotifications));
         } catch (error) {
             console.error('Error fetching notifications');
+        }
+    };
+
+    // Accept the workspace invitation in notifications
+    const acceptWorkspaceInvitation = async (
+        invitationId: number,
+        notificationId: number
+    ): Promise<void> => {
+        try {
+            await verifyAccessToken();
+            const accessToken = Cookies.get('access_token');
+
+            const response = await axios.put(
+                'http://127.0.0.1:8000/api/workspaces/members/accept-invite',
+                {
+                    invitation_id: invitationId,
+                    notification_id: notificationId,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                }
+            );
+            if (response.status === 200) {
+                console.log('Invitation accepted!');
+                window.location.reload();
+            } else {
+                console.error(response.data);
+            }
+        } catch (error) {
+            console.error('Error accepting invite: ', error);
+        }
+    };
+
+    // Reject workspace invitation in notifications
+    const rejectWorkspaceInvitation = async (
+        invitationId: number,
+        notificationId: number
+    ): Promise<void> => {
+        try {
+            await verifyAccessToken();
+            const accessToken = Cookies.get('access_token');
+
+            const response = await axios.put(
+                'http://127.0.0.1:8000/api/workspaces/members/reject-invite',
+                {
+                    invitation_id: invitationId,
+                    notification_id: notificationId,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                }
+            );
+            if (response.status === 200) {
+                console.log('Invitation rejected successfully');
+            } else {
+                console.log(response.data);
+            }
+        } catch (error) {
+            console.error('Error rejecting invitation: ', error);
         }
     };
 
@@ -114,67 +276,6 @@ const PrivateNavbar: React.FC = () => {
 
     const handleLogoClick = (): void => {
         navigate('/home');
-    };
-
-    const acceptWorkspaceInvitation = async (
-        invitationId: number,
-        notificationId: number
-    ): Promise<void> => {
-        try {
-            await verifyAccessToken();
-            const accessToken = Cookies.get('access_token');
-
-            const response = await axios.put(
-                'http://127.0.0.1:8000/api/workspaces/members/accept-invite',
-                {
-                    invitation_id: invitationId,
-                    notification_id: notificationId,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                }
-            );
-            if (response.status === 200) {
-                console.log('Invitation accepted!');
-                window.location.reload();
-            } else {
-                console.error(response.data);
-            }
-        } catch (error) {
-            console.error('Error accepting invite: ', error);
-        }
-    };
-
-    const rejectWorkspaceInvitation = async (
-        invitationId: number,
-        notificationId: number
-    ): Promise<void> => {
-        try {
-            await verifyAccessToken();
-            const accessToken = Cookies.get('access_token');
-
-            const response = await axios.put(
-                'http://127.0.0.1:8000/api/workspaces/members/reject-invite',
-                {
-                    invitation_id: invitationId,
-                    notification_id: notificationId,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                }
-            );
-            if (response.status === 200) {
-                console.log('Invitation rejected successfully');
-            } else {
-                console.log(response.data);
-            }
-        } catch (error) {
-            console.error('Error rejecting invitation: ', error);
-        }
     };
 
     return (

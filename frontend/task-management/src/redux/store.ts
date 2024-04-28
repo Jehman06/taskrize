@@ -13,6 +13,7 @@ import emojiSlice from './reducers/emojiSlice';
 // Import middleware to warn of non-serializable actions in the redux store
 import { createImmutableStateInvariantMiddleware } from '@reduxjs/toolkit';
 import notificationSlice from './reducers/notificationSlice';
+import listSlice from './reducers/listSlice';
 
 const persistConfig = {
     key: 'root',
@@ -30,6 +31,7 @@ const rootReducer = combineReducers({
     profile: profileSlice,
     emoji: emojiSlice,
     notification: notificationSlice,
+    list: listSlice,
 });
 
 // Persist the combined reducer

@@ -96,7 +96,7 @@
 .list {
     max-height: 35rem;
     min-width: 15rem;
-    background: black;
+    background: rgba(0, 0, 0, 0.9);
     color: #9fadbc;
     border-radius: 0.7rem;
     padding: 0.2rem;
@@ -147,7 +147,7 @@
 }
 
 .list-item:last-of-type {
-    margin-bottom: 1rem;
+    margin-bottom: 0.1rem;
 }
 
 .list-bottom,
@@ -174,4 +174,88 @@
     margin-left: 0.3rem;
     align-self: center;
     font-size: 0.85rem;
+}
+
+.new-button {
+    display: flex;
+    align-items: center;
+    background: rgba(144, 140, 140, 0.6);
+    backdrop-filter: blur(6px);
+    color: white;
+    width: 15rem;
+    border-radius: 0.7rem;
+    padding: 0.4rem;
+    cursor: pointer;
+}
+
+.new-button:hover {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(6px);
+}
+
+.new-button > p {
+    margin: 0;
+}
+
+.new-list {
+    min-width: 15rem;
+    background: rgba(0, 0, 0, 0.9);
+    color: #9fadbc;
+    border-radius: 0.7rem;
+    padding: 0.2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.new-list-top {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start; /* Changed from center to flex-start */
+    margin: 0.3rem 0.3rem 0 0.3rem;
+    padding: 0.3rem;
+    font-weight: 700;
+}
+
+.new-list-top > input {
+    min-width: 100%;
+    background-color: #3d3941;
+    border-radius: 0.3rem;
+    border: none;
+    color: #9fadbc;
+    padding-left: 0.3rem;
+}
+
+.new-list-top > input:hover,
+.new-list-top > input:focus {
+    border: 1px solid teal;
+    outline: none;
+}
+
+.new-list-bottom {
+    margin: 0.3rem 0.3rem 0 0.3rem;
+    padding: 0.3rem 0.3rem 0.3rem 0; /* Removed left padding */
+    border-radius: 0.3rem;
+    display: flex;
+    font-size: 1rem;
+    align-items: center; /* Align items vertically in the center */
+    justify-content: space-between; /* Distribute items along the horizontal line */
+    cursor: pointer;
+    width: 100%;
+}
+
+.new-list-button {
+    margin: 0;
+    padding: 0.2rem 0.5rem 0.2rem 0.3rem; /* Added left padding */
+}
+
+.new-list-cancel {
+    margin-left: 0.5rem;
+    padding: 0.3rem;
+    font-size: 1.6rem;
+    border-radius: 0.3rem;
+}
+
+.new-list-cancel:hover {
+    background-color: #3d3941;
 }

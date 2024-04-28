@@ -1,5 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+interface List {
+    id: number;
+    title: string;
+    position: number;
+    description: string;
+    created_at: Date;
+    updated_at: Date;
+    board: number;
+}
+
 interface Board {
     id: number;
     title: string;
@@ -9,6 +19,7 @@ interface Board {
     workspace: number;
     workspace_name: string;
     starFilled: any;
+    lists?: List[];
 }
 
 export interface BoardState {

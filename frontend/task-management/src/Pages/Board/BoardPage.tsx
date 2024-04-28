@@ -9,9 +9,10 @@ import { setBoard } from '../../redux/reducers/boardSlice';
 import PrivateNavbar from '../../Navbar/PrivateNavbar';
 import { FaStar, FaRegStar } from 'react-icons/fa';
 import { SlOptions } from 'react-icons/sl';
-import { Dropdown } from 'react-bootstrap';
+import { Button, Dropdown } from 'react-bootstrap';
 import { MdDelete } from 'react-icons/md';
 import { FaPlus } from 'react-icons/fa';
+import { RxCross1 } from 'react-icons/rx';
 import './BoardPage.css';
 // Images
 import cherryBlossom from '../../images/cherryblossom.jpg';
@@ -22,6 +23,7 @@ import palmTrees from '../../images/palmTrees.jpg';
 import bigSur from '../../images/bigSur.jpg';
 import yellowstone from '../../images/yellowstone.jpg';
 import monumentValley from '../../images/monumentValley.jpg';
+import { setIsCreatingList, setNewListName } from '../../redux/reducers/listSlice';
 
 // Map image names to file paths
 const imageMapping: { [key: string]: string } = {
@@ -40,12 +42,13 @@ const BoardPage: React.FC = () => {
 
     const userId = useSelector((state: RootState) => state.auth.user.id);
     const board = useSelector((state: RootState) => state.board.board);
+    const isCreatingList = useSelector((state: RootState) => state.list.isCreatingList);
+    const newListName = useSelector((state: RootState) => state.list.newListName);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const fetchBoard = async (): Promise<void> => {
         try {
-            await verifyAccessToken();
             const accessToken = Cookies.get('access_token');
 
             const response = await axios.get(`http://127.0.0.1:8000/api/boards/${id}`, {
@@ -109,6 +112,44 @@ const BoardPage: React.FC = () => {
         }
     };
 
+    const handleNewList = () => {
+        dispatch(setIsCreatingList(true));
+    };
+
+    const handleNewListNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        dispatch(setNewListName(e.target.value));
+    };
+
+    const handleCreateList = async (): Promise<void> => {
+        try {
+            await verifyAccessToken();
+            const accessToken = Cookies.get('access_token');
+
+            const response = await axios.post(
+                'http://127.0.0.1:8000/api/lists/create',
+                {
+                    board_id: board?.id,
+                    list_name: newListName,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                }
+            );
+            console.log(response.data);
+            if (response.status === 201) {
+                // If successful
+                dispatch(setIsCreatingList(false));
+                dispatch(setNewListName(''));
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error('Error creating list:', error);
+        }
+    };
+
     return (
         <div className="board-page">
             <PrivateNavbar />
@@ -167,133 +208,53 @@ const BoardPage: React.FC = () => {
                     {/* CONTENT */}
                     <div className="board-content-items">
                         <div className="lists-container">
-                            <div className="list">
-                                <div className="list-top">
-                                    <p>List Name</p>
-                                    <SlOptions className="SlOptions" />
-                                </div>
-                                <div className="list-items">
-                                    <div className="list-item">
-                                        <p>Item 1</p>
+                            {board?.lists &&
+                                board.lists.map((list: any) => (
+                                    <div key={list.id} className="list">
+                                        <div className="list-top">
+                                            <p>{list.title}</p>
+                                            <SlOptions className="SlOptions" />
+                                        </div>
+                                        <div className="list-items">
+                                            <div className="list-item">
+                                                <p>Item 1</p>
+                                            </div>
+                                        </div>
+                                        <p className="list-bottom">
+                                            <FaPlus className="fa-plus" /> Add card
+                                        </p>
                                     </div>
-                                    <div className="list-item">
-                                        <p>Item 2</p>
+                                ))}
+                            {isCreatingList ? (
+                                <div className="new-list">
+                                    <div className="new-list-top">
+                                        <input
+                                            type="text"
+                                            value={newListName}
+                                            onChange={handleNewListNameChange}
+                                        />
+                                        <div className="new-list-bottom">
+                                            <Button
+                                                variant="primary"
+                                                className="new-list-button"
+                                                onClick={handleCreateList}
+                                            >
+                                                Create list
+                                            </Button>
+                                            <RxCross1
+                                                className="new-list-cancel"
+                                                onClick={() => dispatch(setIsCreatingList(false))}
+                                            />
+                                        </div>
                                     </div>
-                                    <div className="list-item">
-                                        <p>Item 3</p>
-                                    </div>
                                 </div>
-                                <p className="list-bottom">
-                                    <FaPlus className="fa-plus" /> Add list
-                                </p>
-                            </div>
-                            <div className="list">
-                                <div className="list-top">
-                                    <p>List Name</p>
-                                    <SlOptions className="SlOptions" />
+                            ) : (
+                                <div className="new-button" onClick={handleNewList}>
+                                    <p>
+                                        <FaPlus className="fa-plus" /> New list
+                                    </p>
                                 </div>
-                                <div className="list-items">
-                                    <div className="list-item">
-                                        <p>Item 1</p>
-                                    </div>
-                                    <div className="list-item">
-                                        <p>Item 2</p>
-                                    </div>
-                                </div>
-                                <p className="list-bottom">
-                                    <FaPlus className="fa-plus" /> Add list
-                                </p>
-                            </div>
-                            <div className="list">
-                                <div className="list-top">
-                                    <p>List Name</p>
-                                    <SlOptions className="SlOptions" />
-                                </div>
-                                <div className="list-item">
-                                    <p>Item 1</p>
-                                </div>
-                                <div className="list-item">
-                                    <p>Item 2</p>
-                                </div>
-                                <p className="list-bottom">
-                                    <FaPlus className="fa-plus" /> Add list
-                                </p>
-                            </div>
-                            <div className="list">
-                                <div className="list-top">
-                                    <p>List Name</p>
-                                    <SlOptions className="SlOptions" />
-                                </div>
-                                <div className="list-item">
-                                    <p>Item 1</p>
-                                </div>
-                                <div className="list-item">
-                                    <p>Item 2</p>
-                                </div>
-                                <p className="list-bottom">
-                                    <FaPlus className="fa-plus" /> Add list
-                                </p>
-                            </div>
-                            <div className="list">
-                                <div className="list-top">
-                                    <p>List Name</p>
-                                    <SlOptions className="SlOptions" />
-                                </div>
-                                <div className="list-item">
-                                    <p>Item 1</p>
-                                </div>
-                                <div className="list-item">
-                                    <p>Item 2</p>
-                                </div>
-                                <p className="list-bottom">
-                                    <FaPlus className="fa-plus" /> Add list
-                                </p>
-                            </div>
-                            <div className="list">
-                                <div className="list-top">
-                                    <p>List Name</p>
-                                    <SlOptions className="SlOptions" />
-                                </div>
-                                <div className="list-item">
-                                    <p>Item 1</p>
-                                </div>
-                                <div className="list-item">
-                                    <p>Item 2</p>
-                                </div>
-                                <p className="list-bottom">
-                                    <FaPlus className="fa-plus" /> Add list
-                                </p>
-                            </div>
-                            <div className="list">
-                                <div className="list-top">
-                                    <p>List Name</p>
-                                    <SlOptions className="SlOptions" />
-                                </div>
-                                <div className="list-item">
-                                    <p>Item 1</p>
-                                </div>
-                                <div className="list-item">
-                                    <p>Item 2</p>
-                                </div>
-                                <p className="list-bottom">
-                                    <FaPlus className="fa-plus" /> Add list
-                                </p>
-                            </div>
-                            <div className="list">
-                                <div className="list-top">
-                                    <p>List Name</p>
-                                    <SlOptions className="SlOptions" />
-                                </div>
-                                <div className="list-item">
-                                    <p>Item 1</p>
-                                </div>
-                                <div className="list-item">
-                                    <p>Item 2</p>
-                                </div>
-                                <p className="list-bottom">
-                                    <FaPlus className="fa-plus" /> Add list
-                                </p>
-                            </div>
+                            )}
                         </div>
                     </div>
                 </div>
