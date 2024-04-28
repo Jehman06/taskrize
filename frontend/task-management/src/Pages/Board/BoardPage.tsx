@@ -11,6 +11,7 @@ import { FaStar, FaRegStar } from 'react-icons/fa';
 import { SlOptions } from 'react-icons/sl';
 import { Dropdown } from 'react-bootstrap';
 import { MdDelete } from 'react-icons/md';
+import { FaPlus } from 'react-icons/fa';
 import './BoardPage.css';
 // Images
 import cherryBlossom from '../../images/cherryblossom.jpg';
@@ -117,7 +118,7 @@ const BoardPage: React.FC = () => {
                     backgroundImage: `url(${board ? imageMapping[board.default_image] : ''})`,
                 }}
             >
-                {/* BOARD */}
+                {/* NAVBAR */}
                 <div className="board-content">
                     <div className="board-navbar">
                         <div className="board-navbar-left">
@@ -159,6 +160,139 @@ const BoardPage: React.FC = () => {
                                         </Dropdown.Item>
                                     </Dropdown.Menu>
                                 </Dropdown>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* CONTENT */}
+                    <div className="board-content-items">
+                        <div className="lists-container">
+                            <div className="list">
+                                <div className="list-top">
+                                    <p>List Name</p>
+                                    <SlOptions className="SlOptions" />
+                                </div>
+                                <div className="list-items">
+                                    <div className="list-item">
+                                        <p>Item 1</p>
+                                    </div>
+                                    <div className="list-item">
+                                        <p>Item 2</p>
+                                    </div>
+                                    <div className="list-item">
+                                        <p>Item 3</p>
+                                    </div>
+                                </div>
+                                <p className="list-bottom">
+                                    <FaPlus className="fa-plus" /> Add list
+                                </p>
+                            </div>
+                            <div className="list">
+                                <div className="list-top">
+                                    <p>List Name</p>
+                                    <SlOptions className="SlOptions" />
+                                </div>
+                                <div className="list-items">
+                                    <div className="list-item">
+                                        <p>Item 1</p>
+                                    </div>
+                                    <div className="list-item">
+                                        <p>Item 2</p>
+                                    </div>
+                                </div>
+                                <p className="list-bottom">
+                                    <FaPlus className="fa-plus" /> Add list
+                                </p>
+                            </div>
+                            <div className="list">
+                                <div className="list-top">
+                                    <p>List Name</p>
+                                    <SlOptions className="SlOptions" />
+                                </div>
+                                <div className="list-item">
+                                    <p>Item 1</p>
+                                </div>
+                                <div className="list-item">
+                                    <p>Item 2</p>
+                                </div>
+                                <p className="list-bottom">
+                                    <FaPlus className="fa-plus" /> Add list
+                                </p>
+                            </div>
+                            <div className="list">
+                                <div className="list-top">
+                                    <p>List Name</p>
+                                    <SlOptions className="SlOptions" />
+                                </div>
+                                <div className="list-item">
+                                    <p>Item 1</p>
+                                </div>
+                                <div className="list-item">
+                                    <p>Item 2</p>
+                                </div>
+                                <p className="list-bottom">
+                                    <FaPlus className="fa-plus" /> Add list
+                                </p>
+                            </div>
+                            <div className="list">
+                                <div className="list-top">
+                                    <p>List Name</p>
+                                    <SlOptions className="SlOptions" />
+                                </div>
+                                <div className="list-item">
+                                    <p>Item 1</p>
+                                </div>
+                                <div className="list-item">
+                                    <p>Item 2</p>
+                                </div>
+                                <p className="list-bottom">
+                                    <FaPlus className="fa-plus" /> Add list
+                                </p>
+                            </div>
+                            <div className="list">
+                                <div className="list-top">
+                                    <p>List Name</p>
+                                    <SlOptions className="SlOptions" />
+                                </div>
+                                <div className="list-item">
+                                    <p>Item 1</p>
+                                </div>
+                                <div className="list-item">
+                                    <p>Item 2</p>
+                                </div>
+                                <p className="list-bottom">
+                                    <FaPlus className="fa-plus" /> Add list
+                                </p>
+                            </div>
+                            <div className="list">
+                                <div className="list-top">
+                                    <p>List Name</p>
+                                    <SlOptions className="SlOptions" />
+                                </div>
+                                <div className="list-item">
+                                    <p>Item 1</p>
+                                </div>
+                                <div className="list-item">
+                                    <p>Item 2</p>
+                                </div>
+                                <p className="list-bottom">
+                                    <FaPlus className="fa-plus" /> Add list
+                                </p>
+                            </div>
+                            <div className="list">
+                                <div className="list-top">
+                                    <p>List Name</p>
+                                    <SlOptions className="SlOptions" />
+                                </div>
+                                <div className="list-item">
+                                    <p>Item 1</p>
+                                </div>
+                                <div className="list-item">
+                                    <p>Item 2</p>
+                                </div>
+                                <p className="list-bottom">
+                                    <FaPlus className="fa-plus" /> Add list
+                                </p>
                             </div>
                         </div>
                     </div>

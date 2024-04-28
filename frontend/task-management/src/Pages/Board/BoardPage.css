@@ -2,20 +2,18 @@
     background-color: #33373a;
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
-    min-width: 100vw;
+    height: 100vh;
 }
 
 .board-container {
     width: 100%;
-    height: 94vh;
+    min-height: calc(100vh - 45px - 4rem - 0.6rem - 45px);
     background-size: cover;
     background-position: center;
 }
 
 .board-content {
-    box-sizing: border-box; /* Add this line */
-    flex: 2;
+    box-sizing: border-box;
     position: relative;
     width: 100%;
     margin: 0;
@@ -28,7 +26,7 @@
     background: rgba(0, 0, 0, 0.55);
     backdrop-filter: blur(6px);
     color: white;
-    position: sticky;
+    position: relative;
     top: 0;
     left: 0;
     display: flex;
@@ -49,8 +47,7 @@
 .board-navbar > div > p {
     font-size: 1.3rem;
     font-weight: 900;
-    padding: 10px; /* Add this line */
-    margin: 0;
+    padding: 10px;
     margin: 0 0.8rem 0 1rem;
 }
 
@@ -78,4 +75,103 @@
 .dropdown-item-content {
     display: flex;
     align-items: center;
+}
+
+.board-content-items {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 45px - 4rem - 0.6rem - 45px);
+    margin: 4rem 4rem 0 4rem;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(155, 155, 155, 0.7) transparent;
+}
+
+.lists-container {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.list {
+    max-height: 35rem;
+    min-width: 15rem;
+    background: black;
+    color: #9fadbc;
+    border-radius: 0.7rem;
+    padding: 0.2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.list-items {
+    overflow-y: auto; /* Add this line */
+    scrollbar-width: thin; /* Optional: makes the scrollbar thinner */
+    scrollbar-color: rgba(155, 155, 155, 0.7) transparent;
+    max-height: calc(35rem - 2.4rem - 2.4rem); /* Optional: changes the scrollbar color */
+}
+
+.list-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0.3rem 0.3rem 0 0.3rem;
+    padding: 0.3rem;
+    height: 2.4rem;
+    font-weight: 700;
+}
+
+.list-top p {
+    font-size: 1rem;
+    line-height: 2.4rem;
+    padding: 0;
+    margin: 0;
+}
+
+.SlOptions {
+    align-self: center;
+    font-size: 1.2rem;
+}
+
+.list-item {
+    display: flex;
+    flex-direction: column;
+    background-color: #3d3941;
+    cursor: pointer;
+    margin-right: 1rem;
+    height: 2.4rem;
+}
+
+.list-item:hover {
+    border: 2px solid #006666;
+}
+
+.list-item:last-of-type {
+    margin-bottom: 1rem;
+}
+
+.list-bottom,
+.list-item {
+    margin: 0.3rem;
+    padding: 0.3rem 0.3rem 0.3rem 0.5rem;
+    border-radius: 0.3rem;
+    display: flex;
+    font-size: 1rem;
+}
+
+.list-bottom {
+    align-items: center;
+    cursor: pointer;
+    height: 2.4rem;
+}
+
+.list-bottom:hover {
+    background-color: #006666;
+}
+
+.fa-plus {
+    margin-right: 0.7rem;
+    margin-left: 0.3rem;
+    align-self: center;
+    font-size: 0.85rem;
 }
