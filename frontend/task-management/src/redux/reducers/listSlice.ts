@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Card } from './cardSlice';
 
-interface List {
+export interface List {
     id: number;
     title: string;
     position: number;
