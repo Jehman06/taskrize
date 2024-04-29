@@ -105,10 +105,10 @@
 }
 
 .list-items {
-    overflow-y: auto; /* Add this line */
-    scrollbar-width: thin; /* Optional: makes the scrollbar thinner */
+    overflow-y: auto;
+    scrollbar-width: thin;
     scrollbar-color: rgba(155, 155, 155, 0.7) transparent;
-    max-height: calc(35rem - 2.4rem - 2.4rem); /* Optional: changes the scrollbar color */
+    max-height: calc(35rem - 2.4rem - 2.4rem);
 }
 
 .list-top {
@@ -211,7 +211,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    align-items: flex-start; /* Changed from center to flex-start */
+    align-items: flex-start;
     margin: 0.3rem 0.3rem 0 0.3rem;
     padding: 0.3rem;
     font-weight: 700;
@@ -234,19 +234,19 @@
 
 .new-list-bottom {
     margin: 0.3rem 0.3rem 0 0.3rem;
-    padding: 0.3rem 0.3rem 0.3rem 0; /* Removed left padding */
+    padding: 0.3rem 0.3rem 0.3rem 0;
     border-radius: 0.3rem;
     display: flex;
     font-size: 1rem;
-    align-items: center; /* Align items vertically in the center */
-    justify-content: space-between; /* Distribute items along the horizontal line */
+    align-items: center;
+    justify-content: space-between;
     cursor: pointer;
     width: 100%;
 }
 
 .new-list-button {
     margin: 0;
-    padding: 0.2rem 0.5rem 0.2rem 0.3rem; /* Added left padding */
+    padding: 0.2rem 0.5rem 0.2rem 0.3rem;
 }
 
 .new-list-cancel {
@@ -258,4 +258,46 @@
 
 .new-list-cancel:hover {
     background-color: #3d3941;
+}
+
+.new-card-list-bottom {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.new-card-list-bottom input {
+    box-sizing: border-box;
+    margin: 0.2rem;
+    padding: 0.3rem 0.3rem 0.3rem 0.5rem;
+    border-radius: 0.3rem;
+    display: flex;
+    font-size: 1rem;
+    flex-direction: column;
+    background-color: #3d3941;
+    height: 2.4rem;
+    width: calc(100% - 0.6rem);
+    border: none;
+    color: #9fadbc;
+}
+
+.new-card-list-bottom input:hover,
+.new-card-list-bottom input:focus {
+    border: 1px solid teal;
+    outline: none;
+}
+
+.new-card-list-bottom input::placeholder,
+.new-list-top input::placeholder {
+    color: #9fadbc;
+}
+
+.button-icon-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: calc(100% - 0.6rem);
+    margin: 0.2rem;
+    padding: 0.3rem 0.3rem 0.3rem 0.5rem;
+    box-sizing: border-box;
 }

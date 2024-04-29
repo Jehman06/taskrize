@@ -14,6 +14,7 @@ import emojiSlice from './reducers/emojiSlice';
 import { createImmutableStateInvariantMiddleware } from '@reduxjs/toolkit';
 import notificationSlice from './reducers/notificationSlice';
 import listSlice from './reducers/listSlice';
+import cardSlice from './reducers/cardSlice';
 
 const persistConfig = {
     key: 'root',
@@ -32,6 +33,7 @@ const rootReducer = combineReducers({
     emoji: emojiSlice,
     notification: notificationSlice,
     list: listSlice,
+    card: cardSlice,
 });
 
 // Persist the combined reducer

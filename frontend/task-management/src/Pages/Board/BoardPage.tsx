@@ -23,7 +23,13 @@ import palmTrees from '../../images/palmTrees.jpg';
 import bigSur from '../../images/bigSur.jpg';
 import yellowstone from '../../images/yellowstone.jpg';
 import monumentValley from '../../images/monumentValley.jpg';
-import { setIsCreatingList, setNewListName } from '../../redux/reducers/listSlice';
+import {
+    setActiveListId,
+    setIsCreatingList,
+    setLists,
+    setNewListName,
+} from '../../redux/reducers/listSlice';
+import { setNewCardTitle } from '../../redux/reducers/cardSlice';
 
 // Map image names to file paths
 const imageMapping: { [key: string]: string } = {
@@ -44,6 +50,8 @@ const BoardPage: React.FC = () => {
     const board = useSelector((state: RootState) => state.board.board);
     const isCreatingList = useSelector((state: RootState) => state.list.isCreatingList);
     const newListName = useSelector((state: RootState) => state.list.newListName);
+    const newCardTitle = useSelector((state: RootState) => state.card.newCardTitle);
+    const activeListId = useSelector((state: RootState) => state.list.activeListId);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -58,6 +66,7 @@ const BoardPage: React.FC = () => {
             });
             console.log(`response: ${response.data}`);
             dispatch(setBoard(response.data));
+            dispatch(setLists(response.data.lists));
         } catch (error) {
             console.error('Error fetching board: ', error);
         }
@@ -150,6 +159,40 @@ const BoardPage: React.FC = () => {
         }
     };
 
+    const handleNewCardTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        dispatch(setNewCardTitle(e.target.value));
+    };
+
+    const handleCreateCard = async (listId: number): Promise<void> => {
+        try {
+            await verifyAccessToken();
+            const accessToken = Cookies.get('access_token');
+
+            const response = await axios.post(
+                'http://127.0.0.1:8000/api/cards/create',
+                {
+                    list_id: listId,
+                    card_title: newCardTitle,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                }
+            );
+            console.log(response.data);
+            if (response.status === 201) {
+                // If successful
+                dispatch(setNewCardTitle(''));
+                dispatch(setActiveListId(null));
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error('Error creating card:', error);
+        }
+    };
+
     return (
         <div className="board-page">
             <PrivateNavbar />
@@ -222,9 +265,41 @@ const BoardPage: React.FC = () => {
                                                 </div>
                                             ))}
                                         </div>
-                                        <p className="list-bottom">
-                                            <FaPlus className="fa-plus" /> Add card
-                                        </p>
+                                        {list.id === activeListId ? (
+                                            <div className="new-card-list-bottom">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Enter a title for this card..."
+                                                    value={newCardTitle}
+                                                    onChange={handleNewCardTitleChange}
+                                                />
+                                                <div className="button-icon-container">
+                                                    <Button
+                                                        variant="primary"
+                                                        className="new-list-button"
+                                                        onClick={() => handleCreateCard(list.id)}
+                                                    >
+                                                        Create card
+                                                    </Button>
+                                                    <RxCross1
+                                                        className="new-list-cancel"
+                                                        onClick={() =>
+                                                            dispatch(setActiveListId(null))
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <p
+                                                className="list-bottom"
+                                                onClick={() => {
+                                                    dispatch(setActiveListId(list.id));
+                                                    dispatch(setIsCreatingList(false));
+                                                }}
+                                            >
+                                                <FaPlus className="fa-plus" /> Add card
+                                            </p>
+                                        )}
                                     </div>
                                 ))}
                             {isCreatingList ? (
@@ -251,7 +326,13 @@ const BoardPage: React.FC = () => {
                                     </div>
                                 </div>
                             ) : (
-                                <div className="new-button" onClick={handleNewList}>
+                                <div
+                                    className="new-button"
+                                    onClick={() => {
+                                        handleNewList();
+                                        dispatch(setActiveListId(null));
+                                    }}
+                                >
                                     <p>
                                         <FaPlus className="fa-plus" /> New list
                                     </p>
