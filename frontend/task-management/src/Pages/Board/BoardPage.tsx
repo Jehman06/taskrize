@@ -216,9 +216,11 @@ const BoardPage: React.FC = () => {
                                             <SlOptions className="SlOptions" />
                                         </div>
                                         <div className="list-items">
-                                            <div className="list-item">
-                                                <p>Item 1</p>
-                                            </div>
+                                            {list.cards.map((card: any) => (
+                                                <div key={card.id} className="list-item">
+                                                    <p>{card.title}</p>
+                                                </div>
+                                            ))}
                                         </div>
                                         <p className="list-bottom">
                                             <FaPlus className="fa-plus" /> Add card
