@@ -108,6 +108,21 @@ const BoardPage: React.FC = () => {
         }
     };
 
+    const handleBlurNewList = (event: React.FocusEvent<HTMLInputElement>) => {
+        if (event.target.value !== '') {
+            dispatch(setNewListName(event.target.value));
+        } else {
+            dispatch(setIsCreatingList(false));
+        }
+    };
+
+    const handleKeyDownNewList = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter' && event.currentTarget.value !== '') {
+            dispatch(setNewListName(event.currentTarget.value));
+            dispatch(setIsCreatingList(false));
+        }
+    };
+
     return (
         <div className="board-page">
             <PrivateNavbar />
@@ -131,8 +146,12 @@ const BoardPage: React.FC = () => {
                                     <div className="new-list-top">
                                         <input
                                             type="text"
+                                            placeholder="Enter list name"
                                             value={newListName}
                                             onChange={handleNewListNameChange}
+                                            onBlur={handleBlurNewList}
+                                            onKeyDown={handleKeyDownNewList}
+                                            autoFocus
                                         />
                                         <div className="new-list-bottom">
                                             <Button

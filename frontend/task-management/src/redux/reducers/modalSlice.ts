@@ -13,6 +13,7 @@ export interface ModalState {
     showDeleteWorkspaceModal: boolean;
     showUpdatePasswordModal: boolean;
     showWorkspaceMembersModal: boolean;
+    showListModal: number | null;
     workspaceIdToShowModal: number | null;
     workspaceIdToDelete: number | null;
     selectedWorkspace: Workspace | null;
@@ -31,6 +32,7 @@ export const initialState: ModalState = {
     showDeleteWorkspaceModal: false,
     showUpdatePasswordModal: false,
     showWorkspaceMembersModal: false,
+    showListModal: null,
     workspaceIdToShowModal: null,
     workspaceIdToDelete: null,
     selectedWorkspace: null,
@@ -91,6 +93,9 @@ const modalSlice = createSlice({
         setErrorWorkspaceMessage(state, action: PayloadAction<string | null>) {
             state.errorWorkspaceMessage = action.payload;
         },
+        setShowListModal(state, action: PayloadAction<number | null>) {
+            state.showListModal = action.payload;
+        },
         resetModalStates(state) {
             state.errorImageMessage = '';
             state.errorTitleMessage = '';
@@ -115,6 +120,7 @@ export const {
     setErrorTitleMessage,
     setErrorImageMessage,
     setErrorWorkspaceMessage,
+    setShowListModal,
     resetModalStates,
     setWorkspaceIdToDelete,
 } = modalSlice.actions;

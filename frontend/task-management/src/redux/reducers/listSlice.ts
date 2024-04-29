@@ -16,14 +16,26 @@ interface ListState {
     lists: List[];
     isCreatingList: boolean;
     newListName: string;
+    openListId: number | null;
     activeListId: number | null;
+    renamingListId: number | null;
+    listFormData: {
+        title?: string;
+        description?: string;
+    };
 }
 
 const initialState: ListState = {
     lists: [],
     isCreatingList: false,
     newListName: '',
+    openListId: null,
     activeListId: null,
+    renamingListId: null,
+    listFormData: {
+        title: '',
+        description: '',
+    },
 };
 
 const listSlice = createSlice({
@@ -42,8 +54,25 @@ const listSlice = createSlice({
         setNewListName(state, action: PayloadAction<string>) {
             state.newListName = action.payload;
         },
+        setOpenListId(state, action: PayloadAction<number | null>) {
+            state.openListId = action.payload;
+        },
+        setRenamingListId(state, action: PayloadAction<number | null>) {
+            state.renamingListId = action.payload;
+        },
+        setListFormData(state, action: PayloadAction<{ title?: string; description?: string }>) {
+            state.listFormData = action.payload;
+        },
     },
 });
 
-export const { setLists, setActiveListId, setIsCreatingList, setNewListName } = listSlice.actions;
+export const {
+    setLists,
+    setActiveListId,
+    setIsCreatingList,
+    setNewListName,
+    setOpenListId,
+    setRenamingListId,
+    setListFormData,
+} = listSlice.actions;
 export default listSlice.reducer;

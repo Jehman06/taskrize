@@ -20,7 +20,7 @@ from authentication.views import register_user, login_user, logout_user, reset_p
 from django.views.generic import RedirectView
 from workspaces.views import create_workspace, get_workspaces, update_workspace, delete_workspace, get_workspace_boards, invite_members, accept_invitation, reject_invitation, leave_workspace
 from boards.views import get_boards, create_board, update_board, toggle_favorite_board, delete_board, get_board_and_lists
-from lists.views import create_list
+from lists.views import create_list, update_list, delete_list
 from cards.views import create_card
 from notifications.views import send_notification, get_notifications, read_notification
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
@@ -64,6 +64,8 @@ urlpatterns = [
     path('api/boards/delete', delete_board, name='board-delete'),
     # Lists
     path('api/lists/create', create_list, name='list-create'),
+    path('api/lists/update/<int:list_id>', update_list, name='list-update'),
+    path('api/lists/delete/<int:list_id>', delete_list, name='list-delete'),
     # Cards
     path('api/cards/create', create_card, name='card-create'),
     # Notifications
