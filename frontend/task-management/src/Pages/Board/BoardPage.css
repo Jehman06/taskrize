@@ -20,63 +20,6 @@
     padding: 0;
 }
 
-.board-navbar {
-    box-sizing: content-box;
-    width: 100%;
-    background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(6px);
-    color: white;
-    position: relative;
-    top: 0;
-    left: 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.board-navbar-left,
-.board-navbar-right {
-    display: flex;
-    align-items: center;
-}
-
-.board-navbar-right {
-    margin-right: 1.5rem;
-}
-
-.board-navbar > div > p {
-    font-size: 1.3rem;
-    font-weight: 900;
-    padding: 10px;
-    margin: 0 0.8rem 0 1rem;
-}
-
-.no-style {
-    background: none !important;
-    color: inherit;
-    border: none;
-    padding: 0;
-    font: inherit;
-    cursor: pointer;
-    outline: inherit;
-    text-decoration: none;
-}
-
-.no-style.dropdown-toggle::after {
-    display: none;
-}
-
-.board-dropdown-menu {
-    position: fixed !important;
-    top: -2.688rem !important;
-    right: -24px !important;
-}
-
-.dropdown-item-content {
-    display: flex;
-    align-items: center;
-}
-
 .board-content-items {
     display: flex;
     flex-direction: column;

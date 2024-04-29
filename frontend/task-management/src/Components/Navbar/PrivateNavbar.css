@@ -1,0 +1,161 @@
+/* Navbar text color #9badbc */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+.private-navbar {
+    background-color: #1d2125;
+    position: relative;
+    height: 45px;
+    padding: 0, 20;
+    font-family: 'Montserrat', sans-serif;
+    border-bottom: 0.2px solid #9fadbc;
+}
+
+.private-logo {
+    height: 30px;
+    width: 75px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.dropdown-btn {
+    background-color: #1d2125;
+    color: #9fadbc;
+    border: none;
+    font-weight: bold;
+    margin-left: 20px;
+}
+
+.dropdown-btn:hover {
+    background-color: #333c44;
+}
+
+.dropdown-menu {
+    background-color: #4a4d50 !important;
+    border: 0.2px solid #9fadbc !important;
+    margin-top: 9px !important;
+}
+
+.dropdown-item {
+    color: #9fadbc !important;
+}
+
+.dropdown-item-name {
+    font-size: 0.8rem;
+}
+
+.dropdown-item:hover {
+    background-color: #333c44 !important;
+    color: #9fadbc;
+}
+
+.create-button {
+    margin-left: 20px;
+    background-color: #579dff !important;
+    border: none;
+    color: #1d2125 !important;
+    border-radius: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-weight: 600;
+}
+
+.dropdown-create {
+    width: 450px;
+}
+
+.create-title {
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
+.create-description {
+    font-size: 0.8rem;
+    margin-bottom: 0;
+    white-space: normal;
+}
+
+.create-button:hover {
+    background-color: #85b8ff !important;
+}
+
+.search-container {
+    position: relative;
+}
+
+.search {
+    padding-left: 35px;
+    background-color: #333c44;
+    border: 0.5px solid #9fadbc;
+    border-radius: 5px;
+    color: #9fadbc;
+}
+
+.search::placeholder {
+    color: #9fadbc;
+}
+
+.search:hover {
+    background-color: #474f56;
+}
+
+.search:focus {
+    color: #9fadbc; /* Color of the text when the input is focused */
+    border-color: #85b8ff; /* Border color when the input is focused */
+    outline: none; /* Remove the default focus outline */
+}
+
+/* For WebKit browsers */
+.search:focus::-webkit-input-placeholder {
+    color: #9fadbc; /* Color of the placeholder text when the input is focused */
+}
+
+.search-icon-container {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.magnifier {
+    color: #9fadbc;
+    font-weight: bold;
+}
+
+.account-icon {
+    color: #04b97a;
+    font-size: 30px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.account-icon:hover {
+    color: #038759;
+}
+
+.dropdown-profile:hover {
+    background-color: #1d2125 !important;
+}
+
+.no-arrow:after {
+    display: none !important;
+}
+
+.profile-menu {
+    margin-right: 20px !important;
+}
+
+.profile-dropdown-item {
+    cursor: pointer;
+}
+
+.notification-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px; /* Adjust as needed */
+}
+
+.button-container {
+    display: flex;
+    gap: 10px; /* Adjust as needed */
+}

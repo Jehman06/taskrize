@@ -7,10 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { setBoard } from '../../redux/reducers/boardSlice';
 import PrivateNavbar from '../../Navbar/PrivateNavbar';
-import { FaStar, FaRegStar } from 'react-icons/fa';
-import { SlOptions } from 'react-icons/sl';
-import { Button, Dropdown } from 'react-bootstrap';
-import { MdDelete } from 'react-icons/md';
+import { Button } from 'react-bootstrap';
 import { FaPlus } from 'react-icons/fa';
 import { RxCross1 } from 'react-icons/rx';
 import './BoardPage.css';
@@ -30,6 +27,7 @@ import {
     setNewListName,
 } from '../../redux/reducers/listSlice';
 import List from '../../Components/List/List';
+import BoardNavbar from '../../Components/Navbar/BoardNavbar';
 
 // Map image names to file paths
 const imageMapping: { [key: string]: string } = {
@@ -46,12 +44,10 @@ const imageMapping: { [key: string]: string } = {
 const BoardPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
 
-    const userId = useSelector((state: RootState) => state.auth.user.id);
     const board = useSelector((state: RootState) => state.board.board);
     const isCreatingList = useSelector((state: RootState) => state.list.isCreatingList);
     const newListName = useSelector((state: RootState) => state.list.newListName);
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const fetchBoard = async (): Promise<void> => {
         try {
@@ -73,51 +69,6 @@ const BoardPage: React.FC = () => {
     useEffect(() => {
         fetchBoard();
     }, []);
-
-    const toggleFavorite = async (): Promise<void> => {
-        try {
-            await verifyAccessToken();
-            const accessToken = Cookies.get('access_token');
-
-            const response = await axios.post(
-                `http://127.0.0.1:8000/api/boards/toggle-favorite?board_id=${board?.id}`,
-                null,
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                }
-            );
-            console.log(response.data);
-            if (response.status === 200) {
-                window.location.reload();
-            }
-        } catch (error) {
-            console.error('Error toggling favorite', error);
-        }
-    };
-
-    const deleteBoard = async (): Promise<void> => {
-        try {
-            await verifyAccessToken();
-            const accessToken = Cookies.get('access_token');
-
-            const response = await axios.delete('http://127.0.0.1:8000/api/boards/delete', {
-                data: {
-                    board_id: board?.id,
-                },
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            });
-            console.log(response.data);
-            if (response.status === 204) {
-                navigate('/home');
-            }
-        } catch (error) {
-            console.error('Error deleting the board', error);
-        }
-    };
 
     const handleNewList = () => {
         dispatch(setIsCreatingList(true));
@@ -166,51 +117,9 @@ const BoardPage: React.FC = () => {
                     backgroundImage: `url(${board ? imageMapping[board.default_image] : ''})`,
                 }}
             >
-                {/* NAVBAR */}
                 <div className="board-content">
-                    <div className="board-navbar">
-                        <div className="board-navbar-left">
-                            <p>{board ? board.title : ''}</p>
-                            {board && userId !== null && board.favorite.includes(userId) ? (
-                                <FaStar
-                                    style={{ cursor: 'pointer' }}
-                                    onClick={() => toggleFavorite()}
-                                />
-                            ) : (
-                                <FaRegStar
-                                    style={{ cursor: 'pointer' }}
-                                    onClick={() => toggleFavorite()}
-                                />
-                            )}
-                        </div>
-                        <div className="board-navbar-right">
-                            <div className="dropdown options">
-                                <Dropdown>
-                                    <Dropdown.Toggle
-                                        variant="none"
-                                        id="dropdown-basic"
-                                        className="no-style"
-                                    >
-                                        <SlOptions
-                                            style={{ cursor: 'pointer', fontSize: '1.3rem' }}
-                                        />
-                                    </Dropdown.Toggle>
-
-                                    <Dropdown.Menu align="end" className="board-dropdown-menu">
-                                        <Dropdown.Item>
-                                            <div
-                                                className="dropdown-item-content"
-                                                onClick={() => deleteBoard()}
-                                            >
-                                                <MdDelete style={{ marginRight: '0.5rem' }} />{' '}
-                                                Delete Board
-                                            </div>
-                                        </Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown>
-                            </div>
-                        </div>
-                    </div>
+                    {/* NAVBAR */}
+                    {board && <BoardNavbar board={board} />}
 
                     {/* CONTENT */}
                     <div className="board-content-items">
