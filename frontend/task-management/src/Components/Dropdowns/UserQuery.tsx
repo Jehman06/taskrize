@@ -72,7 +72,6 @@ const UserQueryDropdown: React.FC<UserQueryDropdownProps> = ({ id }) => {
 
             // Get the recipient IDs from selectedUsers
             const recipientIds = selectedUsers.map((user) => user.id);
-            console.log(recipientIds);
 
             const workspaceId = id;
 

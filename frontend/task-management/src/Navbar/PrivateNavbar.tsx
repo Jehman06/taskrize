@@ -77,7 +77,6 @@ const PrivateNavbar: React.FC = () => {
         async (accessToken: string): Promise<void> => {
             const boardsUrl = 'http://127.0.0.1:8000/api/boards/';
             const workspacesUrl = 'http://127.0.0.1:8000/api/workspaces/';
-            console.log('getBoardsAndWorkspaces is called.');
 
             try {
                 const [boardsResponse, workspacesResponse] = await Promise.all([
@@ -114,7 +113,6 @@ const PrivateNavbar: React.FC = () => {
                             };
                         })
                     );
-                    console.log('updatedWorkspaces: ', updatedWorkspaces);
                     dispatch(setWorkspaces(updatedWorkspaces));
                     // setWorkspaces(updatedWorkspaces);
                 } else {

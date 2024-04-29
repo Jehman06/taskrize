@@ -42,7 +42,6 @@ const WorkspaceMembersModal: React.FC<WorkspaceMembersModalProps> = ({
 
     // Make sure it's the correct selected workspace
     if (id != workspaceIdToShowModal) {
-        console.log('Wrong workspace ID');
         return null;
     }
 

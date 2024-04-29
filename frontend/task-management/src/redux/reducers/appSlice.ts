@@ -41,7 +41,6 @@ const appSlice = createSlice({
             state.query = '';
         },
         fetchSearchResults(state, action: PayloadAction<Member[]>) {
-            console.log('Received search results:', action.payload);
             state.searchResults = action.payload;
         },
         resetSearchResults(state) {

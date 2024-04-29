@@ -10,7 +10,7 @@ import PrivateNavbar from '../../Navbar/PrivateNavbar';
 import { FaStar, FaRegStar } from 'react-icons/fa';
 import { SlOptions } from 'react-icons/sl';
 import { Button, Dropdown } from 'react-bootstrap';
-import { MdDelete } from 'react-icons/md';
+import { MdDelete, MdDriveFileRenameOutline } from 'react-icons/md';
 import { FaPlus } from 'react-icons/fa';
 import { RxCross1 } from 'react-icons/rx';
 import './BoardPage.css';
@@ -233,7 +233,7 @@ const BoardPage: React.FC = () => {
                                     </Dropdown.Toggle>
 
                                     <Dropdown.Menu align="end" className="board-dropdown-menu">
-                                        <Dropdown.Item href="#/action-1">
+                                        <Dropdown.Item>
                                             <div
                                                 className="dropdown-item-content"
                                                 onClick={() => deleteBoard()}
@@ -256,7 +256,39 @@ const BoardPage: React.FC = () => {
                                     <div key={list.id} className="list">
                                         <div className="list-top">
                                             <p>{list.title}</p>
-                                            <SlOptions className="SlOptions" />
+                                            <Dropdown>
+                                                <Dropdown.Toggle
+                                                    variant="none"
+                                                    id="dropdown-basic"
+                                                    className="no-style"
+                                                >
+                                                    <SlOptions className="SlOptions" />
+                                                </Dropdown.Toggle>
+                                                <Dropdown.Menu
+                                                    align="end"
+                                                    className="list-dropdown-menu"
+                                                >
+                                                    <Dropdown.Item>
+                                                        <div
+                                                            className="dropdown-item-content"
+                                                            // onClick delete list
+                                                        >
+                                                            <MdDelete
+                                                                style={{ marginRight: '0.5rem' }}
+                                                            />{' '}
+                                                            Delete List
+                                                        </div>
+                                                    </Dropdown.Item>
+                                                    <Dropdown.Item>
+                                                        <div className="dropdown-item-content">
+                                                            <MdDriveFileRenameOutline
+                                                                style={{ marginRight: '0.5rem' }}
+                                                            />{' '}
+                                                            Rename List
+                                                        </div>
+                                                    </Dropdown.Item>
+                                                </Dropdown.Menu>
+                                            </Dropdown>
                                         </div>
                                         <div className="list-items">
                                             {list.cards.map((card: any) => (

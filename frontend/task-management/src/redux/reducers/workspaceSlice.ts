@@ -60,9 +60,7 @@ const workspaceSLice = createSlice({
     initialState,
     reducers: {
         setWorkspaces(state, action: PayloadAction<Workspace[]>) {
-            console.log('Previous state:', state.workspaces);
             state.workspaces = action.payload;
-            console.log('Updated state:', state.workspaces);
         },
         setWorkspaceName(state, action: PayloadAction<string>) {
             state.workspaceName = action.payload;

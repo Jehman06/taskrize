@@ -301,3 +301,7 @@
     padding: 0.3rem 0.3rem 0.3rem 0.5rem;
     box-sizing: border-box;
 }
+
+.list-dropdown-menu {
+    background-color: #272b2b !important;
+}
