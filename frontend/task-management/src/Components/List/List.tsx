@@ -172,6 +172,8 @@ const List: React.FC<ListProps> = ({ list }) => {
         if (event.key === 'Enter' && event.currentTarget.value !== '') {
             dispatch(setNewCardTitle(event.currentTarget.value));
             handleCreateCard(list.id);
+        } else if (event.key === 'Escape') {
+            dispatch(setActiveListId(null));
         }
     };
 
@@ -240,13 +242,6 @@ const List: React.FC<ListProps> = ({ list }) => {
                         autoFocus
                     />
                     <div className="button-icon-container">
-                        <Button
-                            variant="primary"
-                            className="new-list-button"
-                            onClick={() => handleCreateCard(list.id)}
-                        >
-                            Create card
-                        </Button>
                         <RxCross1
                             className="new-list-cancel"
                             onClick={() => dispatch(setActiveListId(null))}

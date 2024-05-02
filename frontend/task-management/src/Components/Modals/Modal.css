@@ -74,6 +74,11 @@
 .members-workspace-member-items {
     margin: 0;
     padding: 0;
+    cursor: pointer;
+}
+
+.members-workspace-member-items:hover {
+    color: teal;
 }
 
 .members-workspace-member {
@@ -83,7 +88,6 @@
 
 .members-workspace-member {
     padding: 0.6rem 0 0.6rem 0;
-    border-bottom: 0.5px solid black;
 }
 
 .browse-images {

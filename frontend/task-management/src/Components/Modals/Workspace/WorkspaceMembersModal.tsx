@@ -47,19 +47,31 @@ const WorkspaceMembersModal: React.FC<WorkspaceMembersModalProps> = ({
 
     return (
         <>
-            <Modal show={show} onHide={onHide} centered>
+            <Modal show={show} onHide={onHide} centered size="xl">
                 <Modal.Header closeButton style={{ backgroundColor: '#33373a', color: '#9fadbc' }}>
                     <Modal.Title>{workspaceName}'s members</Modal.Title>
                 </Modal.Header>
                 <Modal.Body style={{ backgroundColor: '#33373a', color: '#9fadbc' }}>
-                    {members.map((member) => (
-                        <div key={member.email} className="members-workspace-member">
-                            <p className="members-workspace-member-items">
-                                {member.name} {`(${member.nickname})`}
-                            </p>
-                            <p className="members-workspace-member-items">{member.email}</p>
-                        </div>
-                    ))}
+                    <div
+                        style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(4, 1fr)',
+                            gap: '10px',
+                        }}
+                    >
+                        {members.map((member) => (
+                            <div key={member.email} className="members-workspace-member">
+                                <ul>
+                                    <li>
+                                        <p className="members-workspace-member-items">
+                                            {member.name || member.email}{' '}
+                                            {member.nickname ? `(${member.nickname})` : ''}
+                                        </p>
+                                    </li>
+                                </ul>
+                            </div>
+                        ))}
+                    </div>
                     <UserQueryDropdown id={id} />
                 </Modal.Body>
             </Modal>

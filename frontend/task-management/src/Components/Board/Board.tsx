@@ -40,7 +40,12 @@ const Board: React.FC<BoardProps> = ({
                 {showWorkspaceName && (
                     <div className="workspace-name">In Workspace {workspace_name}</div>
                 )}
-                <div onClick={() => toggleStar(id)}>
+                <div
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        toggleStar(id);
+                    }}
+                >
                     {starFilled ? (
                         <FaStar className="star-full" /> // Render filled star icon if starFilled is true
                     ) : (
