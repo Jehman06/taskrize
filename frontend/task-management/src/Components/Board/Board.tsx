@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaStar, FaRegStar } from 'react-icons/fa';
+import { Image } from '../../redux/reducers/modalSlice';
 import './Board.css';
 
 interface BoardProps {
@@ -8,7 +9,7 @@ interface BoardProps {
     title: string;
     description: string;
     favorite: boolean;
-    default_image: string;
+    default_image: Image;
     workspace: number;
     workspace_name: string;
     starFilled: boolean;
@@ -34,7 +35,7 @@ const Board: React.FC<BoardProps> = ({
     return (
         <div className="board-wrapper" onClick={navigateToBoardPage}>
             <div className="board">
-                <img src={default_image} alt="Board image" className="board-img" />
+                <img src={default_image.url} alt="Board image" className="board-img" />
                 <div className="board-title">{title}</div>
                 {showWorkspaceName && (
                     <div className="workspace-name">In Workspace {workspace_name}</div>

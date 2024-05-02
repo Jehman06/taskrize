@@ -23,6 +23,7 @@ from boards.views import get_boards, create_board, update_board, toggle_favorite
 from lists.views import create_list, update_list, delete_list
 from cards.views import create_card
 from notifications.views import send_notification, get_notifications, read_notification
+from images.views import create_image, get_sample_images, get_all_images
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 urlpatterns = [
@@ -72,4 +73,8 @@ urlpatterns = [
     path('api/notifications', get_notifications, name='notifications'),
     path('api/notifications/send', send_notification, name='notification-send'),
     path('api/notifications/read', read_notification, name='notification-read'),
+    # Images
+    path('api/images/create', create_image, name='image-create'),
+    path('api/images/sample', get_sample_images, name='image-sample'),
+    path('api/images/all', get_all_images, name='image-all'),
 ]

@@ -6,7 +6,7 @@ import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { setBoard } from '../../redux/reducers/boardSlice';
-import PrivateNavbar from '../../Navbar/PrivateNavbar';
+import PrivateNavbar from '../../Components/Navbar/PrivateNavbar';
 import { Button } from 'react-bootstrap';
 import { FaPlus } from 'react-icons/fa';
 import { RxCross1 } from 'react-icons/rx';
@@ -28,18 +28,6 @@ import {
 } from '../../redux/reducers/listSlice';
 import List from '../../Components/List/List';
 import BoardNavbar from '../../Components/Navbar/BoardNavbar';
-
-// Map image names to file paths
-const imageMapping: { [key: string]: string } = {
-    cherryBlossom: cherryBlossom,
-    mountainLake: mountainLake,
-    newYork: newYork,
-    monumentValley: monumentValley,
-    yellowstone: yellowstone,
-    bigSur: bigSur,
-    palmTrees: palmTrees,
-    goldenGate: goldenGate,
-};
 
 const BoardPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -129,7 +117,7 @@ const BoardPage: React.FC = () => {
             <div
                 className="board-container"
                 style={{
-                    backgroundImage: `url(${board ? imageMapping[board.default_image] : ''})`,
+                    backgroundImage: `url(${board ? board.default_image.url : ''})`,
                 }}
             >
                 <div className="board-content">
@@ -138,6 +126,16 @@ const BoardPage: React.FC = () => {
 
                     {/* CONTENT */}
                     <div className="board-content-items">
+                        <p
+                            style={{
+                                position: 'absolute',
+                                top: '3rem',
+                                right: '1rem',
+                                fontSize: '0.8rem',
+                            }}
+                        >
+                            Photo by {board ? board.default_image.owner : ''} on Unsplash
+                        </p>
                         <div className="lists-container">
                             {board?.lists &&
                                 board.lists.map((list: any) => <List key={list.id} list={list} />)}

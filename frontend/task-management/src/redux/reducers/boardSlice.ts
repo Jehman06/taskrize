@@ -10,12 +10,19 @@ interface List {
     board: number;
 }
 
+export interface Image {
+    id: number;
+    url: string;
+    owner: string;
+    alt: string;
+}
+
 export interface Board {
     id: number;
     title: string;
     description: string;
     favorite: number[];
-    default_image: string;
+    default_image: Image;
     workspace: number;
     workspace_name: string;
     starFilled: any;
@@ -32,7 +39,12 @@ export interface BoardState {
             name: string | null;
         };
         custom_image: File | string | null;
-        default_image: string | null;
+        default_image: {
+            id: null;
+            url: string;
+            owner: string;
+            alt: string;
+        };
     };
     board: Board | null;
 }
@@ -44,7 +56,12 @@ export const initialState: BoardState = {
         title: '',
         description: '',
         custom_image: null,
-        default_image: null,
+        default_image: {
+            id: null,
+            url: '',
+            owner: '',
+            alt: '',
+        },
         workspace: {
             name: '',
         },

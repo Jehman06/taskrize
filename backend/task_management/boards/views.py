@@ -19,7 +19,7 @@ def get_boards(request):
     # Include boards where the user is the creator or the workspace is in the user's workspaces
     boards = Board.objects.filter(Q(creator=user) | Q(workspace__in=workspaces))
     # Serialize the list of boards into JSON format, allowing multiple instances
-    serializer = BoardSerializer(boards, many=True)
+    serializer = BoardSerializer(boards, many=True, context={'request': request})
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 # Get a single board and its lists
@@ -43,12 +43,12 @@ def create_board(request):
     user = request.user
     
     # Extract the data from the request payload
-    data = request.data.copy()  # Create a mutable copy of the data dictionary)
+    board_data = request.data.copy()  # Create a mutable copy of the data dictionary)
 
-    workspace_data = data.get('workspace', {})
+    workspace_data = board_data.get('workspace', {})
 
-    if not isinstance(workspace_data, dict):
-        return Response({'error': 'Workspace data must be a dictionary'}, status=status.HTTP_400_BAD_REQUEST)
+    if not board_data.get('custom_image') and not board_data.get('default_image'):
+        return Response({'error': 'Either custom_image or default_image must be provided'}, status=status.HTTP_400_BAD_REQUEST)
     
     # Ensure the workspace ID or name is provided in the request data
     workspace_id = workspace_data.get('id')
@@ -76,12 +76,6 @@ def create_board(request):
             return Response({'error': 'User does not have access to the specified workspace'}, status=status.HTTP_403_FORBIDDEN)
 
     # Prepare the data for board creation
-    board_data = request.data.copy()
-
-    # Check if either custom_image or default_image is provided
-    if not board_data.get('custom_image') and not board_data.get('default_image'):
-        return Response({'error': 'Either custom_image or default_image must be provided'}, status=status.HTTP_400_BAD_REQUEST)
-
     board_data['workspace'] = workspace_id  # Associate the workspace with the board
     
     # Create a serializer instance with the prepared data and pass the request context
@@ -129,8 +123,6 @@ def update_board(request):
 def toggle_favorite_board(request):
     # Retrieve the board ID from the query parameters
     board_id = request.query_params.get('board_id')
-
-    print(f'board_id: {board_id}')
 
     if not board_id:
         return Response({'error': 'Board ID is required'}, status=status.HTTP_400_BAD_REQUEST)

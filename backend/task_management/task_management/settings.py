@@ -104,6 +104,7 @@ INSTALLED_APPS = [
     'comments.apps.CommentsConfig',
     'attachments.apps.AttachmentsConfig',
     'notifications.apps.NotificationsConfig',
+    'images.apps.ImagesConfig',
     'rest_framework',
     'corsheaders'
 ]

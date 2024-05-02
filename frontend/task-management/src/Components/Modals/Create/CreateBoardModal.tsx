@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
     updateCreateBoardModal,
@@ -9,6 +9,9 @@ import {
     setErrorImageMessage,
     resetModalStates,
     setErrorWorkspaceMessage,
+    setImages,
+    setShowImageModal,
+    setSampleImages,
 } from '../../../redux/reducers/modalSlice';
 import { setBoardFormData } from '../../../redux/reducers/boardSlice';
 import { RootState } from '../../../redux/store';
@@ -16,28 +19,13 @@ import '../Modal.css';
 import { Modal, Form, Button, DropdownButton, ButtonGroup, Dropdown } from 'react-bootstrap';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import cherryBlossom from '../../../images/cherryblossom.jpg';
-import mountainLake from '../../../images/mountainlake.jpg';
-import newYork from '../../../images/newYork.jpg';
-import goldenGate from '../../../images/goldenGate.jpg';
-import palmTrees from '../../../images/palmTrees.jpg';
-import bigSur from '../../../images/bigSur.jpg';
-import yellowstone from '../../../images/yellowstone.jpg';
-import monumentValley from '../../../images/monumentValley.jpg';
 import { verifyAccessToken } from '../../../utils/apiUtils';
-
-const images = [
-    cherryBlossom,
-    mountainLake,
-    newYork,
-    goldenGate,
-    palmTrees,
-    bigSur,
-    yellowstone,
-    monumentValley,
-];
+import type { Image } from '../../../redux/reducers/modalSlice';
+import { FaArrowRight } from 'react-icons/fa';
 
 const CreateBoardModal: React.FC = () => {
+    const [formValid, setFormValid] = useState(false);
+
     // Redux state management
     const createBoardShow: boolean = useSelector(
         (state: RootState) => state.modal.createBoardModal
@@ -45,7 +33,7 @@ const CreateBoardModal: React.FC = () => {
     const boardFormData = useSelector((state: RootState) => state.board.boardFormData);
     const workspaces = useSelector((state: RootState) => state.workspace.workspaces);
     const selectedWorkspace = useSelector((state: RootState) => state.modal.selectedWorkspace);
-    const selectedDefaultImage: string | null = useSelector(
+    const selectedDefaultImage: Image | null = useSelector(
         (state: RootState) => state.modal.selectedDefaultImage
     );
     const errorTitleMessage: string | null = useSelector(
@@ -57,54 +45,64 @@ const CreateBoardModal: React.FC = () => {
     const errorWorkspaceMessage: string | null = useSelector(
         (state: RootState) => state.modal.errorWorkspaceMessage
     );
+    const sampleImages = useSelector((state: RootState) => state.modal.sampleImages);
+    const images = useSelector((state: RootState) => state.modal.images);
+    const showImageModal = useSelector((state: RootState) => state.modal.showImageModal);
     const dispatch = useDispatch();
 
     useEffect(() => {
-        // Preload images when the component mounts
-        preloadImages(Object.values(images));
+        fetchImagesSample();
     }, []);
 
-    // Function to preload images
-    const preloadImages = (urls: string[]) => {
-        urls.forEach((url) => {
-            const img = new Image();
-            img.src = url;
-        });
+    useEffect(() => {
+        if (showImageModal) {
+            fetchImages();
+        }
+    }, [showImageModal]);
+
+    useEffect(() => {
+        if (selectedDefaultImage && boardFormData.title && boardFormData.workspace.name) {
+            setFormValid(true);
+        } else {
+            setFormValid(false);
+        }
+    }, [selectedDefaultImage, boardFormData.title, boardFormData.workspace.name]);
+
+    // Modify handleImageSelect to store the selected image object
+    const handleImageSelect = (image: any) => {
+        dispatch(setSelectedDefaultImage(image));
+        dispatch(setBoardFormData({ ...boardFormData, default_image: image.id })); // Dispatch action to update default_image in board form data
     };
 
-    // As of right now, users cannot upload their own images as backgrounds. It's a feature that I will be working on in the future.
-    const handleImageSelect = (image: string | File) => {
-        if (typeof image === 'string') {
-            // If the selected image is one of the default images, set it as the selectedDefaultImage
-            dispatch(setSelectedDefaultImage(image));
-            dispatch(setSelectedCustomImage(null));
-            // Update board form data with default image
-            dispatch(
-                setBoardFormData({ ...boardFormData, custom_image: null, default_image: image })
-            );
-        } else {
-            // If the selected image is a custom image, set it as the selectedCustomImage
-            dispatch(setSelectedCustomImage(image));
-            dispatch(setSelectedDefaultImage(null));
-            // Update board form data with custom image
-            dispatch(
-                setBoardFormData({ ...boardFormData, custom_image: image, default_image: null })
-            );
+    const fetchImagesSample = async () => {
+        try {
+            const accessToken = Cookies.get('access_token');
+            const response = await axios.get('http://127.0.0.1:8000/api/images/sample', {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+            dispatch(setSampleImages(response.data.images));
+        } catch (error) {
+            console.error('Error fetching images:', error);
         }
     };
 
-    // // Feature that will be worked on in the future
-    // const handleFileUpload = (file: File | undefined) => {
-    //     if (file) {
-    //         // Handle the file as needed, upload it to the backend or display it preview
-    //         // For now, let's just log the file details
-    //         console.log('Uploaded file:', file);
-    //         // Set the custom image in state
-    //         dispatch(updateSelectedCustomImage(file));
-    //         // Clear the default image selection
-    //         dispatch(updateSelectedDefaultImage(null));
-    //     }
-    // };
+    const fetchImages = async () => {
+        try {
+            await verifyAccessToken();
+            const accessToken = Cookies.get('access_token');
+
+            const response = await axios.get('http://127.0.0.1:8000/api/images/all', {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+            dispatch(setImages(response.data.images));
+        } catch (error) {
+            console.error('Error fetching images:', error);
+        }
+    };
 
     useEffect(() => {
         // Set the first workspace as the default selected workspace when workspaces change
@@ -134,34 +132,27 @@ const CreateBoardModal: React.FC = () => {
             dispatch(resetModalStates());
             // Reload the page to fetch updated data
             window.location.reload();
+            console.log('boardFormData:', boardFormData);
         } catch (error) {
             // Handle error
+            console.log('boardFormData:', boardFormData);
             console.error('Error creating board:', error);
         }
     };
 
     const handleWorkspaceSelect = (workspace: any) => {
         dispatch(setSelectedWorkspace(workspace));
-        dispatch(setBoardFormData({ ...boardFormData, workspace: workspace })); // Dispatch action to update workspace in board form data
+        dispatch(setBoardFormData({ ...boardFormData, workspace: workspace.id })); // Dispatch action to update workspace in board form data
     };
 
-    const handleFormSubmit = () => {
-        if (!selectedDefaultImage) {
-            dispatch(setErrorImageMessage('Please select a background image.'));
-            return;
+    const handleFormSubmit = (event: React.FormEvent) => {
+        event.preventDefault();
+        if (formValid) {
+            // Dispatch action to create board with form data
+            dispatch(updateCreateBoardModal());
+            dispatch(resetModalStates());
+            createBoard(boardFormData);
         }
-        if (!boardFormData.title) {
-            dispatch(setErrorTitleMessage('Please provide a title for your board.'));
-            return;
-        }
-        if (!boardFormData.workspace.name) {
-            dispatch(setErrorWorkspaceMessage('Please create a workspace for your board.'));
-            return;
-        }
-        // Dispatch action to create board with form data
-        dispatch(updateCreateBoardModal());
-        dispatch(resetModalStates());
-        createBoard(boardFormData);
     };
 
     return (
@@ -173,95 +164,90 @@ const CreateBoardModal: React.FC = () => {
                 style={{ backgroundColor: '#33373a', color: '#9fadbc' }}
                 className="modal-body"
             >
-                <Form>
+                <Form onSubmit={handleFormSubmit}>
                     <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                         <Form.Label>Background image</Form.Label>
                         <div className="modal-background-images">
-                            <img
-                                className={
-                                    selectedDefaultImage === 'cherryBlossom'
-                                        ? 'modal-background selected'
-                                        : 'modal-background'
-                                }
-                                src={cherryBlossom}
-                                alt="Cherry Blossom"
-                                onClick={() => handleImageSelect('cherryBlossom')}
-                            />
-                            <img
-                                className={
-                                    selectedDefaultImage === 'mountainLake'
-                                        ? 'modal-background selected'
-                                        : 'modal-background'
-                                }
-                                src={mountainLake}
-                                alt="Mountain lake"
-                                onClick={() => handleImageSelect('mountainLake')}
-                            />
-                            <img
-                                className={
-                                    selectedDefaultImage === 'bigSur'
-                                        ? 'modal-background selected'
-                                        : 'modal-background'
-                                }
-                                src={bigSur}
-                                alt="Big Sur"
-                                onClick={() => handleImageSelect('bigSur')}
-                            />
-                            <img
-                                className={
-                                    selectedDefaultImage === 'newYork'
-                                        ? 'modal-background selected'
-                                        : 'modal-background'
-                                }
-                                src={newYork}
-                                alt="New York"
-                                onClick={() => handleImageSelect('newYork')}
-                            />
-                            <img
-                                className={
-                                    selectedDefaultImage === 'palmTrees'
-                                        ? 'modal-background selected'
-                                        : 'modal-background'
-                                }
-                                src={palmTrees}
-                                alt="Palm Trees"
-                                onClick={() => handleImageSelect('palmTrees')}
-                            />
-                            <img
-                                className={
-                                    selectedDefaultImage === 'goldenGate'
-                                        ? 'modal-background selected'
-                                        : 'modal-background'
-                                }
-                                src={goldenGate}
-                                alt="Golden Gate"
-                                onClick={() => handleImageSelect('goldenGate')}
-                            />
-                            <img
-                                className={
-                                    selectedDefaultImage === 'yellowstone'
-                                        ? 'modal-background selected'
-                                        : 'modal-background'
-                                }
-                                src={yellowstone}
-                                alt="Yellowstone"
-                                onClick={() => handleImageSelect('yellowstone')}
-                            />
-                            <img
-                                className={
-                                    selectedDefaultImage === 'monumentValley'
-                                        ? 'modal-background selected'
-                                        : 'modal-background'
-                                }
-                                src={monumentValley}
-                                alt="Monument Valley"
-                                onClick={() => handleImageSelect('monumentValley')}
-                            />
+                            {(sampleImages || []).map((image) => {
+                                return (
+                                    <img
+                                        key={image.id}
+                                        src={image.url}
+                                        alt={image.alt}
+                                        className={
+                                            selectedDefaultImage?.id === image.id
+                                                ? 'modal-background selected'
+                                                : 'modal-background'
+                                        }
+                                        onClick={() => handleImageSelect(image)}
+                                    />
+                                );
+                            })}
+                            <div className="browse-and-selected">
+                                <button
+                                    className="browse-images"
+                                    onClick={() => dispatch(setShowImageModal(true))}
+                                >
+                                    <FaArrowRight /> Browse more images...
+                                </button>
+                                {selectedDefaultImage && (
+                                    <div
+                                        className="selected-image"
+                                        style={{ marginTop: '0.5rem', marginBottom: 0 }}
+                                    >
+                                        <img
+                                            src={selectedDefaultImage.url}
+                                            alt={selectedDefaultImage.alt}
+                                            className="modal-background selected"
+                                        />
+                                        <p>Nice choice!</p>
+                                    </div>
+                                )}
+                            </div>
                             {errorImageMessage && (
                                 <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
                                     {errorImageMessage}
                                 </div>
                             )}
+                            <Modal
+                                show={showImageModal}
+                                onHide={() => dispatch(setShowImageModal(false))}
+                                size="xl"
+                                centered
+                            >
+                                <Modal.Header closeButton style={{ backgroundColor: '#33373a' }}>
+                                    <Modal.Title style={{ color: '#9fadbc' }}>
+                                        Choose an image
+                                    </Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body style={{ backgroundColor: '#33373a' }}>
+                                    <div className="modal-background-images">
+                                        {(showImageModal ? images : sampleImages).map((image) => {
+                                            return (
+                                                <img
+                                                    key={image.id}
+                                                    src={image.url}
+                                                    alt={image.alt}
+                                                    className={
+                                                        selectedDefaultImage?.id === image.id
+                                                            ? 'modal-background selected'
+                                                            : 'modal-background'
+                                                    }
+                                                    onClick={() => handleImageSelect(image)}
+                                                />
+                                            );
+                                        })}
+                                    </div>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <Button
+                                            variant="secondary"
+                                            onClick={() => dispatch(setShowImageModal(false))}
+                                        >
+                                            Ok
+                                        </Button>
+                                    </div>
+                                </Modal.Body>
+                            </Modal>
                         </div>
                         {/* <div className="custom-upload">
                             <label htmlFor="file-upload" className="file-upload-label">
@@ -281,7 +267,6 @@ const CreateBoardModal: React.FC = () => {
                             type="text"
                             className="modal-input"
                             autoFocus
-                            required
                             value={boardFormData.title}
                             onChange={(e) =>
                                 dispatch(
@@ -372,7 +357,12 @@ const CreateBoardModal: React.FC = () => {
                 >
                     Close
                 </Button>
-                <Button variant="primary" onClick={handleFormSubmit} className="create-button">
+                <Button
+                    variant="primary"
+                    onClick={handleFormSubmit}
+                    disabled={!formValid}
+                    className="create-button"
+                >
                     Create board
                 </Button>
             </Modal.Footer>

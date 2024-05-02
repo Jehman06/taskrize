@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from workspaces.models import Workspace, Invitation
 from boards.models import Board
 from workspaces.serializers import WorkspaceSerializer
+from boards.serializers import BoardSerializer
 from authentication.models import UserProfile
 from notifications.models import Notifications
 
@@ -41,11 +42,11 @@ def get_workspace_boards(request, workspace_id):
     # Retrieve all boards associated with the workspace
     boards = Board.objects.filter(workspace=workspace)
 
-    # Serialize the list of boards into JSON format
-    board_data = [{'id': board.id, 'title': board.title, 'description': board.description, 'default_image': board.default_image, 'favorite': list(board.favorite.values_list('id', flat=True))} for board in boards]
+    # Serialize the list of boards using BoardSerializer
+    serializer = BoardSerializer(boards, many=True, context={'request': request})
 
     # Return the serialized board data as a JSON response
-    return Response(board_data, status=status.HTTP_200_OK)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 # Create a new workspace
 @api_view(['POST'])
@@ -68,7 +69,6 @@ def create_workspace(request):
         workspace.members.set([user])
         return Response(WorkspaceSerializer(workspace).data, status=status.HTTP_201_CREATED)
     else:
-        print("Validation errors:", serializer.errors)  # Print validation errors for debugging
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['PUT'])
@@ -114,7 +114,6 @@ def delete_workspace(request):
     
     try:
         workspace = Workspace.objects.get(id=workspace_id)
-        print(f'workspace.owner = {workspace.owner}')
         # Check whether the user is the workspace's owner
         if user != workspace.owner:
             return Response({'error': 'You are not authorized to delete the workspace'}, status=status.HTTP_403_FORBIDDEN)

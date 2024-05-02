@@ -6,7 +6,7 @@ import { resetAppStates } from '../../redux/reducers/appSlice';
 import { setBoards, setFavoriteBoards } from '../../redux/reducers/boardSlice';
 import { setWorkspaces } from '../../redux/reducers/workspaceSlice';
 // Components
-import PrivateNavbar from '../../Navbar/PrivateNavbar';
+import PrivateNavbar from '../../Components/Navbar/PrivateNavbar';
 import Board from '../../Components/Board/Board';
 import Workspace from '../../Components/Workspace/Workspace';
 // API related
@@ -131,7 +131,7 @@ const Home: React.FC = () => {
                                     title={board.title}
                                     description={board.description}
                                     favorite={board.favorite}
-                                    default_image={imageMapping[board.default_image]}
+                                    default_image={board.default_image}
                                     workspace={board.workspace}
                                     workspace_name={board.workspace_name}
                                     starFilled={favoriteBoards.some(
@@ -155,7 +155,7 @@ const Home: React.FC = () => {
                                     title={board.title}
                                     description={board.description}
                                     favorite={board.favorite}
-                                    default_image={imageMapping[board.default_image]}
+                                    default_image={board.default_image}
                                     workspace={board.workspace}
                                     workspace_name={board.workspace_name}
                                     starFilled={favoriteBoards.some(

@@ -5,6 +5,13 @@ interface Workspace {
     name: string;
 }
 
+export interface Image {
+    id: number;
+    alt: string;
+    owner: string;
+    url: string;
+}
+
 export interface ModalState {
     createBoardModal: boolean;
     createWorkspaceModal: boolean;
@@ -14,14 +21,17 @@ export interface ModalState {
     showUpdatePasswordModal: boolean;
     showWorkspaceMembersModal: boolean;
     showListModal: number | null;
+    showImageModal: boolean;
     workspaceIdToShowModal: number | null;
     workspaceIdToDelete: number | null;
     selectedWorkspace: Workspace | null;
-    selectedDefaultImage: string | null;
+    selectedDefaultImage: Image | null;
     selectedCustomImage: File | null;
     errorTitleMessage: string | null;
     errorImageMessage: string | null;
     errorWorkspaceMessage: string | null;
+    images: Image[];
+    sampleImages: Image[];
 }
 
 export const initialState: ModalState = {
@@ -33,6 +43,7 @@ export const initialState: ModalState = {
     showUpdatePasswordModal: false,
     showWorkspaceMembersModal: false,
     showListModal: null,
+    showImageModal: false,
     workspaceIdToShowModal: null,
     workspaceIdToDelete: null,
     selectedWorkspace: null,
@@ -41,6 +52,8 @@ export const initialState: ModalState = {
     errorTitleMessage: '',
     errorImageMessage: '',
     errorWorkspaceMessage: '',
+    images: [],
+    sampleImages: [],
 };
 
 const modalSlice = createSlice({
@@ -78,7 +91,7 @@ const modalSlice = createSlice({
         setWorkspaceIdToDelete(state, action: PayloadAction<number | null>) {
             state.workspaceIdToDelete = action.payload;
         },
-        setSelectedDefaultImage(state, action: PayloadAction<string | null>) {
+        setSelectedDefaultImage(state, action: PayloadAction<Image | null>) {
             state.selectedDefaultImage = action.payload;
         },
         setSelectedCustomImage(state, action: PayloadAction<File | null>) {
@@ -95,6 +108,15 @@ const modalSlice = createSlice({
         },
         setShowListModal(state, action: PayloadAction<number | null>) {
             state.showListModal = action.payload;
+        },
+        setSampleImages(state, action: PayloadAction<Image[]>) {
+            state.sampleImages = action.payload;
+        },
+        setImages(state, action: PayloadAction<Image[]>) {
+            state.images = action.payload;
+        },
+        setShowImageModal(state, action: PayloadAction<boolean>) {
+            state.showImageModal = action.payload;
         },
         resetModalStates(state) {
             state.errorImageMessage = '';
@@ -122,6 +144,9 @@ export const {
     setErrorWorkspaceMessage,
     setShowListModal,
     resetModalStates,
+    setSampleImages,
+    setImages,
+    setShowImageModal,
     setWorkspaceIdToDelete,
 } = modalSlice.actions;
 

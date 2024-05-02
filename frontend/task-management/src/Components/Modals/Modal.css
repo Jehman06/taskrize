@@ -12,6 +12,7 @@
     transition:
         border 0.2s ease,
         transform 0.2s ease;
+    background-size: cover;
 }
 
 .modal-background:hover {
@@ -83,5 +84,12 @@
 .members-workspace-member {
     padding: 0.6rem 0 0.6rem 0;
     border-bottom: 0.5px solid black;
-    /* margin-bottom: 1rem; */
+}
+
+.browse-images {
+    background-color: #33373a;
+    border: 1px solid teal;
+    border-radius: 0.5rem;
+    color: #9fadbc;
+    font-size: 0.8rem;
 }

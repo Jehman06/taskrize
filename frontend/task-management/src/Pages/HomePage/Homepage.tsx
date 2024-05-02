@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PublicNavbar from '../../Navbar/PublicNavbar';
+import PublicNavbar from '../../Components/Navbar/PublicNavbar';
 import './Homepage.css';
 
 // Redux
