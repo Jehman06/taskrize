@@ -27,9 +27,12 @@ import ListModal from '../Modals/List/ListModal';
 
 interface ListProps {
     list: ListType;
+    socket: WebSocket;
+    boardId?: number;
 }
 
-const List: React.FC<ListProps> = ({ list }) => {
+const List: React.FC<ListProps> = ({ list, socket, boardId }) => {
+    const userId = useSelector((state: RootState) => state.auth.user.id);
     const activeListId = useSelector((state: RootState) => state.list.activeListId);
     const newCardTitle = useSelector((state: RootState) => state.card.newCardTitle);
     const renamingListId = useSelector((state: RootState) => state.list.renamingListId);
@@ -38,6 +41,8 @@ const List: React.FC<ListProps> = ({ list }) => {
     const dispatch = useDispatch();
 
     const inputRef = useRef<HTMLInputElement | null>(null);
+
+    console.log(boardId);
 
     const handleNewCardTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
@@ -80,55 +85,39 @@ const List: React.FC<ListProps> = ({ list }) => {
     // };
 
     const handleDeleteList = async (listId: number): Promise<void> => {
-        try {
-            await verifyAccessToken();
-            const accessToken = Cookies.get('access_token');
-
-            const response = await axios
-                .delete(`http://127.0.0.1:8000/api/lists/delete/${listId}`, {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                })
-                // TODO: Handle 403 error with displayed message
-                .then((response) => {
-                    if (response.status === 403) {
-                        throw new Error('You do not have permission to delete this list.');
-                    } else if (response.status === 204) {
-                        window.location.reload();
-                    }
-                    return response;
-                });
-            console.log('List deleted successfully!');
-        } catch (error: any) {
-            console.error('Error deleting list:', error.message);
+        console.log('handleDeleteList called, listId:', listId);
+        console.log(`listId: ${listId}, userId: ${userId}`);
+        if (socket.readyState === WebSocket.OPEN) {
+            console.log('socket ready:', socket.readyState === WebSocket.OPEN);
+            try {
+                socket.send(
+                    JSON.stringify({
+                        action: 'delete_list',
+                        list_id: listId,
+                        user_id: userId,
+                        board_id: boardId,
+                    })
+                );
+            } catch (error) {
+                console.error('Error deleting list:', error);
+            }
         }
     };
 
-    const handleUpdateListTitle = async (listId: number): Promise<void> => {
-        try {
-            await verifyAccessToken();
-            const accessToken = Cookies.get('access_token');
-
-            const response = await axios.put(
-                `http://127.0.0.1:8000/api/lists/update/${listId}`,
-                {
-                    updated_data: listFormData,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                }
-            );
-            // TODO: Better error handling, message displayed to user
-            if (response.status === 200) {
-                window.location.reload();
-            }
-        } catch (error: any) {
-            if (error.response && error.response.status === 403) {
-                console.error('You do not have permission to update this list.');
-            } else {
+    const handleUpdateListTitle = async (listId: number, newTitle: string): Promise<void> => {
+        console.log('listFormData.title:', listFormData.title);
+        if (socket.readyState === WebSocket.OPEN) {
+            try {
+                socket.send(
+                    JSON.stringify({
+                        action: 'update_list',
+                        list_id: listId,
+                        updated_data: { title: newTitle },
+                        user_id: userId,
+                        board_id: boardId,
+                    })
+                );
+            } catch (error) {
                 console.error('Error updating list title:', error);
             }
         }
@@ -142,7 +131,7 @@ const List: React.FC<ListProps> = ({ list }) => {
     const handleBlurRename = (event: React.FocusEvent<HTMLInputElement>) => {
         if (event.target.value !== '') {
             dispatch(setListFormData({ title: event.target.value }));
-            handleUpdateListTitle(list.id);
+            handleUpdateListTitle(list.id, event.target.value);
             dispatch(setRenamingListId(null)); // Move this line inside the if statement
         }
     };
@@ -150,7 +139,7 @@ const List: React.FC<ListProps> = ({ list }) => {
     const handleKeyDownRename = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter' && event.currentTarget.value !== '') {
             dispatch(setListFormData({ title: event.currentTarget.value }));
-            handleUpdateListTitle(list.id);
+            handleUpdateListTitle(list.id, event.currentTarget.value);
             dispatch(setRenamingListId(null)); // Move this line inside the if statement
         }
     };

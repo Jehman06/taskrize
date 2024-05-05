@@ -1,14 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-interface List {
-    id: number;
-    title: string;
-    position: number;
-    description: string;
-    created_at: Date;
-    updated_at: Date;
-    board: number;
-}
+import { List } from './listSlice';
 
 export interface Image {
     id: number;
@@ -82,8 +73,25 @@ const boardSlice = createSlice({
         setBoardFormData(state, action: PayloadAction<Partial<BoardState>['boardFormData']>) {
             state.boardFormData = { ...state.boardFormData, ...action.payload };
         },
-        setBoard(state, action: PayloadAction<Board | null>) {
-            state.board = action.payload;
+        setBoard(state, action: PayloadAction<Partial<Board> | null>) {
+            if (action.payload === null) {
+                state.board = null;
+            } else {
+                state.board = {
+                    id: state.board ? state.board.id : 0,
+                    title: state.board ? state.board.title : '',
+                    description: state.board ? state.board.description : '',
+                    favorite: state.board ? state.board.favorite : [],
+                    default_image: state.board
+                        ? state.board.default_image
+                        : { id: 0, url: '', owner: '', alt: '' },
+                    workspace: state.board ? state.board.workspace : 0,
+                    workspace_name: state.board ? state.board.workspace_name : '',
+                    starFilled: state.board ? state.board.starFilled : null,
+                    lists: state.board ? state.board.lists : [],
+                    ...action.payload,
+                };
+            }
         },
     },
 });

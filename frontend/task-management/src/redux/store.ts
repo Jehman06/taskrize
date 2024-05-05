@@ -19,7 +19,8 @@ import cardSlice from './reducers/cardSlice';
 const persistConfig = {
     key: 'root',
     storage,
-    whitelist: ['auth'], // Only persist the 'auth' slice
+    whitelist: ['auth'],
+    debounce: 0, // Only persist the 'auth' slice
 };
 
 // Combine all reducers
