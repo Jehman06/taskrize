@@ -3,6 +3,8 @@ from lists.models import List
 
 class ListSerializer(serializers.ModelSerializer):
     cards = serializers.SerializerMethodField()
+    created_at = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S")
+    updated_at = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S")
 
     class Meta:
         model = List
