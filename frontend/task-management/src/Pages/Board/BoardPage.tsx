@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,28 +11,29 @@ import { FaPlus } from 'react-icons/fa';
 import { RxCross1 } from 'react-icons/rx';
 import './BoardPage.css';
 import {
-    moveList,
     setActiveListId,
     setIsCreatingList,
     setLists,
     setNewListName,
     sortListsByPosition,
 } from '../../redux/reducers/listSlice';
-import { List as ListType } from '../../redux/reducers/listSlice';
 import BoardNavbar from '../../Components/Navbar/BoardNavbar';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import { Board } from '../../redux/reducers/boardSlice';
 import List from '../../Components/List/List';
-import { transform } from 'typescript';
 
-let socket = new WebSocket('ws://127.0.0.1:8000/ws/lists/');
+export const getDraggableStyles = (isDragging: boolean) => ({
+    transform: isDragging ? 'rotate(10deg)' : 'none',
+    border: isDragging ? '1px solid teal' : 'none',
+    borderRadius: isDragging ? '0.7rem' : '0.7rem',
+    transition: 'transform 0.2s ease',
+});
 
 const BoardPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
 
-    const [listMoved, setListMoved] = useState(false);
     const [updateNeeded, setUpdateNeeded] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [cardOrder, setCardOrder] = useState([]);
 
     const board = useSelector((state: RootState) => state.board.board);
     const lists = useSelector((state: RootState) => state.list.lists);
@@ -58,7 +59,7 @@ const BoardPage: React.FC = () => {
 
     // Function to establish the WebSocket connection and set up the event handlers
     // Create a new WebSocket connection outside of the useEffect hook
-    let socket = new WebSocket('ws://127.0.0.1:8000/ws/lists/');
+    let socket = new WebSocket('ws://127.0.0.1:8000/ws/board/');
 
     socket.onopen = () => {
         console.log('WebSocket connection opened');
@@ -68,19 +69,12 @@ const BoardPage: React.FC = () => {
         const response = JSON.parse(event.data);
         console.log('response.list: ', JSON.stringify(response.list));
         if (response.list) {
-            switch (response.action) {
-                case 'list_created':
-                case 'list_moved':
-                case 'list_updated':
-                case 'list_deleted':
-                    // Check if response.data.list is an array before updating the state
-                    if (Array.isArray(response.list)) {
-                        dispatch(setLists(response.list));
-                        setIsLoading(false);
-                    } else {
-                        console.error('Invalid list data from server:', response.list);
-                    }
-                    break;
+            // Check if response.data.list is an array before updating the state
+            if (Array.isArray(response.list)) {
+                dispatch(setLists(response.list));
+                setIsLoading(false);
+            } else {
+                console.error('Invalid list data from server:', response.list);
             }
         } else {
             console.error('Invalid response from server:', response);
@@ -88,11 +82,11 @@ const BoardPage: React.FC = () => {
     };
 
     socket.onerror = (error) => {
-        socket = new WebSocket('ws://127.0.0.1:8000/ws/lists/');
+        socket = new WebSocket('ws://127.0.0.1:8000/ws/board/');
     };
 
     socket.onclose = () => {
-        socket = new WebSocket('ws://127.0.0.1:8000/ws/lists/');
+        socket = new WebSocket('ws://127.0.0.1:8000/ws/board/');
     };
 
     useEffect(() => {
@@ -157,6 +151,7 @@ const BoardPage: React.FC = () => {
                         user_id: userId,
                     })
                 );
+                dispatch(setNewListName(''));
             } catch (error) {
                 console.error('Error creating list:', error);
             }
@@ -181,15 +176,53 @@ const BoardPage: React.FC = () => {
     };
 
     const handleOnDragEnd = async (result: any) => {
-        const { destination, source, draggableId } = result;
+        const { destination, source, draggableId, type } = result;
 
         // Ignore the result if the item was dropped outside of a droppable area
         if (!destination) {
             return;
         }
 
+        // If board or board.lists are not defined, do nothing
+        if (!board || !board.lists) {
+            return;
+        }
+
         // Check if board and board.lists are defined
-        if (board && board.lists) {
+        if (type === 'card') {
+            // If the card was dropped in the same place it was dragged from, do nothing
+            if (
+                destination.droppableId === source.droppableId &&
+                destination.index === source.index
+            ) {
+                return;
+            }
+
+            // Get the card ID from the draggableId
+            const cardId = draggableId.split('-')[1];
+            console.log('cardId:', cardId);
+
+            console.log(`WebSocket readyState: ${socket.readyState}`);
+            // Check WebSocket readyState
+            if (socket.readyState === WebSocket.OPEN) {
+                try {
+                    console.log('Entering the try block');
+                    // Send a message over the WebSocket connection
+                    socket.send(
+                        JSON.stringify({
+                            action: 'move_card',
+                            card_id: cardId,
+                            new_list_id: destination.droppableId.split('-')[1],
+                            new_position: destination.index + 1, // Add 1 to destination.index
+                            board_id: board.id,
+                        })
+                    );
+                    console.log(`Action sent to the backend: card_moved`);
+                } catch (error) {
+                    console.error('Error moving card:', error);
+                }
+            }
+        } else {
             const startListIndex = source.index;
             const finishListIndex = destination.index;
 
@@ -217,13 +250,6 @@ const BoardPage: React.FC = () => {
             }
         }
     };
-
-    const getDraggableStyles = (isDragging: boolean) => ({
-        transform: isDragging ? 'rotate(10deg)' : 'none',
-        border: isDragging ? '1px solid teal' : 'none',
-        borderRadius: isDragging ? '0.7rem' : 'none',
-        transition: 'transform 0.2s ease',
-    });
 
     return (
         <div className="board-page">

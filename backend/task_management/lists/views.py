@@ -1,11 +1,7 @@
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.decorators import api_view, authentication_classes
-from rest_framework_simplejwt.authentication import JWTAuthentication
 from boards.models import Board
 from authentication.models import CustomUser
 from lists.models import List
-from .serializers import ListSerializer
+from lists.serializers import ListSerializer
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.core.exceptions import ObjectDoesNotExist
 from channels.db import database_sync_to_async
@@ -22,6 +18,9 @@ class DateTimeEncoder(DjangoJSONEncoder):
 
 # Websocket consumer for handling list operations
 class ListConsumer(AsyncJsonWebsocketConsumer):
+    def __init__(self, dispatcher):
+        self.dispatcher = dispatcher
+
     async def connect(self):
         await self.accept()
 
@@ -64,12 +63,12 @@ class ListConsumer(AsyncJsonWebsocketConsumer):
         # Use database_sync_to_async to run the synchronous ORM code
         list_data = await self.create_new_list(board_id, list_name, user_id)
         if 'error' in list_data:
-            await self.send_json({
+            await self.dispatcher.send_json({
                 'error': 'List could not be created'
             })
         else:
             all_lists = await self.get_all_lists_with_cards(board_id)
-            await self.send_json({
+            await self.dispatcher.send_json({
                 'action': 'list_created',
                 'list': all_lists,
             })
@@ -101,16 +100,16 @@ class ListConsumer(AsyncJsonWebsocketConsumer):
         list_data = await self.delete_list(list_id, user_id)
         if list_data and 'status' in list_data:
             all_lists_data = await self.get_all_lists_with_cards(board_id)
-            await self.send_json({
+            await self.dispatcher.send_json({
                 'action': 'list_deleted',
                 'list': all_lists_data,
             })
         elif list_data:
-            await self.send_json({
+            await self.dispatcher.send_json({
                 'error': list_data['error']
             })
         else:
-            await self.send_json({
+            await self.dispatcher.send_json({
                 'error': 'An error occurred while deleting the list'
             })
 
@@ -162,12 +161,12 @@ class ListConsumer(AsyncJsonWebsocketConsumer):
 
         list_data = await self.update_new_list(updated_data, list_id, user_id)
         if 'error' in list_data:
-            await self.send_json({
+            await self.dispatcher.send_json({
                 'error': list_data['error']
             })
         else:
             all_lists_data = await self.get_all_lists_with_cards(board_id)
-            await self.send_json({
+            await self.dispatcher.send_json({
                 'action': 'list_updated',
                 'list': all_lists_data,
             })
@@ -203,7 +202,7 @@ class ListConsumer(AsyncJsonWebsocketConsumer):
         # Use database_sync_to_async to run the synchronous ORM code
         list_data = await self.update_list_position(list_id, new_position)
         if 'error' in list_data:
-            await self.send_json({
+            await self.dispatcher.send_json({
                 'error': 'List not found'
             })
         else:
@@ -215,12 +214,12 @@ class ListConsumer(AsyncJsonWebsocketConsumer):
             if isinstance(all_lists_data, list):
                 all_lists_data_encoded = [{k: v.isoformat() if isinstance(v, datetime.datetime) else v for k, v in list_data.items()} for list_data in all_lists_data]
 
-                await self.send_json({
+                await self.dispatcher.send_json({
                     'action': 'list_moved',
                     'list': all_lists_data_encoded,
                 })
             else:
-                await self.send_json({
+                await self.dispatcher.send_json({
                     'error': 'No lists found for the given board_id'
                 })
 

@@ -24,6 +24,8 @@ import './List.css';
 import Card from '../Card/Card';
 import { setShowListModal } from '../../redux/reducers/modalSlice';
 import ListModal from '../Modals/List/ListModal';
+import { Droppable, Draggable } from 'react-beautiful-dnd';
+import { getDraggableStyles } from '../../Pages/Board/BoardPage';
 
 interface ListProps {
     list: ListType;
@@ -42,39 +44,25 @@ const List: React.FC<ListProps> = ({ list, socket, boardId }) => {
 
     const inputRef = useRef<HTMLInputElement | null>(null);
 
-    console.log(boardId);
-
     const handleNewCardTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
         dispatch(setNewCardTitle(e.target.value));
     };
 
     const handleCreateCard = async (listId: number): Promise<void> => {
-        try {
-            await verifyAccessToken();
-            const accessToken = Cookies.get('access_token');
-
-            const response = await axios.post(
-                'http://127.0.0.1:8000/api/cards/create',
-                {
-                    list_id: listId,
-                    card_title: newCardTitle,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                }
-            );
-            console.log(response.data);
-            if (response.status === 201) {
-                // If successful
-                dispatch(setNewCardTitle(''));
-                dispatch(setActiveListId(null));
-                window.location.reload();
+        if (socket.readyState === WebSocket.OPEN) {
+            try {
+                socket.send(
+                    JSON.stringify({
+                        action: 'create_card',
+                        list_id: listId,
+                        title: newCardTitle,
+                        board_id: boardId,
+                    })
+                );
+            } catch (error) {
+                console.error('Error creating card:', error);
             }
-        } catch (error) {
-            console.error('Error creating card:', error);
         }
     };
 
@@ -161,6 +149,8 @@ const List: React.FC<ListProps> = ({ list, socket, boardId }) => {
         if (event.key === 'Enter' && event.currentTarget.value !== '') {
             dispatch(setNewCardTitle(event.currentTarget.value));
             handleCreateCard(list.id);
+            dispatch(setActiveListId(null));
+            dispatch(setNewCardTitle(''));
         } else if (event.key === 'Escape') {
             dispatch(setActiveListId(null));
         }
@@ -214,11 +204,39 @@ const List: React.FC<ListProps> = ({ list, socket, boardId }) => {
                     </Dropdown.Menu>
                 </Dropdown>
             </div>
-            <div className="list-items">
-                {list.cards.map((card: CardType) => (
-                    <Card key={card.id} card={card} />
-                ))}
-            </div>
+            <Droppable droppableId={`list-${list.id}`} direction="vertical" type="card">
+                {(provided, snapshot) => (
+                    <div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        style={{ minHeight: snapshot.isDraggingOver ? '30px' : 'auto' }}
+                    >
+                        {[...list.cards]
+                            .sort((a: CardType, b: CardType) => a.position - b.position)
+                            .map((card: CardType, index: number) => (
+                                <Draggable
+                                    key={card.id}
+                                    draggableId={`card-${card.id}`}
+                                    index={index}
+                                >
+                                    {(provided, snapshot) => (
+                                        <div
+                                            ref={provided.innerRef}
+                                            {...provided.draggableProps}
+                                            {...provided.dragHandleProps}
+                                        >
+                                            <div style={getDraggableStyles(snapshot.isDragging)}>
+                                                <Card key={card.id} card={card} />
+                                            </div>
+                                        </div>
+                                    )}
+                                </Draggable>
+                            ))}
+                        {provided.placeholder}
+                        {list.cards.length === 0 && <div style={{ height: '10px' }} />}
+                    </div>
+                )}
+            </Droppable>
             {list.id === activeListId ? (
                 <div className="new-card-list-bottom">
                     <input

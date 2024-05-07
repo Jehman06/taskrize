@@ -1,10 +1,9 @@
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.urls import path
-from lists.views import ListConsumer
+from task_management.consumers import DispatcherConsumer
 
 websocket_urlpatterns = [
-    path('ws/lists/', ListConsumer.as_asgi()),
-    # path('ws/cards/', CardConsumer.as_asgi()),
+    path('ws/board/', DispatcherConsumer.as_asgi()),
 ]
 
 application = ProtocolTypeRouter({
