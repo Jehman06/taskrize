@@ -286,7 +286,7 @@ const BoardPage: React.FC = () => {
                                     style={{ display: 'flex', flexDirection: 'row' }}
                                 >
                                     <Droppable droppableId="lists" direction="horizontal">
-                                        {(provided) => (
+                                        {(provided: any) => (
                                             <div
                                                 className="lists-container"
                                                 ref={provided.innerRef}
@@ -305,7 +305,7 @@ const BoardPage: React.FC = () => {
                                                                 draggableId={`list-${list.id}`}
                                                                 index={index}
                                                             >
-                                                                {(provided, snapshot) => (
+                                                                {(provided: any, snapshot: any) => (
                                                                     <div
                                                                         ref={provided.innerRef}
                                                                         {...provided.draggableProps}

@@ -1,0 +1,9 @@
+django
+python-dotenv
+djangorestframework
+djangorestframework-simplejwt
+django-cors-headers
+channels
+psycopg2
+Pillow
+uvicorn

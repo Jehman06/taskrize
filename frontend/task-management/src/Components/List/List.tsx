@@ -205,7 +205,7 @@ const List: React.FC<ListProps> = ({ list, socket, boardId }) => {
                 </Dropdown>
             </div>
             <Droppable droppableId={`list-${list.id}`} direction="vertical" type="card">
-                {(provided, snapshot) => (
+                {(provided: any, snapshot: any) => (
                     <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
@@ -219,7 +219,7 @@ const List: React.FC<ListProps> = ({ list, socket, boardId }) => {
                                     draggableId={`card-${card.id}`}
                                     index={index}
                                 >
-                                    {(provided, snapshot) => (
+                                    {(provided: any, snapshot: any) => (
                                         <div
                                             ref={provided.innerRef}
                                             {...provided.draggableProps}
