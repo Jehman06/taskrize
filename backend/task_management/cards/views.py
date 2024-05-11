@@ -46,7 +46,7 @@ class CardConsumer(AsyncJsonWebsocketConsumer):
         elif action == 'create_card':
             await self.create_card(content)
         elif action == 'delete_card':
-            await self.handle_delete_card(content)
+            await self.delete_card(content)
         elif action == 'update_card':
             await self.update_card(content)
 
@@ -207,3 +207,38 @@ class CardConsumer(AsyncJsonWebsocketConsumer):
         serializer = CardSerializer(card)
         print(f'Updated card: {serializer.data}')
         return serializer.data
+    
+    async def delete_card(self,content):
+        card_id = content.get('card_id')
+        board_id = content.get('board_id')
+
+        card_data = await self.delete_card_from_list(card_id)
+        if 'error' in card_data:
+            await self.dispatcher.send_json({
+                'error': card_data['error']
+            })
+        else:
+            all_lists = await self.get_all_lists_with_cards(board_id)
+            await self.dispatcher.send_json({
+                'action': 'card_deleted',
+                'list': all_lists,
+            })
+
+    @database_sync_to_async
+    def delete_card_from_list(self, card_id):
+        try:
+            card = Card.objects.get(id=card_id)
+        except Card.DoesNotExist:
+            return {'error': 'Card not found'}
+
+        list_id = card.list_id
+        position = card.position
+
+        # Decrement the positions of cards in the list that are after the card
+        cards_in_list = Card.objects.filter(list_id=list_id, position__gt=position)
+        for card_item in cards_in_list:
+            card_item.position -= 1
+            card_item.save()
+
+        card.delete()
+        return {}

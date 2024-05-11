@@ -23,6 +23,7 @@ import { setShowEmojiPicker } from '../../../redux/reducers/emojiSlice';
 import '../../../Pages/Profile/Profile.css';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
+import { setShowCardModal } from '../../../redux/reducers/modalSlice';
 
 interface CardModalProps {
     card: Card | null;
@@ -139,6 +140,22 @@ const CardModal: React.FC<CardModalProps> = ({
                         description: description,
                         due_date: dueDate,
                         label: label,
+                        board_id: boardId,
+                    }),
+                );
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    };
+
+    const deleteCard = (cardId: number | undefined) => {
+        if (socket.readyState === WebSocket.OPEN) {
+            try {
+                socket.send(
+                    JSON.stringify({
+                        action: 'delete_card',
+                        card_id: cardId,
                         board_id: boardId,
                     }),
                 );
@@ -307,6 +324,15 @@ const CardModal: React.FC<CardModalProps> = ({
                         </Form>
                     </div>
                 </div>
+                <Button
+                    variant="danger"
+                    onClick={() => {
+                        dispatch(setShowCardModal(false));
+                        deleteCard(card?.id);
+                    }}
+                >
+                    Delete card
+                </Button>
             </Modal.Body>
         </Modal>
     );
