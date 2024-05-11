@@ -38,8 +38,12 @@ const BoardPage: React.FC = () => {
     const board = useSelector((state: RootState) => state.board.board);
     const lists = useSelector((state: RootState) => state.list.lists);
     // const isLoading = useSelector((state: RootState) => state.list.isLoading);
-    const isCreatingList = useSelector((state: RootState) => state.list.isCreatingList);
-    const newListName = useSelector((state: RootState) => state.list.newListName);
+    const isCreatingList = useSelector(
+        (state: RootState) => state.list.isCreatingList,
+    );
+    const newListName = useSelector(
+        (state: RootState) => state.list.newListName,
+    );
     const userId = useSelector((state: RootState) => state.auth.user.id);
     const dispatch = useDispatch();
 
@@ -65,23 +69,28 @@ const BoardPage: React.FC = () => {
         console.log('WebSocket connection opened');
     };
 
-    socket.onmessage = (event) => {
-        const response = JSON.parse(event.data);
-        console.log('response.list: ', JSON.stringify(response.list));
-        if (response.list) {
-            // Check if response.data.list is an array before updating the state
-            if (Array.isArray(response.list)) {
-                dispatch(setLists(response.list));
-                setIsLoading(false);
-            } else {
-                console.error('Invalid list data from server:', response.list);
-            }
-        } else {
-            console.error('Invalid response from server:', response);
+    socket.onmessage = event => {
+        const data = JSON.parse(event.data);
+        console.log('Received WebSocket message:', data);
+
+        if (data && data.card) {
+            // Dispatch a specific action for WebSocket card updates
+            dispatch({
+                type: 'WEBSOCKET_CARD_UPDATE',
+                payload: { card: data.card },
+            });
+        }
+
+        if (data && data.list) {
+            // Dispatch a specific action for WebSocket list updates
+            dispatch({
+                type: 'WEBSOCKET_LIST_UPDATE',
+                payload: { lists: data.list },
+            });
         }
     };
 
-    socket.onerror = (error) => {
+    socket.onerror = error => {
         socket = new WebSocket('ws://127.0.0.1:8000/ws/board/');
     };
 
@@ -102,15 +111,20 @@ const BoardPage: React.FC = () => {
         try {
             const accessToken = Cookies.get('access_token');
 
-            const response = await axios.get(`http://127.0.0.1:8000/api/boards/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
+            const response = await axios.get(
+                `http://127.0.0.1:8000/api/boards/${id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
                 },
-            });
+            );
             console.log(`response: ${response.data}`);
             dispatch(setBoard(response.data));
             dispatch(setLists(response.data.lists));
-            console.log(`lists when fetchBoard is called: ${JSON.stringify(response.data.lists)}`);
+            console.log(
+                `lists when fetchBoard is called: ${JSON.stringify(response.data.lists)}`,
+            );
             setUpdateNeeded(false);
         } catch (error) {
             console.error('Error fetching board: ', error);
@@ -131,16 +145,21 @@ const BoardPage: React.FC = () => {
         dispatch(setIsCreatingList(true));
     };
 
-    const handleNewListNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleNewListNameChange = (
+        e: React.ChangeEvent<HTMLInputElement>,
+    ) => {
         e.preventDefault();
         dispatch(setNewListName(e.target.value));
     };
 
     const handleCreateList = async (newListName: string) => {
         if (socket.readyState === WebSocket.OPEN) {
-            console.log('WebSocket ready:', socket.readyState === WebSocket.OPEN);
             console.log(
-                `Data sent to the backend: ${JSON.stringify({ action: 'create_list', board_id: board?.id, list_name: newListName, user_id: userId })}`
+                'WebSocket ready:',
+                socket.readyState === WebSocket.OPEN,
+            );
+            console.log(
+                `Data sent to the backend: ${JSON.stringify({ action: 'create_list', board_id: board?.id, list_name: newListName, user_id: userId })}`,
             );
             try {
                 socket.send(
@@ -149,7 +168,7 @@ const BoardPage: React.FC = () => {
                         board_id: board?.id,
                         list_name: newListName,
                         user_id: userId,
-                    })
+                    }),
                 );
                 dispatch(setNewListName(''));
             } catch (error) {
@@ -166,7 +185,9 @@ const BoardPage: React.FC = () => {
         }
     };
 
-    const handleKeyDownNewList = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleKeyDownNewList = (
+        event: React.KeyboardEvent<HTMLInputElement>,
+    ) => {
         if (event.key === 'Enter' && event.currentTarget.value !== '') {
             dispatch(setNewListName(event.currentTarget.value));
             handleCreateList(newListName);
@@ -215,7 +236,7 @@ const BoardPage: React.FC = () => {
                             new_list_id: destination.droppableId.split('-')[1],
                             new_position: destination.index + 1, // Add 1 to destination.index
                             board_id: board.id,
-                        })
+                        }),
                     );
                     console.log(`Action sent to the backend: card_moved`);
                 } catch (error) {
@@ -241,7 +262,7 @@ const BoardPage: React.FC = () => {
                                 listId: listId,
                                 newPosition: finishListIndex + 1,
                                 board_id: board.id,
-                            })
+                            }),
                         );
                     } catch (error) {
                         console.error('Error moving list:', error);
@@ -274,7 +295,8 @@ const BoardPage: React.FC = () => {
                                 fontSize: '0.8rem',
                             }}
                         >
-                            Photo by {board ? board.default_image.owner : ''} on Unsplash
+                            Photo by {board ? board.default_image.owner : ''} on
+                            Unsplash
                         </p>
 
                         {isLoading ? (
@@ -283,9 +305,15 @@ const BoardPage: React.FC = () => {
                             <DragDropContext onDragEnd={handleOnDragEnd}>
                                 <div
                                     className="lists-and-new-button-container"
-                                    style={{ display: 'flex', flexDirection: 'row' }}
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                    }}
                                 >
-                                    <Droppable droppableId="lists" direction="horizontal">
+                                    <Droppable
+                                        droppableId="lists"
+                                        direction="horizontal"
+                                    >
                                         {(provided: any) => (
                                             <div
                                                 className="lists-container"
@@ -297,35 +325,56 @@ const BoardPage: React.FC = () => {
                                                     [...lists]
                                                         .sort(
                                                             (a: any, b: any) =>
-                                                                a.position - b.position
+                                                                a.position -
+                                                                b.position,
                                                         )
-                                                        .map((list: any, index: number) => (
-                                                            <Draggable
-                                                                key={list.id}
-                                                                draggableId={`list-${list.id}`}
-                                                                index={index}
-                                                            >
-                                                                {(provided: any, snapshot: any) => (
-                                                                    <div
-                                                                        ref={provided.innerRef}
-                                                                        {...provided.draggableProps}
-                                                                        {...provided.dragHandleProps}
-                                                                    >
+                                                        .map(
+                                                            (
+                                                                list: any,
+                                                                index: number,
+                                                            ) => (
+                                                                <Draggable
+                                                                    key={
+                                                                        list.id
+                                                                    }
+                                                                    draggableId={`list-${list.id}`}
+                                                                    index={
+                                                                        index
+                                                                    }
+                                                                >
+                                                                    {(
+                                                                        provided: any,
+                                                                        snapshot: any,
+                                                                    ) => (
                                                                         <div
-                                                                            style={getDraggableStyles(
-                                                                                snapshot.isDragging
-                                                                            )}
+                                                                            ref={
+                                                                                provided.innerRef
+                                                                            }
+                                                                            {...provided.draggableProps}
+                                                                            {...provided.dragHandleProps}
                                                                         >
-                                                                            <List
-                                                                                list={list}
-                                                                                socket={socket}
-                                                                                boardId={board?.id}
-                                                                            />
+                                                                            <div
+                                                                                style={getDraggableStyles(
+                                                                                    snapshot.isDragging,
+                                                                                )}
+                                                                            >
+                                                                                <List
+                                                                                    list={
+                                                                                        list
+                                                                                    }
+                                                                                    socket={
+                                                                                        socket
+                                                                                    }
+                                                                                    boardId={
+                                                                                        board?.id
+                                                                                    }
+                                                                                />
+                                                                            </div>
                                                                         </div>
-                                                                    </div>
-                                                                )}
-                                                            </Draggable>
-                                                        ))}
+                                                                    )}
+                                                                </Draggable>
+                                                            ),
+                                                        )}
                                                 {provided.placeholder}
                                             </div>
                                         )}
@@ -341,9 +390,15 @@ const BoardPage: React.FC = () => {
                                                         type="text"
                                                         placeholder="Enter list name"
                                                         value={newListName}
-                                                        onChange={handleNewListNameChange}
-                                                        onBlur={handleBlurNewList}
-                                                        onKeyDown={handleKeyDownNewList}
+                                                        onChange={
+                                                            handleNewListNameChange
+                                                        }
+                                                        onBlur={
+                                                            handleBlurNewList
+                                                        }
+                                                        onKeyDown={
+                                                            handleKeyDownNewList
+                                                        }
                                                         autoFocus
                                                     />
                                                     <div className="new-list-bottom">
@@ -351,8 +406,14 @@ const BoardPage: React.FC = () => {
                                                             variant="primary"
                                                             className="new-list-button"
                                                             onClick={() => {
-                                                                handleCreateList(newListName);
-                                                                dispatch(setIsCreatingList(false));
+                                                                handleCreateList(
+                                                                    newListName,
+                                                                );
+                                                                dispatch(
+                                                                    setIsCreatingList(
+                                                                        false,
+                                                                    ),
+                                                                );
                                                             }}
                                                         >
                                                             Create list
@@ -360,7 +421,11 @@ const BoardPage: React.FC = () => {
                                                         <RxCross1
                                                             className="new-list-cancel"
                                                             onClick={() =>
-                                                                dispatch(setIsCreatingList(false))
+                                                                dispatch(
+                                                                    setIsCreatingList(
+                                                                        false,
+                                                                    ),
+                                                                )
                                                             }
                                                         />
                                                     </div>
@@ -371,11 +436,14 @@ const BoardPage: React.FC = () => {
                                                 className="new-button"
                                                 onClick={() => {
                                                     handleNewList();
-                                                    dispatch(setActiveListId(null));
+                                                    dispatch(
+                                                        setActiveListId(null),
+                                                    );
                                                 }}
                                             >
                                                 <p>
-                                                    <FaPlus className="fa-plus" /> New list
+                                                    <FaPlus className="fa-plus" />{' '}
+                                                    New list
                                                 </p>
                                             </div>
                                         )}

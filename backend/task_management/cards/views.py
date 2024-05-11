@@ -17,6 +17,13 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.forms.models import model_to_dict
 from cards.models import Card
 import datetime
+import json
+
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime.datetime):
+            return obj.isoformat()
+        return super(DateTimeEncoder, self).default(obj)
 
 class CardConsumer(AsyncJsonWebsocketConsumer):
     def __init__(self, dispatcher):
@@ -30,7 +37,7 @@ class CardConsumer(AsyncJsonWebsocketConsumer):
 
     async def receive_json(self, content):
         print('receive_json function called')
-        action = content.get('action').strip()
+        action = content.get('action').strip().lower()
         print(f'Received action: {action}')  # Print the received action
         print(f'Type of action: {type(action)}')
         print(f'ASCII values of action: {[ord(c) for c in action]}')
@@ -48,9 +55,11 @@ class CardConsumer(AsyncJsonWebsocketConsumer):
     def get_all_lists_with_cards(self, board_id):
         lists = List.objects.filter(board_id=board_id).prefetch_related('cards')
         all_lists_with_cards = []
+        encoder = DateTimeEncoder()
         for list_obj in lists:
             list_dict = model_to_dict(list_obj)  # Convert the list model to a dictionary
-            list_dict['cards'] = list(list_obj.cards.all().values())  # Add the related cards to the dictionary
+            cards = list_obj.cards.all()
+            list_dict['cards'] = [json.loads(encoder.encode(model_to_dict(card))) for card in cards]
             all_lists_with_cards.append(list_dict)
         return all_lists_with_cards
 
@@ -148,3 +157,53 @@ class CardConsumer(AsyncJsonWebsocketConsumer):
                 return {'error': 'List not found'}
             else:
                 return {'error': 'List instance is not None but there is a problem'}
+            
+    async def update_card(self, content):
+        card_id = content.get('card_id')
+        title = content.get('title')
+        board_id = content.get('board_id')
+        description = content.get('description')
+        due_date = content.get('due_date')
+        label = content.get('label')
+
+        print(f'update_card called with card_id: {card_id}, title: {title}, board_id: {board_id}, description: {description}, due_date: {due_date}, label: {label}')
+
+        card_data = await self.update_card_details(card_id, title, description, due_date, label)
+        if 'error' in card_data:
+            await self.dispatcher.send_json({
+                'error': card_data['error']
+            })
+        else:
+            all_lists = await self.get_all_lists_with_cards(board_id)
+            await self.dispatcher.send_json({
+                'action': 'card_updated',
+                'list': all_lists,
+                'card': card_data
+            })
+
+    @database_sync_to_async
+    def update_card_details(self, card_id, title, description, due_date, label):
+        try:
+            card = Card.objects.get(id=card_id)
+        except Card.DoesNotExist:
+            return {'error': 'Card not found'}
+
+        if title is not None:
+            card.title = title
+        if description is not None:
+            card.description = description
+        if due_date == 'REMOVE':
+            card.due_date = None
+        elif due_date is not None:
+            card.due_date = due_date
+        if label is not None:
+            card.label = label
+
+        try:
+            card.save()
+        except Exception as e:
+            return {'error': str(e)}
+
+        serializer = CardSerializer(card)
+        print(f'Updated card: {serializer.data}')
+        return serializer.data

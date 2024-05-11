@@ -59,10 +59,40 @@
 .list-item {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
     background-color: #3d3941;
     cursor: pointer;
     margin-right: 1rem;
-    height: 2.4rem;
+    height: auto;
+}
+
+.title-icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.due-date {
+    align-self: flex-start;
+    font-size: 0.7rem;
+    /* background-color: #ffc966; */
+    background-color: teal;
+    color: black;
+    border-radius: 0.4rem;
+    padding: 0.2rem;
+    margin: 0.2rem 0 0 0;
+}
+
+.edit-icon {
+    margin: 0 0.5rem 0 0.5rem;
+    font-size: 1.2rem;
+    font-size: 1rem;
+}
+
+.edit-icon:hover {
+    color: teal;
 }
 
 .list-item:hover {
@@ -97,4 +127,134 @@
     margin-left: 0.3rem;
     align-self: center;
     font-size: 0.85rem;
+}
+
+.card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-title-input {
+    background-color: transparent;
+    border: none;
+    color: #9fadbc;
+}
+
+.card-title-input:focus {
+    outline: none;
+}
+
+.card-title-container {
+    display: flex;
+    align-items: center;
+}
+
+.card-title-container input,
+.card-title {
+    margin-left: 1rem;
+    font-size: 1.4rem;
+    font-weight: 800;
+}
+
+.card-icon {
+    font-size: 1.4rem;
+    font-weight: 800;
+}
+
+.card-modal-container {
+    padding: 2rem;
+}
+
+.card-label-duedate-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1rem;
+    width: 70%;
+    margin-left: 1rem;
+}
+
+.card-label-duedate-header {
+    display: flex;
+    justify-content: start;
+}
+
+.card-label-duedate-header p {
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.card-label-duedate-content {
+    display: flex;
+    justify-content: start;
+}
+
+.card-labels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Adjust this value to set the space between labels */
+}
+
+.label {
+    width: 4rem;
+    height: 1.5rem;
+    border-radius: 0.3rem;
+    border: 1px solid black;
+    transition: border 0.2s ease;
+}
+
+.label:hover {
+    border: 2px solid teal;
+}
+
+.description-container {
+    margin: 2.5rem 0 0 0.5rem;
+}
+
+.description-container p {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.description-content,
+.description-input {
+    padding: 0.5rem 2rem 2rem 0.5rem;
+    background-color: #474b4d;
+    border: none;
+    resize: none;
+    font: inherit;
+    color: inherit;
+    width: 100%;
+    height: 50%;
+}
+
+.description-input:focus {
+    outline: none;
+}
+
+.description-button {
+    width: 3rem;
+    height: 2rem;
+    font-size: 0.8rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.bio-input-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.description-button-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.date-cross:hover {
+    background-color: #474b4d;
+    border-radius: 0.2rem;
+    cursor: pointer;
 }

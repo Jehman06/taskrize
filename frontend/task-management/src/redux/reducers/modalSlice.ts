@@ -22,6 +22,7 @@ export interface ModalState {
     showWorkspaceMembersModal: boolean;
     showListModal: number | null;
     showImageModal: boolean;
+    showCardModal: boolean;
     workspaceIdToShowModal: number | null;
     workspaceIdToDelete: number | null;
     selectedWorkspace: Workspace | null;
@@ -44,6 +45,7 @@ export const initialState: ModalState = {
     showWorkspaceMembersModal: false,
     showListModal: null,
     showImageModal: false,
+    showCardModal: false,
     workspaceIdToShowModal: null,
     workspaceIdToDelete: null,
     selectedWorkspace: null,
@@ -80,7 +82,7 @@ const modalSlice = createSlice({
         },
         setShowWorkspaceMembersModal: (
             state,
-            action: PayloadAction<{ show: boolean; id: number | null }>
+            action: PayloadAction<{ show: boolean; id: number | null }>,
         ) => {
             state.showWorkspaceMembersModal = action.payload.show;
             state.workspaceIdToShowModal = action.payload.id;
@@ -118,6 +120,9 @@ const modalSlice = createSlice({
         setShowImageModal(state, action: PayloadAction<boolean>) {
             state.showImageModal = action.payload;
         },
+        setShowCardModal(state, action: PayloadAction<boolean>) {
+            state.showCardModal = action.payload;
+        },
         resetModalStates(state) {
             state.errorImageMessage = '';
             state.errorTitleMessage = '';
@@ -147,6 +152,7 @@ export const {
     setSampleImages,
     setImages,
     setShowImageModal,
+    setShowCardModal,
     setWorkspaceIdToDelete,
 } = modalSlice.actions;
 

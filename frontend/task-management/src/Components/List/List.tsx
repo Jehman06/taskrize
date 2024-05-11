@@ -35,16 +35,26 @@ interface ListProps {
 
 const List: React.FC<ListProps> = ({ list, socket, boardId }) => {
     const userId = useSelector((state: RootState) => state.auth.user.id);
-    const activeListId = useSelector((state: RootState) => state.list.activeListId);
-    const newCardTitle = useSelector((state: RootState) => state.card.newCardTitle);
-    const renamingListId = useSelector((state: RootState) => state.list.renamingListId);
-    const listFormData = useSelector((state: RootState) => state.list.listFormData);
+    const activeListId = useSelector(
+        (state: RootState) => state.list.activeListId,
+    );
+    const newCardTitle = useSelector(
+        (state: RootState) => state.card.newCardTitle,
+    );
+    const renamingListId = useSelector(
+        (state: RootState) => state.list.renamingListId,
+    );
+    const listFormData = useSelector(
+        (state: RootState) => state.list.listFormData,
+    );
     // const showListModal = useSelector((state: RootState) => state.modal.showListModal);
     const dispatch = useDispatch();
 
     const inputRef = useRef<HTMLInputElement | null>(null);
 
-    const handleNewCardTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleNewCardTitleChange = (
+        e: React.ChangeEvent<HTMLInputElement>,
+    ) => {
         e.preventDefault();
         dispatch(setNewCardTitle(e.target.value));
     };
@@ -58,7 +68,7 @@ const List: React.FC<ListProps> = ({ list, socket, boardId }) => {
                         list_id: listId,
                         title: newCardTitle,
                         board_id: boardId,
-                    })
+                    }),
                 );
             } catch (error) {
                 console.error('Error creating card:', error);
@@ -84,7 +94,7 @@ const List: React.FC<ListProps> = ({ list, socket, boardId }) => {
                         list_id: listId,
                         user_id: userId,
                         board_id: boardId,
-                    })
+                    }),
                 );
             } catch (error) {
                 console.error('Error deleting list:', error);
@@ -92,7 +102,10 @@ const List: React.FC<ListProps> = ({ list, socket, boardId }) => {
         }
     };
 
-    const handleUpdateListTitle = async (listId: number, newTitle: string): Promise<void> => {
+    const handleUpdateListTitle = async (
+        listId: number,
+        newTitle: string,
+    ): Promise<void> => {
         console.log('listFormData.title:', listFormData.title);
         if (socket.readyState === WebSocket.OPEN) {
             try {
@@ -103,7 +116,7 @@ const List: React.FC<ListProps> = ({ list, socket, boardId }) => {
                         updated_data: { title: newTitle },
                         user_id: userId,
                         board_id: boardId,
-                    })
+                    }),
                 );
             } catch (error) {
                 console.error('Error updating list title:', error);
@@ -124,7 +137,9 @@ const List: React.FC<ListProps> = ({ list, socket, boardId }) => {
         }
     };
 
-    const handleKeyDownRename = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleKeyDownRename = (
+        event: React.KeyboardEvent<HTMLInputElement>,
+    ) => {
         if (event.key === 'Enter' && event.currentTarget.value !== '') {
             dispatch(setListFormData({ title: event.currentTarget.value }));
             handleUpdateListTitle(list.id, event.currentTarget.value);
@@ -145,7 +160,9 @@ const List: React.FC<ListProps> = ({ list, socket, boardId }) => {
         dispatch(setActiveListId(null));
     };
 
-    const handleKeyDownNewCard = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleKeyDownNewCard = (
+        event: React.KeyboardEvent<HTMLInputElement>,
+    ) => {
         if (event.key === 'Enter' && event.currentTarget.value !== '') {
             dispatch(setNewCardTitle(event.currentTarget.value));
             handleCreateCard(list.id);
@@ -165,13 +182,23 @@ const List: React.FC<ListProps> = ({ list, socket, boardId }) => {
                     placeholder={list.title}
                     onBlur={handleBlurRename}
                     onKeyDown={handleKeyDownRename}
-                    style={{ display: renamingListId === list.id ? 'block' : 'none' }}
+                    style={{
+                        display: renamingListId === list.id ? 'block' : 'none',
+                    }}
                 />
-                <p style={{ display: renamingListId === list.id ? 'none' : 'block' }}>
+                <p
+                    style={{
+                        display: renamingListId === list.id ? 'none' : 'block',
+                    }}
+                >
                     {list.title}
                 </p>
                 <Dropdown>
-                    <Dropdown.Toggle variant="none" id="dropdown-basic" className="no-style">
+                    <Dropdown.Toggle
+                        variant="none"
+                        id="dropdown-basic"
+                        className="no-style"
+                    >
                         <SlOptions className="SlOptions" />
                     </Dropdown.Toggle>
                     <Dropdown.Menu align="end" className="list-dropdown-menu">
@@ -189,7 +216,8 @@ const List: React.FC<ListProps> = ({ list, socket, boardId }) => {
                                 className="dropdown-item-content"
                                 onClick={() => handleDeleteList(list.id)}
                             >
-                                <MdDelete style={{ marginRight: '0.5rem' }} /> Delete
+                                <MdDelete style={{ marginRight: '0.5rem' }} />{' '}
+                                Delete
                             </div>
                         </Dropdown.Item>
                         <Dropdown.Item>
@@ -197,22 +225,35 @@ const List: React.FC<ListProps> = ({ list, socket, boardId }) => {
                                 className="dropdown-item-content"
                                 onClick={() => handleRenameList(list.id)}
                             >
-                                <MdDriveFileRenameOutline style={{ marginRight: '0.5rem' }} />{' '}
+                                <MdDriveFileRenameOutline
+                                    style={{ marginRight: '0.5rem' }}
+                                />{' '}
                                 Rename
                             </div>
                         </Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
             </div>
-            <Droppable droppableId={`list-${list.id}`} direction="vertical" type="card">
+            <Droppable
+                droppableId={`list-${list.id}`}
+                direction="vertical"
+                type="card"
+            >
                 {(provided: any, snapshot: any) => (
                     <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
-                        style={{ minHeight: snapshot.isDraggingOver ? '30px' : 'auto' }}
+                        style={{
+                            minHeight: snapshot.isDraggingOver
+                                ? '30px'
+                                : 'auto',
+                        }}
                     >
                         {[...list.cards]
-                            .sort((a: CardType, b: CardType) => a.position - b.position)
+                            .sort(
+                                (a: CardType, b: CardType) =>
+                                    a.position - b.position,
+                            )
                             .map((card: CardType, index: number) => (
                                 <Draggable
                                     key={card.id}
@@ -225,15 +266,26 @@ const List: React.FC<ListProps> = ({ list, socket, boardId }) => {
                                             {...provided.draggableProps}
                                             {...provided.dragHandleProps}
                                         >
-                                            <div style={getDraggableStyles(snapshot.isDragging)}>
-                                                <Card key={card.id} card={card} />
+                                            <div
+                                                style={getDraggableStyles(
+                                                    snapshot.isDragging,
+                                                )}
+                                            >
+                                                <Card
+                                                    key={card.id}
+                                                    card={card}
+                                                    socket={socket}
+                                                    boardId={boardId}
+                                                />
                                             </div>
                                         </div>
                                     )}
                                 </Draggable>
                             ))}
                         {provided.placeholder}
-                        {list.cards.length === 0 && <div style={{ height: '10px' }} />}
+                        {list.cards.length === 0 && (
+                            <div style={{ height: '10px' }} />
+                        )}
                     </div>
                 )}
             </Droppable>

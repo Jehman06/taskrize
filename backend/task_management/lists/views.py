@@ -9,6 +9,8 @@ from django.db import transaction
 from django.core.serializers.json import DjangoJSONEncoder
 from django.forms.models import model_to_dict
 import datetime
+import json
+from cards.views import DateTimeEncoder
 
 class DateTimeEncoder(DjangoJSONEncoder):
     def default(set, obj):
@@ -38,14 +40,16 @@ class ListConsumer(AsyncJsonWebsocketConsumer):
         elif action == 'list_moved':
             await self.list_moved(content)
     
-    # Include the cards in the response
+    # Include the lists in the response
     @database_sync_to_async
     def get_all_lists_with_cards(self, board_id):
         lists = List.objects.filter(board_id=board_id).prefetch_related('cards')
         all_lists_with_cards = []
+        encoder = DateTimeEncoder()
         for list_obj in lists:
             list_dict = model_to_dict(list_obj)  # Convert the list model to a dictionary
-            list_dict['cards'] = list(list_obj.cards.all().values())  # Add the related cards to the dictionary
+            cards = list_obj.cards.all()
+            list_dict['cards'] = [json.loads(encoder.encode(model_to_dict(card))) for card in cards]
             all_lists_with_cards.append(list_dict)
         return all_lists_with_cards
     
