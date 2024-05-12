@@ -7,7 +7,6 @@ frontend:
         - npm install
     build:
       commands:
-        - cd frontend/task-management
         - npm run build
   artifacts:
     baseDirectory: frontend/task-management/build
