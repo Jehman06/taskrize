@@ -20,6 +20,7 @@ import {
 import BoardNavbar from '../../Components/Navbar/BoardNavbar';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import List from '../../Components/List/List';
+import { verifyAccessToken } from '../../utils/apiUtils';
 
 export const getDraggableStyles = (isDragging: boolean) => ({
     transform: isDragging ? 'rotate(10deg)' : 'none',
@@ -33,7 +34,6 @@ const BoardPage: React.FC = () => {
 
     const [updateNeeded, setUpdateNeeded] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [cardOrder, setCardOrder] = useState([]);
 
     const board = useSelector((state: RootState) => state.board.board);
     const lists = useSelector((state: RootState) => state.list.lists);
@@ -109,6 +109,7 @@ const BoardPage: React.FC = () => {
 
     const fetchBoard = async (): Promise<void> => {
         try {
+            await verifyAccessToken();
             const accessToken = Cookies.get('access_token');
 
             const response = await axios.get(
