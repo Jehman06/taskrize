@@ -7,11 +7,12 @@ frontend:
         - npm install
     build:
       commands:
+        - cd frontend/task-management
         - npm run build
   artifacts:
-    baseDirectory: build
+    baseDirectory: frontend/task-management/build
     files:
       - '**/*'
   cache:
     paths:
-      - node_modules/**/*
+      - frontend/task-management/node_modules/**/*
