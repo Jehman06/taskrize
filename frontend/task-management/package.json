@@ -17,6 +17,7 @@
         "@types/react-dom": "^18.2.23",
         "axios": "^1.6.7",
         "bootstrap": "^5.3.3",
+        "gh-pages": "^6.1.1",
         "js-cookie": "^3.0.5",
         "jwt-decode": "^4.0.0",
         "ldrs": "^1.0.1",
