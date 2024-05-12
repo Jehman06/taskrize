@@ -26,16 +26,10 @@ import { Button, Modal } from 'react-bootstrap';
 import { BsFillPeopleFill } from 'react-icons/bs';
 import { IoSettingsSharp, IoExitOutline } from 'react-icons/io5';
 import { MdDriveFileRenameOutline, MdDelete } from 'react-icons/md';
-// Images
-import cherryBlossom from '../../images/cherryblossom.jpg';
-import mountainLake from '../../images/mountainlake.jpg';
-import newYork from '../../images/newYork.jpg';
-import goldenGate from '../../images/goldenGate.jpg';
-import palmTrees from '../../images/palmTrees.jpg';
-import bigSur from '../../images/bigSur.jpg';
-import yellowstone from '../../images/yellowstone.jpg';
-import monumentValley from '../../images/monumentValley.jpg';
-const WorkspaceMembersModal = lazy(() => import('../Modals/Workspace/WorkspaceMembersModal'));
+
+const WorkspaceMembersModal = lazy(
+    () => import('../Modals/Workspace/WorkspaceMembersModal'),
+);
 
 interface WorkspaceProps {
     id: number;
@@ -48,18 +42,6 @@ interface WorkspaceProps {
     favoriteBoards: any[];
 }
 
-// Map image names to file paths
-const imageMapping: { [key: string]: string } = {
-    cherryBlossom: cherryBlossom,
-    mountainLake: mountainLake,
-    newYork: newYork,
-    monumentValley: monumentValley,
-    yellowstone: yellowstone,
-    bigSur: bigSur,
-    palmTrees: palmTrees,
-    goldenGate: goldenGate,
-};
-
 const Workspace: React.FC<WorkspaceProps> = ({
     name,
     boards,
@@ -70,21 +52,29 @@ const Workspace: React.FC<WorkspaceProps> = ({
 }) => {
     // Redux state management
     const editing = useSelector((state: RootState) => state.workspace.editing);
-    const workspaceName = useSelector((state: RootState) => state.workspace.workspaceName);
+    const workspaceName = useSelector(
+        (state: RootState) => state.workspace.workspaceName,
+    );
     const editingWorkspaceId = useSelector(
-        (state: RootState) => state.workspace.editingWorkspaceId
+        (state: RootState) => state.workspace.editingWorkspaceId,
     );
-    const showDeleteModal = useSelector((state: RootState) => state.modal.showDeleteWorkspaceModal);
+    const showDeleteModal = useSelector(
+        (state: RootState) => state.modal.showDeleteWorkspaceModal,
+    );
     const showMembersModal = useSelector(
-        (state: RootState) => state.modal.showWorkspaceMembersModal
+        (state: RootState) => state.modal.showWorkspaceMembersModal,
     );
-    const workspaceIdToDelete = useSelector((state: RootState) => state.modal.workspaceIdToDelete);
+    const workspaceIdToDelete = useSelector(
+        (state: RootState) => state.modal.workspaceIdToDelete,
+    );
     const dispatch = useDispatch();
 
     // Calculate the starFilled property for each board
-    const boardsWithStarFilled = boards.map((board) => ({
+    const boardsWithStarFilled = boards.map(board => ({
         ...board,
-        starFilled: favoriteBoards.some((favoriteBoard) => favoriteBoard.id === board.id),
+        starFilled: favoriteBoards.some(
+            favoriteBoard => favoriteBoard.id === board.id,
+        ),
     }));
 
     // Update Workspace
@@ -123,7 +113,7 @@ const Workspace: React.FC<WorkspaceProps> = ({
                             Authorization: `Bearer ${accessToken}`,
                             'Content-Type': 'application/json',
                         },
-                    }
+                    },
                 );
             }
         } catch (error) {
@@ -167,13 +157,16 @@ const Workspace: React.FC<WorkspaceProps> = ({
             const accessToken = Cookies.get('access_token');
 
             // Make a DELETE request to the Workspace API to delete the workspace
-            const response = await axios.delete('http://127.0.0.1:8000/api/workspaces/delete', {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json', // Include Content-Type header
+            const response = await axios.delete(
+                'http://127.0.0.1:8000/api/workspaces/delete',
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json', // Include Content-Type header
+                    },
+                    data: { workspace_id: workspaceId }, // Pass workspace_id in the request body
                 },
-                data: { workspace_id: workspaceId }, // Pass workspace_id in the request body
-            });
+            );
 
             // Check if the response is successful
             if (response.status === 204) {
@@ -223,7 +216,7 @@ const Workspace: React.FC<WorkspaceProps> = ({
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
-                }
+                },
             );
             console.log(response.data);
             if (response.status === 200) {
@@ -258,7 +251,10 @@ const Workspace: React.FC<WorkspaceProps> = ({
                     )}
                 </div>
                 <div className="workspace-buttons">
-                    <button className="btn button" onClick={toggleWorkspaceMembersModal}>
+                    <button
+                        className="btn button"
+                        onClick={toggleWorkspaceMembersModal}
+                    >
                         <BsFillPeopleFill className="settings-icon" /> Members
                     </button>
 
@@ -273,7 +269,12 @@ const Workspace: React.FC<WorkspaceProps> = ({
                             id={id}
                             show={showMembersModal}
                             onHide={() =>
-                                dispatch(setShowWorkspaceMembersModal({ show: false, id: null }))
+                                dispatch(
+                                    setShowWorkspaceMembersModal({
+                                        show: false,
+                                        id: null,
+                                    }),
+                                )
                             }
                             members={members}
                             workspaceName={name}
@@ -287,7 +288,10 @@ const Workspace: React.FC<WorkspaceProps> = ({
                     >
                         <IoSettingsSharp className="settings-icon" /> Settings
                     </button>
-                    <ul className="dropdown-menu" aria-labelledby="dropdownSettingsButton">
+                    <ul
+                        className="dropdown-menu"
+                        aria-labelledby="dropdownSettingsButton"
+                    >
                         <li
                             className="dropdown-item"
                             style={{ cursor: 'pointer' }}
@@ -317,7 +321,9 @@ const Workspace: React.FC<WorkspaceProps> = ({
                     {/* Confirm-Delete-Modal */}
                     <Modal
                         show={showDeleteModal}
-                        onHide={() => dispatch(setShowDeleteWorkspaceModal(false))}
+                        onHide={() =>
+                            dispatch(setShowDeleteWorkspaceModal(false))
+                        }
                         backdrop="static"
                         keyboard={false}
                         style={{ borderRadius: '0.3rem' }}
@@ -325,10 +331,14 @@ const Workspace: React.FC<WorkspaceProps> = ({
                     >
                         <Modal.Body
                             className="modal-body"
-                            style={{ backgroundColor: '#33373a', color: '#9fadbc' }}
+                            style={{
+                                backgroundColor: '#33373a',
+                                color: '#9fadbc',
+                            }}
                         >
                             <div className="modal-delete-text">
-                                All boards will be deleted for you and all members. Are you sure?
+                                All boards will be deleted for you and all
+                                members. Are you sure?
                             </div>
                             <div className="modal-delete-buttons">
                                 <Button

@@ -18,51 +18,23 @@ import './Home.css';
 import { spiral } from 'ldrs';
 import { FaRegClock } from 'react-icons/fa';
 import { FaRegStar } from 'react-icons/fa';
-// Images
-import cherryBlossom from '../../images/cherryblossom.jpg';
-import mountainLake from '../../images/mountainlake.jpg';
-import newYork from '../../images/newYork.jpg';
-import goldenGate from '../../images/goldenGate.jpg';
-import palmTrees from '../../images/palmTrees.jpg';
-import bigSur from '../../images/bigSur.jpg';
-import yellowstone from '../../images/yellowstone.jpg';
-import monumentValley from '../../images/monumentValley.jpg';
-
-// Map image names to file paths
-const imageMapping: { [key: string]: string } = {
-    cherryBlossom: cherryBlossom,
-    mountainLake: mountainLake,
-    newYork: newYork,
-    monumentValley: monumentValley,
-    yellowstone: yellowstone,
-    bigSur: bigSur,
-    palmTrees: palmTrees,
-    goldenGate: goldenGate,
-};
 
 spiral.register();
 
 const Home: React.FC = () => {
     const [selectedItem, setSelectedItem] = useState(null);
     // Redux state management
-    const userId: number | null = useSelector((state: RootState) => state.auth.user.id);
+    const userId: number | null = useSelector(
+        (state: RootState) => state.auth.user.id,
+    );
     const dispatch = useDispatch();
     const boards = useSelector((state: RootState) => state.board.boards);
-    const workspaces = useSelector((state: RootState) => state.workspace.workspaces);
-    const favoriteBoards = useSelector((state: RootState) => state.board.favoriteBoards);
-
-    // Preload images for improved performance
-    useEffect(() => {
-        // Preload images when the component mounts
-        preloadImages(Object.values(imageMapping));
-    }, []);
-
-    const preloadImages = (urls: string[]) => {
-        urls.forEach((url) => {
-            const img = new Image();
-            img.src = url;
-        });
-    };
+    const workspaces = useSelector(
+        (state: RootState) => state.workspace.workspaces,
+    );
+    const favoriteBoards = useSelector(
+        (state: RootState) => state.board.favoriteBoards,
+    );
 
     // Add board to favorite
     const toggleStar = async (boardId: number) => {
@@ -73,7 +45,7 @@ const Home: React.FC = () => {
             const accessToken = Cookies.get('access_token');
 
             // Toggle the starFilled property locally
-            const updatedBoards = boards.map((board) => {
+            const updatedBoards = boards.map(board => {
                 if (board.id === boardId) {
                     // Toggle the starFilled property
                     return { ...board, starFilled: !board.starFilled };
@@ -85,7 +57,9 @@ const Home: React.FC = () => {
             dispatch(setBoards(updatedBoards));
 
             // Update favoriteBoards state
-            const updatedFavoriteBoards = updatedBoards.filter((board) => board.starFilled);
+            const updatedFavoriteBoards = updatedBoards.filter(
+                board => board.starFilled,
+            );
             dispatch(setFavoriteBoards(updatedFavoriteBoards));
 
             // Send a request to the backend to update the favorite status
@@ -96,7 +70,7 @@ const Home: React.FC = () => {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
-                }
+                },
             );
         } catch (error) {
             console.error('Error toggling star:', error);
@@ -105,7 +79,7 @@ const Home: React.FC = () => {
 
     // Allow to have favorite boards displayed in the favorite section dynamically (on component mount)
     useEffect(() => {
-        const initialFavoriteBoards = boards.filter((board) => board.starFilled);
+        const initialFavoriteBoards = boards.filter(board => board.starFilled);
         dispatch(setFavoriteBoards(initialFavoriteBoards));
     }, [boards, dispatch]);
 
@@ -120,7 +94,8 @@ const Home: React.FC = () => {
                     <div className="boards">
                         <div className="board-content-title">
                             <p>
-                                <FaRegStar className="board-content-title-icon" /> Favorites
+                                <FaRegStar className="board-content-title-icon" />{' '}
+                                Favorites
                             </p>
                         </div>
                         <div className="board-content">
@@ -135,7 +110,8 @@ const Home: React.FC = () => {
                                     workspace={board.workspace}
                                     workspace_name={board.workspace_name}
                                     starFilled={favoriteBoards.some(
-                                        (favoriteBoard) => favoriteBoard.id === board.id
+                                        favoriteBoard =>
+                                            favoriteBoard.id === board.id,
                                     )}
                                     toggleStar={() => toggleStar(board.id)}
                                 />
@@ -144,7 +120,8 @@ const Home: React.FC = () => {
 
                         <div className="board-content-title">
                             <p>
-                                <FaRegClock className="board-content-title-icon" /> Recently viewed
+                                <FaRegClock className="board-content-title-icon" />{' '}
+                                Recently viewed
                             </p>
                         </div>
                         <div className="board-content">
@@ -159,7 +136,8 @@ const Home: React.FC = () => {
                                     workspace={board.workspace}
                                     workspace_name={board.workspace_name}
                                     starFilled={favoriteBoards.some(
-                                        (favoriteBoard) => favoriteBoard.id === board.id
+                                        favoriteBoard =>
+                                            favoriteBoard.id === board.id,
                                     )}
                                     toggleStar={() => toggleStar(board.id)}
                                 />

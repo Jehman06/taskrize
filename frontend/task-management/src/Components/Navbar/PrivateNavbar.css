@@ -11,7 +11,7 @@
 }
 
 .private-logo {
-    height: 30px;
+    height: auto;
     width: 75px;
     margin-left: 10px;
     cursor: pointer;

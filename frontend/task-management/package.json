@@ -2,6 +2,7 @@
     "name": "task-management",
     "version": "0.1.0",
     "private": true,
+    "homepage": "https://www.taskrize.com",
     "dependencies": {
         "@emoji-mart/data": "^1.1.2",
         "@emoji-mart/react": "^1.1.1",
@@ -38,6 +39,8 @@
     "scripts": {
         "start": "HOST=127.0.0.1 react-scripts start",
         "build": "react-scripts build",
+        "predeploy": "cd frontend && npm run build",
+        "deploy": "gh-pages -d frontend/build",
         "test": "react-scripts test",
         "eject": "react-scripts eject",
         "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write"
