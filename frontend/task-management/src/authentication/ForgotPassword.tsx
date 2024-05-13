@@ -4,8 +4,16 @@ import { useNavigate, Link } from 'react-router-dom';
 
 // Redux
 import { useDispatch, useSelector } from 'react-redux';
-import { resetAuthStates, setAuthFormData, setResetCode } from '../redux/reducers/authSlice';
-import { setLoading, setErrorMessage, resetAppStates } from '../redux/reducers/appSlice';
+import {
+    resetAuthStates,
+    setAuthFormData,
+    setResetCode,
+} from '../redux/reducers/authSlice';
+import {
+    setLoading,
+    setErrorMessage,
+    resetAppStates,
+} from '../redux/reducers/appSlice';
 import { RootState } from '../redux/store';
 
 // Styling
@@ -16,8 +24,12 @@ const ForgotPassword: React.FC = () => {
     // State management
     const dispatch = useDispatch();
     const formData = useSelector((state: RootState) => state.auth.authFormData);
-    const loading: boolean = useSelector((state: RootState) => state.app.loading);
-    const errorMessage: string = useSelector((state: RootState) => state.app.errorMessage);
+    const loading: boolean = useSelector(
+        (state: RootState) => state.app.loading,
+    );
+    const errorMessage: string = useSelector(
+        (state: RootState) => state.app.errorMessage,
+    );
 
     // Reset Auth and App states to ensure a clean state on component mount
     useEffect(() => {
@@ -37,16 +49,23 @@ const ForgotPassword: React.FC = () => {
     };
 
     // Handle form submission for email input
-    const handleEmailSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    const handleEmailSubmit = async (
+        e: React.FormEvent<HTMLFormElement>,
+    ): Promise<void> => {
         e.preventDefault();
 
         dispatch(setLoading(true)); // Update loading state while waiting for API response
         try {
             // Make API call to initiate reset process
-            const response: AxiosResponse<{ user_id: string; reset_code: string }> =
-                await axios.post('http://127.0.0.1:8000/api/user/reset-password', {
+            const response: AxiosResponse<{
+                user_id: string;
+                reset_code: string;
+            }> = await axios.post(
+                'https://taskrize-f661faf78282.herokuapp.com/api/user/reset-password',
+                {
                     email: formData.email,
-                });
+                },
+            );
             const { user_id, reset_code } = response.data;
             dispatch(setResetCode(reset_code)); // Update resetCode state
             // Navigation to the Reset Password page with user ID and reset code
@@ -56,9 +75,15 @@ const ForgotPassword: React.FC = () => {
                 if (error.response) {
                     dispatch(setErrorMessage('Email not found.'));
                 } else if (error.request) {
-                    dispatch(setErrorMessage('A network error occurred. Please try again.'));
+                    dispatch(
+                        setErrorMessage(
+                            'A network error occurred. Please try again.',
+                        ),
+                    );
                 } else {
-                    dispatch(setErrorMessage('An error occurred. Please try again.'));
+                    dispatch(
+                        setErrorMessage('An error occurred. Please try again.'),
+                    );
                 }
             }
         } finally {

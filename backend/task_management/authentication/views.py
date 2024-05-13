@@ -69,7 +69,7 @@ def login_user(request):
         response.set_cookie(key='refresh_token', value=str(refresh), httponly=False, samesite='None', secure=True)
         
         # Set CORS headers
-        response["Access-Control-Allow-Origin"] = "http://127.0.0.1:3000"
+        response["Access-Control-Allow-Origin"] = "https://www.taskrize.com"
         response["Access-Control-Allow-Credentials"] = "true"
 
         return response

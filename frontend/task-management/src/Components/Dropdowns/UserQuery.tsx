@@ -16,7 +16,9 @@ interface UserQueryDropdownProps {
 }
 
 const UserQueryDropdown: React.FC<UserQueryDropdownProps> = ({ id }) => {
-    const selectedUsers = useSelector((state: RootState) => state.app.selectedUsers);
+    const selectedUsers = useSelector(
+        (state: RootState) => state.app.selectedUsers,
+    );
     const dispatch = useDispatch();
 
     // Function to query through the database to search members
@@ -27,12 +29,12 @@ const UserQueryDropdown: React.FC<UserQueryDropdownProps> = ({ id }) => {
 
             // Send a GET request to search for users
             const response = await axios.get(
-                `http://127.0.0.1:8000/api/user/profiles/?search=${inputValue}&workspace_id=${id}`,
+                `https://taskrize-f661faf78282.herokuapp.com/api/user/profiles/?search=${inputValue}&workspace_id=${id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
-                }
+                },
             );
             const users = response.data;
             // Map though users and set the values and labels
@@ -43,7 +45,10 @@ const UserQueryDropdown: React.FC<UserQueryDropdownProps> = ({ id }) => {
                     name: user.name,
                     nickname: user.nickname,
                 },
-                label: user.name && user.nickname ? `${user.name} (${user.nickname})` : user.email,
+                label:
+                    user.name && user.nickname
+                        ? `${user.name} (${user.nickname})`
+                        : user.email,
             }));
             return options;
         } catch (error) {
@@ -71,13 +76,13 @@ const UserQueryDropdown: React.FC<UserQueryDropdownProps> = ({ id }) => {
             const accessToken = Cookies.get('access_token');
 
             // Get the recipient IDs from selectedUsers
-            const recipientIds = selectedUsers.map((user) => user.id);
+            const recipientIds = selectedUsers.map(user => user.id);
 
             const workspaceId = id;
 
             // Send a POST request to send invite and notifications to selected users
             const response = await axios.post(
-                'http://127.0.0.1:8000/api/workspaces/members/invite',
+                'https://taskrize-f661faf78282.herokuapp.com/api/workspaces/members/invite',
                 {
                     selected_user_ids: recipientIds,
                     workspace_id: workspaceId,
@@ -86,7 +91,7 @@ const UserQueryDropdown: React.FC<UserQueryDropdownProps> = ({ id }) => {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
-                }
+                },
             );
             // TODO: Better error handling
             console.log(response.data);
@@ -105,7 +110,11 @@ const UserQueryDropdown: React.FC<UserQueryDropdownProps> = ({ id }) => {
                 onChange={handleChange}
                 className="async-select"
             />
-            <Button variant="secondary" onClick={inviteUsers} className="invite-button">
+            <Button
+                variant="secondary"
+                onClick={inviteUsers}
+                className="invite-button"
+            >
                 Invite users
             </Button>
         </div>

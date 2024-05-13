@@ -164,7 +164,7 @@ const ProfilePage: React.FC = () => {
 
             // Send get request to user API to get user's information
             const response = await axios.get(
-                'http://127.0.0.1:8000/api/user/profile',
+                'https://taskrize-f661faf78282.herokuapp.com/api/user/profile',
                 {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
@@ -201,7 +201,7 @@ const ProfilePage: React.FC = () => {
 
             // Send a put request to update the user profile
             const response: AxiosResponse = await axios.put(
-                `http://127.0.0.1:8000/api/user/profile/update/${profile?.id}/`,
+                `https://taskrize-f661faf78282.herokuapp.com/api/user/profile/update/${profile?.id}/`,
                 updatedData,
                 {
                     headers: {
@@ -243,12 +243,15 @@ const ProfilePage: React.FC = () => {
             const accessToken = Cookies.get('access_token'); // Access the access token from the cookies
 
             // Send a delete request to the user API to delete the account
-            await axios.delete('http://127.0.0.1:8000/api/user/delete', {
-                data: dangerZoneFormData,
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
+            await axios.delete(
+                'https://taskrize-f661faf78282.herokuapp.com/api/user/delete',
+                {
+                    data: dangerZoneFormData,
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
                 },
-            });
+            );
             // Navigate to homepage and reset states and cookies
             navigate('/');
             dispatch(resetAppStates());
@@ -311,7 +314,7 @@ const ProfilePage: React.FC = () => {
 
             // Send a put request to the user API to update the email address
             const response = await axios.put(
-                'http://127.0.0.1:8000/api/user/email-update',
+                'https://taskrize-f661faf78282.herokuapp.com/api/user/email-update',
                 requestData,
                 {
                     headers: {
@@ -322,7 +325,7 @@ const ProfilePage: React.FC = () => {
             if (response.status === 200) {
                 // If the password update went through, log the user out
                 await axios.post(
-                    'http://127.0.0.1:8000/api/user/logout',
+                    'https://taskrize-f661faf78282.herokuapp.com/api/user/logout',
                     {},
                     {
                         headers: { Authorization: `Bearer ${accessToken}` },
@@ -422,7 +425,7 @@ const ProfilePage: React.FC = () => {
 
                 // If it matches, send a PUT request to the user API to update password
                 const response = await axios.put(
-                    'http://127.0.0.1:8000/api/user/password-update',
+                    'https://taskrize-f661faf78282.herokuapp.com/api/user/password-update',
                     requestData,
                     {
                         headers: {
@@ -433,7 +436,7 @@ const ProfilePage: React.FC = () => {
                 // If the request went through, log the user out
                 if (response.status === 200) {
                     await axios.post(
-                        'http://127.0.0.1:8000/api/user/logout',
+                        'https://taskrize-f661faf78282.herokuapp.com/api/user/logout',
                         {},
                         {
                             headers: { Authorization: `Bearer ${accessToken}` },

@@ -9,9 +9,9 @@ export const verifyAccessToken = async (): Promise<void> => {
     try {
         // Verify the access token
         await axios.post(
-            'http://127.0.0.1:8000/api/token/verify/',
+            'https://taskrize-f661faf78282.herokuapp.com/api/token/verify/',
             { token: accessToken },
-            { headers: { 'Content-Type': 'application/json' } }
+            { headers: { 'Content-Type': 'application/json' } },
         );
     } catch (verifyError) {
         // Handle token verification error
@@ -20,9 +20,9 @@ export const verifyAccessToken = async (): Promise<void> => {
             try {
                 // If verification fails (status 401), refresh the access token
                 const refreshResponse = await axios.post(
-                    'http://127.0.0.1:8000/api/token/refresh/',
+                    'https://taskrize-f661faf78282.herokuapp.com/api/token/refresh/',
                     { refresh: refreshToken },
-                    { headers: { 'Content-Type': 'application/json' } }
+                    { headers: { 'Content-Type': 'application/json' } },
                 );
                 // Update the access token with the refreshed token from the response
                 accessToken = refreshResponse.data.access;

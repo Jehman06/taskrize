@@ -15,11 +15,13 @@ import { verifyAccessToken } from '../../../utils/apiUtils';
 const CreateWorkspaceModal: React.FC = () => {
     // Redux state management
     const createWorkspaceShow: boolean = useSelector(
-        (state: RootState) => state.modal.createWorkspaceModal
+        (state: RootState) => state.modal.createWorkspaceModal,
     );
-    const workspaceFormData = useSelector((state: RootState) => state.workspace.workspaceFormData);
+    const workspaceFormData = useSelector(
+        (state: RootState) => state.workspace.workspaceFormData,
+    );
     const errorTitleMessage: string | null = useSelector(
-        (state: RootState) => state.modal.errorTitleMessage
+        (state: RootState) => state.modal.errorTitleMessage,
     );
     const dispatch = useDispatch();
 
@@ -32,14 +34,14 @@ const CreateWorkspaceModal: React.FC = () => {
             const accessToken = Cookies.get('access_token');
             // Send POST request to workspace API
             const response: AxiosResponse = await axios.post(
-                'http://127.0.0.1:8000/api/workspaces/create',
+                'https://taskrize-f661faf78282.herokuapp.com/api/workspaces/create',
                 workspaceFormData,
                 {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                         Authorization: `Bearer ${accessToken}`,
                     },
-                }
+                },
             );
             // Reset error message
             dispatch(resetModalStates());
@@ -52,7 +54,11 @@ const CreateWorkspaceModal: React.FC = () => {
 
     const handleFormSubmit = async (): Promise<void> => {
         if (!workspaceFormData.name) {
-            dispatch(setErrorTitleMessage('Please provide a name for your workspace.'));
+            dispatch(
+                setErrorTitleMessage(
+                    'Please provide a name for your workspace.',
+                ),
+            );
             return;
         }
         // Dispatch action to create workspace with form data
@@ -67,7 +73,10 @@ const CreateWorkspaceModal: React.FC = () => {
             onHide={() => dispatch(updateCreateWorkspaceModal())}
             centered
         >
-            <Modal.Header closeButton style={{ backgroundColor: '#33373a', color: '#9fadbc' }}>
+            <Modal.Header
+                closeButton
+                style={{ backgroundColor: '#33373a', color: '#9fadbc' }}
+            >
                 <Modal.Title>Create a new Workspace</Modal.Title>
             </Modal.Header>
             <Modal.Body
@@ -75,8 +84,14 @@ const CreateWorkspaceModal: React.FC = () => {
                 className="modal-body"
             >
                 <Form>
-                    <Form.Group className="mb-3" controlId="exampleForm.ControlInput1"></Form.Group>
-                    <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                    <Form.Group
+                        className="mb-3"
+                        controlId="exampleForm.ControlInput1"
+                    ></Form.Group>
+                    <Form.Group
+                        className="mb-3"
+                        controlId="exampleForm.ControlInput1"
+                    >
                         <Form.Label>Workspace name</Form.Label>
                         <Form.Control
                             type="text"
@@ -84,8 +99,12 @@ const CreateWorkspaceModal: React.FC = () => {
                             autoFocus
                             required
                             value={workspaceFormData.name}
-                            onChange={(e) =>
-                                dispatch(setWorkspaceFormData({ name: e.target.value }))
+                            onChange={e =>
+                                dispatch(
+                                    setWorkspaceFormData({
+                                        name: e.target.value,
+                                    }),
+                                )
                             }
                         />
                         {errorTitleMessage && (
@@ -94,21 +113,30 @@ const CreateWorkspaceModal: React.FC = () => {
                             </div>
                         )}
                     </Form.Group>
-                    <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                    <Form.Group
+                        className="mb-3"
+                        controlId="exampleForm.ControlTextarea1"
+                    >
                         <Form.Label>Description</Form.Label>
                         <Form.Control
                             as="textarea"
                             rows={3}
                             className="modal-input"
                             value={workspaceFormData.description}
-                            onChange={(e) =>
-                                dispatch(setWorkspaceFormData({ description: e.target.value }))
+                            onChange={e =>
+                                dispatch(
+                                    setWorkspaceFormData({
+                                        description: e.target.value,
+                                    }),
+                                )
                             }
                         />
                     </Form.Group>
                 </Form>
             </Modal.Body>
-            <Modal.Footer style={{ backgroundColor: '#33373a', color: '#9fadbc' }}>
+            <Modal.Footer
+                style={{ backgroundColor: '#33373a', color: '#9fadbc' }}
+            >
                 <Button
                     variant="secondary"
                     onClick={() => dispatch(updateCreateWorkspaceModal())}
@@ -116,7 +144,11 @@ const CreateWorkspaceModal: React.FC = () => {
                 >
                     Close
                 </Button>
-                <Button variant="primary" onClick={handleFormSubmit} className="create-button">
+                <Button
+                    variant="primary"
+                    onClick={handleFormSubmit}
+                    className="create-button"
+                >
                     Create workspace
                 </Button>
             </Modal.Footer>

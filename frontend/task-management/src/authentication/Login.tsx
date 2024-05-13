@@ -10,7 +10,11 @@ import {
     setAuthFormData,
     setShowPassword,
 } from '../redux/reducers/authSlice';
-import { setLoading, setErrorMessage, resetAppStates } from '../redux/reducers/appSlice';
+import {
+    setLoading,
+    setErrorMessage,
+    resetAppStates,
+} from '../redux/reducers/appSlice';
 import { RootState } from '../redux/store';
 
 // Styling
@@ -29,9 +33,15 @@ const LoginPage: React.FC = () => {
     // State management
     const dispatch = useDispatch();
     const formData = useSelector((state: RootState) => state.auth.authFormData);
-    const loading: boolean = useSelector((state: RootState) => state.app.loading);
-    const errorMessage: string = useSelector((state: RootState) => state.app.errorMessage);
-    const showPassword: boolean = useSelector((state: RootState) => state.auth.showPassword);
+    const loading: boolean = useSelector(
+        (state: RootState) => state.app.loading,
+    );
+    const errorMessage: string = useSelector(
+        (state: RootState) => state.app.errorMessage,
+    );
+    const showPassword: boolean = useSelector(
+        (state: RootState) => state.auth.showPassword,
+    );
 
     let navigate = useNavigate();
 
@@ -57,15 +67,17 @@ const LoginPage: React.FC = () => {
     };
 
     // Handle form submission for login
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    const handleSubmit = async (
+        e: React.FormEvent<HTMLFormElement>,
+    ): Promise<void> => {
         e.preventDefault();
         dispatch(setLoading(true)); // Update loading state to indicate request in progress
 
         try {
             // Send login request to the backend API
             const response: AxiosResponse = await axios.post(
-                'http://127.0.0.1:8000/api/user/login',
-                formData
+                'https://taskrize-f661faf78282.herokuapp.com/api/user/login',
+                formData,
             );
 
             if (response.status >= 200 && response.status < 300) {
@@ -85,7 +97,9 @@ const LoginPage: React.FC = () => {
             } else {
                 console.error('Login failed:', response.status, response.data);
                 // Handle unexpected response status
-                handleServerError('An unexpected error occurred. Please try again later.');
+                handleServerError(
+                    'An unexpected error occurred. Please try again later.',
+                );
             }
         } catch (error: any) {
             // Handle errors from the login request
@@ -100,16 +114,29 @@ const LoginPage: React.FC = () => {
     const handleRequestError = (error: AxiosError): void => {
         if (error.response) {
             // Server responded with an error message
-            if (error.response.status === 401 || error.response.status === 400) {
+            if (
+                error.response.status === 401 ||
+                error.response.status === 400
+            ) {
                 // Incorrect email/password error
-                dispatch(setErrorMessage('Invalid credentials. Please try again.'));
+                dispatch(
+                    setErrorMessage('Invalid credentials. Please try again.'),
+                );
             } else {
                 // Other error from the server
-                dispatch(setErrorMessage('An error occurred during login. Please try again.'));
+                dispatch(
+                    setErrorMessage(
+                        'An error occurred during login. Please try again.',
+                    ),
+                );
             }
         } else {
             // Network error or other unexpected error
-            dispatch(setErrorMessage('An unexpected error occurred. Please try again later.'));
+            dispatch(
+                setErrorMessage(
+                    'An unexpected error occurred. Please try again later.',
+                ),
+            );
         }
     };
 
@@ -170,10 +197,18 @@ const LoginPage: React.FC = () => {
                             />
                             <div
                                 className="position-absolute top-50 translate-middle-y"
-                                style={{ cursor: 'pointer', right: '15px', fontSize: '1.5em' }}
+                                style={{
+                                    cursor: 'pointer',
+                                    right: '15px',
+                                    fontSize: '1.5em',
+                                }}
                                 onClick={togglePasswordVisibility}
                             >
-                                {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+                                {showPassword ? (
+                                    <FaRegEye />
+                                ) : (
+                                    <FaRegEyeSlash />
+                                )}
                             </div>
                         </div>
                     </Form.Group>

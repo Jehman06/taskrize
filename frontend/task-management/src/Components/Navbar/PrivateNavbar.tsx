@@ -33,25 +33,39 @@ import { setWorkspaces } from '../../redux/reducers/workspaceSlice';
 import { setBoards, setFavoriteBoards } from '../../redux/reducers/boardSlice';
 
 // Lazy loading Modal imports
-const CreateBoardModal = lazy(() => import('../Modals/Create/CreateBoardModal'));
-const CreateWorkspaceModal = lazy(() => import('../Modals/Create/CreateWorkspaceModal'));
+const CreateBoardModal = lazy(
+    () => import('../Modals/Create/CreateBoardModal'),
+);
+const CreateWorkspaceModal = lazy(
+    () => import('../Modals/Create/CreateWorkspaceModal'),
+);
 
 const PrivateNavbar: React.FC = () => {
     // UseState
-    const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
+    const [accessToken, setAccessToken] = useState<string | undefined>(
+        undefined,
+    );
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     // Redux
     const userId = useSelector((state: RootState) => state.auth.user.id);
-    const favoriteBoards = useSelector((state: RootState) => state.board.favoriteBoards);
+    const favoriteBoards = useSelector(
+        (state: RootState) => state.board.favoriteBoards,
+    );
     const boards = useSelector((state: RootState) => state.board.boards);
-    const workspaces = useSelector((state: RootState) => state.workspace.workspaces);
-    const newNotifications = useSelector((state: RootState) => state.notification.newNotifications);
-    const notifications = useSelector((state: RootState) => state.notification.notifications);
+    const workspaces = useSelector(
+        (state: RootState) => state.workspace.workspaces,
+    );
+    const newNotifications = useSelector(
+        (state: RootState) => state.notification.newNotifications,
+    );
+    const notifications = useSelector(
+        (state: RootState) => state.notification.notifications,
+    );
     const notificationsFetched = useSelector(
-        (state: RootState) => state.notification.notificationsFetched
+        (state: RootState) => state.notification.notificationsFetched,
     );
 
     // Preload the image
@@ -61,7 +75,10 @@ const PrivateNavbar: React.FC = () => {
     }, []);
 
     // Fetch boards and workspaces
-    const fetchData = async (url: string, accessToken: string): Promise<any> => {
+    const fetchData = async (
+        url: string,
+        accessToken: string,
+    ): Promise<any> => {
         try {
             const response: AxiosResponse = await axios.get(url, {
                 headers: {
@@ -78,8 +95,10 @@ const PrivateNavbar: React.FC = () => {
     // Fetch the boards and workspaces for the user
     const getBoardsAndWorkspaces = useCallback(
         async (accessToken: string): Promise<void> => {
-            const boardsUrl = 'http://127.0.0.1:8000/api/boards/';
-            const workspacesUrl = 'http://127.0.0.1:8000/api/workspaces/';
+            const boardsUrl =
+                'https://taskrize-f661faf78282.herokuapp.com/api/boards/';
+            const workspacesUrl =
+                'https://taskrize-f661faf78282.herokuapp.com/api/workspaces/';
 
             try {
                 const [boardsResponse, workspacesResponse] = await Promise.all([
@@ -97,7 +116,7 @@ const PrivateNavbar: React.FC = () => {
 
                     // Filter favorite boards
                     const initialFavoriteBoards = fetchedBoards.filter(
-                        (board: any) => board.starFilled
+                        (board: any) => board.starFilled,
                     );
                     setFavoriteBoards(initialFavoriteBoards);
 
@@ -106,7 +125,7 @@ const PrivateNavbar: React.FC = () => {
                         workspacesResponse.map(async (workspace: any) => {
                             const boardsData = await fetchData(
                                 `${workspacesUrl}${workspace.id}/boards`,
-                                accessToken
+                                accessToken,
                             );
 
                             // Merge the fetched boards data with the workspace object
@@ -114,7 +133,7 @@ const PrivateNavbar: React.FC = () => {
                                 ...workspace,
                                 boards: boardsData,
                             };
-                        })
+                        }),
                     );
                     dispatch(setWorkspaces(updatedWorkspaces));
                     // setWorkspaces(updatedWorkspaces);
@@ -125,7 +144,7 @@ const PrivateNavbar: React.FC = () => {
                 console.error('Error fetching data:', error);
             }
         },
-        [dispatch, userId]
+        [dispatch, userId],
     );
 
     // Fetch the data on component mount
@@ -162,13 +181,16 @@ const PrivateNavbar: React.FC = () => {
     // Fetch notifications for the user
     const fetchNotifications = async (accessToken: string): Promise<void> => {
         try {
-            const response = await axios.get('http://127.0.0.1:8000/api/notifications', {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
+            const response = await axios.get(
+                'https://taskrize-f661faf78282.herokuapp.com/api/notifications',
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
                 },
-            });
+            );
             const unreadNotifications = response.data.filter(
-                (notification: any) => !notification.read
+                (notification: any) => !notification.read,
             );
             // Update the state based on unread notifications
             dispatch(setNewNotifications(unreadNotifications.length > 0));
@@ -183,14 +205,14 @@ const PrivateNavbar: React.FC = () => {
     // Accept the workspace invitation in notifications
     const acceptWorkspaceInvitation = async (
         invitationId: number,
-        notificationId: number
+        notificationId: number,
     ): Promise<void> => {
         try {
             await verifyAccessToken();
             const accessToken = Cookies.get('access_token');
 
             const response = await axios.put(
-                'http://127.0.0.1:8000/api/workspaces/members/accept-invite',
+                'https://taskrize-f661faf78282.herokuapp.com/api/workspaces/members/accept-invite',
                 {
                     invitation_id: invitationId,
                     notification_id: notificationId,
@@ -199,7 +221,7 @@ const PrivateNavbar: React.FC = () => {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
-                }
+                },
             );
             if (response.status === 200) {
                 console.log('Invitation accepted!');
@@ -215,14 +237,14 @@ const PrivateNavbar: React.FC = () => {
     // Reject workspace invitation in notifications
     const rejectWorkspaceInvitation = async (
         invitationId: number,
-        notificationId: number
+        notificationId: number,
     ): Promise<void> => {
         try {
             await verifyAccessToken();
             const accessToken = Cookies.get('access_token');
 
             const response = await axios.put(
-                'http://127.0.0.1:8000/api/workspaces/members/reject-invite',
+                'https://taskrize-f661faf78282.herokuapp.com/api/workspaces/members/reject-invite',
                 {
                     invitation_id: invitationId,
                     notification_id: notificationId,
@@ -231,7 +253,7 @@ const PrivateNavbar: React.FC = () => {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
-                }
+                },
             );
             if (response.status === 200) {
                 console.log('Invitation rejected successfully');
@@ -252,11 +274,11 @@ const PrivateNavbar: React.FC = () => {
 
             // Once the token has been validated, log the user out
             await axios.post(
-                'http://127.0.0.1:8000/api/user/logout',
+                'https://taskrize-f661faf78282.herokuapp.com/api/user/logout',
                 {},
                 {
                     headers: { Authorization: `Bearer ${accessToken}` },
-                }
+                },
             );
 
             // Update states and remove tokens from cookies
@@ -271,7 +293,10 @@ const PrivateNavbar: React.FC = () => {
             // Navigate to the homepage
             navigate('/');
         } catch (error: any) {
-            console.error('Error encountered when logging out. Please try again.', error);
+            console.error(
+                'Error encountered when logging out. Please try again.',
+                error,
+            );
         }
     };
 
@@ -300,9 +325,12 @@ const PrivateNavbar: React.FC = () => {
                     >
                         Workspaces
                     </button>
-                    <ul className="dropdown-menu" aria-labelledby="dropdownWorkspacesButton">
+                    <ul
+                        className="dropdown-menu"
+                        aria-labelledby="dropdownWorkspacesButton"
+                    >
                         {workspaces &&
-                            workspaces.map((workspace) => {
+                            workspaces.map(workspace => {
                                 return (
                                     <li key={workspace.id}>
                                         <a className="dropdown-item" href="#">
@@ -323,9 +351,12 @@ const PrivateNavbar: React.FC = () => {
                     >
                         Boards
                     </button>
-                    <ul className="dropdown-menu" aria-labelledby="dropdownBoardsButton">
+                    <ul
+                        className="dropdown-menu"
+                        aria-labelledby="dropdownBoardsButton"
+                    >
                         {boards &&
-                            boards.map((board) => {
+                            boards.map(board => {
                                 return (
                                     <li key={board.id}>
                                         <a className="dropdown-item" href="#">
@@ -349,7 +380,10 @@ const PrivateNavbar: React.FC = () => {
                     >
                         Recents
                     </button>
-                    <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                    <ul
+                        className="dropdown-menu"
+                        aria-labelledby="dropdownMenuButton1"
+                    >
                         {/* Dropdown items for Recent */}
                     </ul>
                 </div>
@@ -363,9 +397,12 @@ const PrivateNavbar: React.FC = () => {
                     >
                         Favorites
                     </button>
-                    <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+                    <ul
+                        className="dropdown-menu"
+                        aria-labelledby="dropdownMenuButton2"
+                    >
                         {favoriteBoards &&
-                            favoriteBoards.map((favoriteBoard) => {
+                            favoriteBoards.map(favoriteBoard => {
                                 return (
                                     <li key={favoriteBoard.id}>
                                         <a className="dropdown-item" href="#">
@@ -396,15 +433,18 @@ const PrivateNavbar: React.FC = () => {
                         <li>
                             <a
                                 className="dropdown-item"
-                                onClick={() => dispatch(updateCreateBoardModal())}
+                                onClick={() =>
+                                    dispatch(updateCreateBoardModal())
+                                }
                             >
                                 {' '}
                                 <p className="create-title"> Create Board</p>
                                 <p className="create-description">
-                                    Start a new board to visually organize tasks, track progress,
-                                    and collaborate with team members efficiently. Boards serve as
-                                    flexible workspaces where you can customize columns, add cards,
-                                    and prioritize tasks
+                                    Start a new board to visually organize
+                                    tasks, track progress, and collaborate with
+                                    team members efficiently. Boards serve as
+                                    flexible workspaces where you can customize
+                                    columns, add cards, and prioritize tasks
                                 </p>
                             </a>
                         </li>
@@ -419,21 +459,31 @@ const PrivateNavbar: React.FC = () => {
                         </Suspense>
                         <li>
                             <a className="dropdown-item" href="#">
-                                <p className="create-title">Start from a template</p>
-                                <p className="create-description">Under development</p>
+                                <p className="create-title">
+                                    Start from a template
+                                </p>
+                                <p className="create-description">
+                                    Under development
+                                </p>
                             </a>
                         </li>
                         <li>
                             <a
                                 className="dropdown-item"
-                                onClick={() => dispatch(updateCreateWorkspaceModal())}
+                                onClick={() =>
+                                    dispatch(updateCreateWorkspaceModal())
+                                }
                             >
-                                <p className="create-title">Create a Workspace</p>
+                                <p className="create-title">
+                                    Create a Workspace
+                                </p>
                                 <p className="create-description">
-                                    Set up a dedicated workspace to organize boards, share
-                                    resources, and collaborate seamlessly with your team. Workspaces
-                                    provide a centralized hub for team communication, file sharing,
-                                    and project management
+                                    Set up a dedicated workspace to organize
+                                    boards, share resources, and collaborate
+                                    seamlessly with your team. Workspaces
+                                    provide a centralized hub for team
+                                    communication, file sharing, and project
+                                    management
                                 </p>
                             </a>
                         </li>
@@ -485,7 +535,7 @@ const PrivateNavbar: React.FC = () => {
                             className="dropdown-menu dropdown-menu-end"
                             aria-labelledby="notificationsDropdownMenu"
                         >
-                            {notifications.map((notification) => (
+                            {notifications.map(notification => (
                                 <li key={notification.id}>
                                     <div className="notification-container">
                                         <a
@@ -500,7 +550,7 @@ const PrivateNavbar: React.FC = () => {
                                                 onClick={() =>
                                                     acceptWorkspaceInvitation(
                                                         notification.invitation,
-                                                        notification.id
+                                                        notification.id,
                                                     )
                                                 }
                                             >
@@ -511,7 +561,7 @@ const PrivateNavbar: React.FC = () => {
                                                 onClick={() =>
                                                     rejectWorkspaceInvitation(
                                                         notification.invitation,
-                                                        notification.id
+                                                        notification.id,
                                                     )
                                                 }
                                             >

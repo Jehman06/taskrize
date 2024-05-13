@@ -34,17 +34,27 @@ const ResetPassword: React.FC = () => {
     const formData = useSelector((state: RootState) => state.auth.authFormData);
 
     const confirmPassword: string = useSelector(
-        (state: RootState) => state.auth.authFormData.password_confirmation
+        (state: RootState) => state.auth.authFormData.password_confirmation,
     );
 
-    const resetCode: string = useSelector((state: RootState) => state.auth.resetCode || '');
+    const resetCode: string = useSelector(
+        (state: RootState) => state.auth.resetCode || '',
+    );
 
-    const loading: boolean = useSelector((state: RootState) => state.app.loading);
-    const message: string = useSelector((state: RootState) => state.app.message);
+    const loading: boolean = useSelector(
+        (state: RootState) => state.app.loading,
+    );
+    const message: string = useSelector(
+        (state: RootState) => state.app.message,
+    );
     const stage: string = useSelector((state: RootState) => state.auth.stage);
-    const errorMessage: string = useSelector((state: RootState) => state.app.errorMessage);
+    const errorMessage: string = useSelector(
+        (state: RootState) => state.app.errorMessage,
+    );
 
-    const showPassword: boolean = useSelector((state: RootState) => state.auth.showPassword);
+    const showPassword: boolean = useSelector(
+        (state: RootState) => state.auth.showPassword,
+    );
 
     // Loading icon
     spiral.register();
@@ -69,12 +79,16 @@ const ResetPassword: React.FC = () => {
         if (name === 'password') {
             dispatch(setAuthFormData({ ...formData, password: value }));
         } else if (name === 'password_confirmation') {
-            dispatch(setAuthFormData({ ...formData, password_confirmation: value }));
+            dispatch(
+                setAuthFormData({ ...formData, password_confirmation: value }),
+            );
         }
     };
 
     // Handle submission of the reset code form
-    const handleResetCodeSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    const handleResetCodeSubmit = async (
+        e: React.FormEvent<HTMLFormElement>,
+    ): Promise<void> => {
         e.preventDefault();
         try {
             if (resetCode !== reset_code) {
@@ -86,7 +100,9 @@ const ResetPassword: React.FC = () => {
                 dispatch(setStage('reset'));
             }
         } catch (error: any) {
-            dispatch(setErrorMessage('An error occurred. Please try again later.'));
+            dispatch(
+                setErrorMessage('An error occurred. Please try again later.'),
+            );
         }
     };
 
@@ -95,7 +111,9 @@ const ResetPassword: React.FC = () => {
     };
 
     // Handle submission of the password confirmation form
-    const handlePasswordSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    const handlePasswordSubmit = async (
+        e: React.FormEvent<HTMLFormElement>,
+    ): Promise<void> => {
         e.preventDefault();
         dispatch(setErrorMessage(''));
         if (formData.password !== confirmPassword) {
@@ -105,10 +123,10 @@ const ResetPassword: React.FC = () => {
         dispatch(setLoading(true));
         try {
             const response = await axios.post(
-                `http://127.0.0.1:8000/api/user/reset-password-confirm/${user_id}`,
+                `https://taskrize-f661faf78282.herokuapp.com/api/user/reset-password-confirm/${user_id}`,
                 {
                     new_password: formData.password,
-                }
+                },
             );
             // Check if the response was successful
             if (response.status === 200) {
@@ -121,7 +139,11 @@ const ResetPassword: React.FC = () => {
                 }, 3000);
             } else {
                 // Handle unexpected response status
-                dispatch(setErrorMessage('An unexpected error occurred. Please try again later.'));
+                dispatch(
+                    setErrorMessage(
+                        'An unexpected error occurred. Please try again later.',
+                    ),
+                );
             }
         } catch (error: any) {
             // Handle specific types of errors
@@ -129,24 +151,31 @@ const ResetPassword: React.FC = () => {
                 if (error.response) {
                     // Server responded with an error message
                     const errorMessage =
-                        error.response.data?.message || 'An error occurred. Please try to login.';
+                        error.response.data?.message ||
+                        'An error occurred. Please try to login.';
                     dispatch(setErrorMessage(errorMessage));
                 } else if (error.request) {
                     // The request was made but no response was received
                     dispatch(
                         setErrorMessage(
-                            'No response received from the server. Please try again later.'
-                        )
+                            'No response received from the server. Please try again later.',
+                        ),
                     );
                 } else {
                     // Something happened in setting up the request that triggered an error
                     dispatch(
-                        setErrorMessage('An unexpected error occurred. Please try again later.')
+                        setErrorMessage(
+                            'An unexpected error occurred. Please try again later.',
+                        ),
                     );
                 }
             } else {
                 // Handle other types of errors
-                dispatch(setErrorMessage('An unexpected error occurred. Please try again later.'));
+                dispatch(
+                    setErrorMessage(
+                        'An unexpected error occurred. Please try again later.',
+                    ),
+                );
             }
         } finally {
             dispatch(setLoading(false));
@@ -168,11 +197,17 @@ const ResetPassword: React.FC = () => {
                             />
                             <p
                                 className="text-center mt-3 mb-4"
-                                style={{ fontSize: '1.5rem', fontWeight: 'bold' }}
+                                style={{
+                                    fontSize: '1.5rem',
+                                    fontWeight: 'bold',
+                                }}
                             >
                                 Enter the verification code
                             </p>
-                            <form onSubmit={handleResetCodeSubmit} className="col-md-6 mx-auto">
+                            <form
+                                onSubmit={handleResetCodeSubmit}
+                                className="col-md-6 mx-auto"
+                            >
                                 {errorMessage && (
                                     <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
                                         {errorMessage}
@@ -188,13 +223,20 @@ const ResetPassword: React.FC = () => {
                                         className="form-control"
                                         type="text"
                                         value={resetCode}
-                                        onChange={(e) => dispatch(setResetCode(e.target.value))}
+                                        onChange={e =>
+                                            dispatch(
+                                                setResetCode(e.target.value),
+                                            )
+                                        }
                                         required
                                         placeholder="Reset Code"
                                         autoComplete="off"
                                     />
                                 </div>
-                                <button type="submit" className="btn btn-primary w-100 mb-1">
+                                <button
+                                    type="submit"
+                                    className="btn btn-primary w-100 mb-1"
+                                >
                                     Submit
                                 </button>
                                 <div className="d-flex justify-content-center mt-1 mb-5">
@@ -220,7 +262,10 @@ const ResetPassword: React.FC = () => {
                             />
                             <p
                                 className="text-center mt-3 mb-4"
-                                style={{ fontSize: '1.5rem', fontWeight: 'bold' }}
+                                style={{
+                                    fontSize: '1.5rem',
+                                    fontWeight: 'bold',
+                                }}
                             >
                                 Reset your password
                             </p>
@@ -231,7 +276,10 @@ const ResetPassword: React.FC = () => {
                             ) : (
                                 ''
                             )}
-                            <form onSubmit={handlePasswordSubmit} className="col-md-6 mx-auto">
+                            <form
+                                onSubmit={handlePasswordSubmit}
+                                className="col-md-6 mx-auto"
+                            >
                                 {errorMessage && (
                                     <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
                                         {errorMessage}
@@ -245,7 +293,11 @@ const ResetPassword: React.FC = () => {
                                 <Form.Group>
                                     <div className="position-relative mb-2">
                                         <Form.Control
-                                            type={showPassword ? 'text' : 'password'}
+                                            type={
+                                                showPassword
+                                                    ? 'text'
+                                                    : 'password'
+                                            }
                                             placeholder="Password"
                                             name="password"
                                             value={formData.password}
@@ -260,14 +312,20 @@ const ResetPassword: React.FC = () => {
                                             }}
                                             onClick={togglePasswordVisibility}
                                         >
-                                            {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+                                            {showPassword ? (
+                                                <FaRegEye />
+                                            ) : (
+                                                <FaRegEyeSlash />
+                                            )}
                                         </div>
                                     </div>
                                 </Form.Group>
                                 <div className="mb-2">
                                     <input
                                         className="form-control"
-                                        type={showPassword ? 'text' : 'password'}
+                                        type={
+                                            showPassword ? 'text' : 'password'
+                                        }
                                         name="password_confirmation"
                                         value={formData.password_confirmation}
                                         onChange={handleChange}
@@ -275,7 +333,10 @@ const ResetPassword: React.FC = () => {
                                         placeholder="Confirm new password"
                                     />
                                 </div>
-                                <button type="submit" className="btn btn-primary w-100">
+                                <button
+                                    type="submit"
+                                    className="btn btn-primary w-100"
+                                >
                                     Submit
                                 </button>
                                 <div className="d-flex justify-content-center mt-1 mb-5">

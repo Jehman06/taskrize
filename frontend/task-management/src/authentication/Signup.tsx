@@ -10,7 +10,11 @@ import {
     resetAuthStates,
     setShowPassword,
 } from '../redux/reducers/authSlice';
-import { setErrorMessage, setLoading, resetAppStates } from '../redux/reducers/appSlice';
+import {
+    setErrorMessage,
+    setLoading,
+    resetAppStates,
+} from '../redux/reducers/appSlice';
 import { RootState } from '../redux/store';
 
 // Styling
@@ -25,11 +29,17 @@ const SignupPage: React.FC = () => {
     const dispatch = useDispatch();
     const formData = useSelector((state: RootState) => state.auth.authFormData);
     const confirmPassword: string = useSelector(
-        (state: RootState) => state.auth.authFormData.password_confirmation
+        (state: RootState) => state.auth.authFormData.password_confirmation,
     );
-    const errorMessage: string = useSelector((state: RootState) => state.app.errorMessage);
-    const loading: boolean = useSelector((state: RootState) => state.app.loading);
-    const showPassword: boolean = useSelector((state: RootState) => state.auth.showPassword);
+    const errorMessage: string = useSelector(
+        (state: RootState) => state.app.errorMessage,
+    );
+    const loading: boolean = useSelector(
+        (state: RootState) => state.app.loading,
+    );
+    const showPassword: boolean = useSelector(
+        (state: RootState) => state.auth.showPassword,
+    );
 
     const navigate = useNavigate();
 
@@ -47,7 +57,9 @@ const SignupPage: React.FC = () => {
     };
 
     // Handle input change event for confirm password
-    const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const handleConfirmPasswordChange = (
+        e: React.ChangeEvent<HTMLInputElement>,
+    ): void => {
         dispatch(setConfirmPassword(e.target.value));
     };
 
@@ -56,7 +68,9 @@ const SignupPage: React.FC = () => {
     };
 
     // Handle form submission for sign up process
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    const handleSubmit = async (
+        e: React.FormEvent<HTMLFormElement>,
+    ): Promise<void> => {
         e.preventDefault();
         if (formData.password !== confirmPassword) {
             dispatch(setErrorMessage("Passwords don't match."));
@@ -65,9 +79,13 @@ const SignupPage: React.FC = () => {
 
         dispatch(setLoading(true)); // Update loading state to indicate request in progress
         try {
-            await axios.post('http://127.0.0.1:8000/api/user/register', formData, {
-                headers: { 'Content-Type': 'application/json' },
-            });
+            await axios.post(
+                'https://taskrize-f661faf78282.herokuapp.com/api/user/register',
+                formData,
+                {
+                    headers: { 'Content-Type': 'application/json' },
+                },
+            );
             dispatch(setErrorMessage(''), setLoading(false));
             navigate('/login'); // Redirect user to the login page
         } catch (error: any) {
@@ -75,7 +93,10 @@ const SignupPage: React.FC = () => {
             const errorMessage: string =
                 (error as AxiosError<any>)?.response?.data?.error ||
                 'An error occurred during registration.';
-            dispatch(setErrorMessage(errorMessage), dispatch(setLoading(false)));
+            dispatch(
+                setErrorMessage(errorMessage),
+                dispatch(setLoading(false)),
+            );
         }
     };
 
@@ -138,7 +159,11 @@ const SignupPage: React.FC = () => {
                                 }}
                                 onClick={togglePasswordVisibility}
                             >
-                                {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+                                {showPassword ? (
+                                    <FaRegEye />
+                                ) : (
+                                    <FaRegEyeSlash />
+                                )}
                             </div>
                         </div>
                     </Form.Group>
@@ -156,7 +181,10 @@ const SignupPage: React.FC = () => {
                         />
                     </div>
 
-                    <button type="submit" className="btn btn-primary w-100 mb-1">
+                    <button
+                        type="submit"
+                        className="btn btn-primary w-100 mb-1"
+                    >
                         Signup
                     </button>
                     <div className="d-flex justify-content-center mt-1 mb-5">

@@ -106,7 +106,7 @@ const Workspace: React.FC<WorkspaceProps> = ({
 
                 // Send PUT request to update the workspace name
                 const response = await axios.put(
-                    'http://127.0.0.1:8000/api/workspaces/update',
+                    'https://taskrize-f661faf78282.herokuapp.com/api/workspaces/update',
                     requestData,
                     {
                         headers: {
@@ -158,7 +158,7 @@ const Workspace: React.FC<WorkspaceProps> = ({
 
             // Make a DELETE request to the Workspace API to delete the workspace
             const response = await axios.delete(
-                'http://127.0.0.1:8000/api/workspaces/delete',
+                'https://taskrize-f661faf78282.herokuapp.com/api/workspaces/delete',
                 {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
@@ -208,7 +208,7 @@ const Workspace: React.FC<WorkspaceProps> = ({
             const accessToken = Cookies.get('access_token');
 
             const response = await axios.put(
-                'http://127.0.0.1:8000/api/workspaces/leave',
+                'https://taskrize-f661faf78282.herokuapp.com/api/workspaces/leave',
                 {
                     workspace_id: workspaceId,
                 },

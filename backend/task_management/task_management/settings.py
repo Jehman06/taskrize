@@ -79,10 +79,10 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
 ]
 CORS_ALLOWED_ORIGINS = [
-    'http://127.0.0.1:3000',
+    'https://www.taskrize.com',
 ]
 CSRF_TRUSTED_ORIGINS = [
-    'http://127.0.0.1:3000',
+    'https://www.taskrize.com',
 ]
 CSRF_COOKIE_DOMAIN = '127.0.0.1'
 CORS_ALLOW_CREDENTIALS = True
