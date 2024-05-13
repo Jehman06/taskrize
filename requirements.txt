@@ -8,3 +8,4 @@ psycopg2
 Pillow
 uvicorn
 uvicorn[standard]
+dj-database-url
