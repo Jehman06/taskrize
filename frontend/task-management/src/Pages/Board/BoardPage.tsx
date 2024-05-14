@@ -64,7 +64,7 @@ const BoardPage: React.FC = () => {
     // Function to establish the WebSocket connection and set up the event handlers
     // Create a new WebSocket connection outside of the useEffect hook
     let socket = new WebSocket(
-        'ws://taskrize-2e3dd97a0d3e.herokuapp.com/ws/board/',
+        'wss://taskrize-2e3dd97a0d3e.herokuapp.com/ws/board/',
     );
 
     socket.onopen = () => {
@@ -94,13 +94,13 @@ const BoardPage: React.FC = () => {
 
     socket.onerror = error => {
         socket = new WebSocket(
-            'ws://taskrize-2e3dd97a0d3e.herokuapp.com/ws/board/',
+            'wss://taskrize-2e3dd97a0d3e.herokuapp.com/ws/board/',
         );
     };
 
     socket.onclose = () => {
         socket = new WebSocket(
-            'ws://taskrize-2e3dd97a0d3e.herokuapp.com/ws/board/',
+            'wss://taskrize-2e3dd97a0d3e.herokuapp.com/ws/board/',
         );
     };
 
