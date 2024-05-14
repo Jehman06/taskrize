@@ -457,16 +457,6 @@ const PrivateNavbar: React.FC = () => {
                             <CreateBoardModal />
                         </Suspense>
                         <li>
-                            <a className="dropdown-item disabled" href="#">
-                                <p className="create-title">
-                                    Start from a template
-                                </p>
-                                <p className="create-description">
-                                    Under development
-                                </p>
-                            </a>
-                        </li>
-                        <li>
                             <a
                                 className="dropdown-item"
                                 onClick={() =>
@@ -483,6 +473,16 @@ const PrivateNavbar: React.FC = () => {
                                     provide a centralized hub for team
                                     communication, file sharing, and project
                                     management
+                                </p>
+                            </a>
+                        </li>
+                        <li>
+                            <a className="dropdown-item disabled" href="#">
+                                <p className="create-title">
+                                    Start from a template
+                                </p>
+                                <p className="create-description">
+                                    Under development
                                 </p>
                             </a>
                         </li>

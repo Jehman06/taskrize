@@ -94,7 +94,7 @@ const UserQueryDropdown: React.FC<UserQueryDropdownProps> = ({ id }) => {
                 },
             );
             // TODO: Better error handling
-            console.log(response.data);
+            // console.log(response.data);
         } catch (error) {
             console.error('Error inviting users:', error);
         }

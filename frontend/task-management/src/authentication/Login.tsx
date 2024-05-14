@@ -223,6 +223,13 @@ const LoginPage: React.FC = () => {
                             </Link>
                             <Link to={'/forgotpassword'}>Can't log in?</Link>
                         </div>
+                        <div className="cookie-notice">
+                            <p>
+                                This site uses cookies to maintain your session.
+                                We do not share this information with third
+                                parties.
+                            </p>
+                        </div>
                     </div>
                 </form>
             </div>
