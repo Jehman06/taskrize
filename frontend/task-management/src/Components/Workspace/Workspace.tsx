@@ -179,15 +179,12 @@ const Workspace: React.FC<WorkspaceProps> = ({
             if (error.response) {
                 // The request was made and the server responded with a status code
                 // that falls out of the range of 2xx
-                console.log(error.response.data);
                 window.alert(error.response.data.error);
             } else if (error.request) {
                 // The request was made but no response was received
-                console.log(error.request);
                 window.alert('No response received from server.');
             } else {
                 // Something happened in setting up the request that triggered an Error
-                console.log('Error', error.message);
                 window.alert(error.message);
             }
         }
@@ -218,7 +215,6 @@ const Workspace: React.FC<WorkspaceProps> = ({
                     },
                 },
             );
-            console.log(response.data);
             if (response.status === 200) {
                 window.location.reload();
             }

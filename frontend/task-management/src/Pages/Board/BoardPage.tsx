@@ -73,7 +73,6 @@ const BoardPage: React.FC = () => {
 
     socket.onmessage = event => {
         const data = JSON.parse(event.data);
-        console.log('Received WebSocket message:', data);
 
         if (data && data.card) {
             // Dispatch a specific action for WebSocket card updates
@@ -126,12 +125,8 @@ const BoardPage: React.FC = () => {
                     },
                 },
             );
-            console.log(`response: ${response.data}`);
             dispatch(setBoard(response.data));
             dispatch(setLists(response.data.lists));
-            console.log(
-                `lists when fetchBoard is called: ${JSON.stringify(response.data.lists)}`,
-            );
             setUpdateNeeded(false);
         } catch (error) {
             console.error('Error fetching board: ', error);
@@ -161,13 +156,6 @@ const BoardPage: React.FC = () => {
 
     const handleCreateList = async (newListName: string) => {
         if (socket.readyState === WebSocket.OPEN) {
-            console.log(
-                'WebSocket ready:',
-                socket.readyState === WebSocket.OPEN,
-            );
-            console.log(
-                `Data sent to the backend: ${JSON.stringify({ action: 'create_list', board_id: board?.id, list_name: newListName, user_id: userId })}`,
-            );
             try {
                 socket.send(
                     JSON.stringify({
@@ -228,13 +216,10 @@ const BoardPage: React.FC = () => {
 
             // Get the card ID from the draggableId
             const cardId = draggableId.split('-')[1];
-            console.log('cardId:', cardId);
 
-            console.log(`WebSocket readyState: ${socket.readyState}`);
             // Check WebSocket readyState
             if (socket.readyState === WebSocket.OPEN) {
                 try {
-                    console.log('Entering the try block');
                     // Send a message over the WebSocket connection
                     socket.send(
                         JSON.stringify({
@@ -245,7 +230,6 @@ const BoardPage: React.FC = () => {
                             board_id: board.id,
                         }),
                     );
-                    console.log(`Action sent to the backend: card_moved`);
                 } catch (error) {
                     console.error('Error moving card:', error);
                 }
@@ -257,7 +241,6 @@ const BoardPage: React.FC = () => {
             if (startListIndex !== finishListIndex) {
                 // Extract the list id from the draggableId
                 const listId = draggableId.split('-')[1];
-                console.log('listId:', listId);
 
                 // Check WebSocket readyState
                 if (socket.readyState === WebSocket.OPEN) {

@@ -170,10 +170,8 @@ const CreateBoardModal: React.FC = () => {
             dispatch(resetModalStates());
             // Reload the page to fetch updated data
             window.location.reload();
-            console.log('boardFormData:', boardFormData);
         } catch (error) {
             // Handle error
-            console.log('boardFormData:', boardFormData);
             console.error('Error creating board:', error);
         }
     };

@@ -4,7 +4,6 @@ import {
     setActiveListId,
     setIsCreatingList,
     setListFormData,
-    setOpenListId,
     setRenamingListId,
 } from '../../redux/reducers/listSlice';
 import { Card as CardType } from '../../redux/reducers/cardSlice';
@@ -17,13 +16,8 @@ import { IoOpen } from 'react-icons/io5';
 import { RootState } from '../../redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { setNewCardTitle } from '../../redux/reducers/cardSlice';
-import { verifyAccessToken } from '../../utils/apiUtils';
-import Cookies from 'js-cookie';
-import axios from 'axios';
 import './List.css';
 import Card from '../Card/Card';
-import { setShowListModal } from '../../redux/reducers/modalSlice';
-import ListModal from '../Modals/List/ListModal';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import { getDraggableStyles } from '../../Pages/Board/BoardPage';
 
@@ -43,9 +37,6 @@ const List: React.FC<ListProps> = ({ list, socket, boardId }) => {
     );
     const renamingListId = useSelector(
         (state: RootState) => state.list.renamingListId,
-    );
-    const listFormData = useSelector(
-        (state: RootState) => state.list.listFormData,
     );
     // const showListModal = useSelector((state: RootState) => state.modal.showListModal);
     const dispatch = useDispatch();
@@ -83,10 +74,7 @@ const List: React.FC<ListProps> = ({ list, socket, boardId }) => {
     // };
 
     const handleDeleteList = async (listId: number): Promise<void> => {
-        console.log('handleDeleteList called, listId:', listId);
-        console.log(`listId: ${listId}, userId: ${userId}`);
         if (socket.readyState === WebSocket.OPEN) {
-            console.log('socket ready:', socket.readyState === WebSocket.OPEN);
             try {
                 socket.send(
                     JSON.stringify({
@@ -106,7 +94,6 @@ const List: React.FC<ListProps> = ({ list, socket, boardId }) => {
         listId: number,
         newTitle: string,
     ): Promise<void> => {
-        console.log('listFormData.title:', listFormData.title);
         if (socket.readyState === WebSocket.OPEN) {
             try {
                 socket.send(
@@ -179,6 +166,7 @@ const List: React.FC<ListProps> = ({ list, socket, boardId }) => {
                 <input
                     ref={inputRef}
                     type="text"
+                    name="title"
                     placeholder={list.title}
                     onBlur={handleBlurRename}
                     onKeyDown={handleKeyDownRename}

@@ -34,7 +34,6 @@ const BoardNavbar: React.FC<BoardNavbarProps> = ({ board }) => {
                     },
                 },
             );
-            console.log(response.data);
             if (response.status === 200) {
                 window.location.reload();
             }
@@ -59,7 +58,6 @@ const BoardNavbar: React.FC<BoardNavbarProps> = ({ board }) => {
                     },
                 },
             );
-            console.log(response.data);
             if (response.status === 204) {
                 navigate('/home');
             }

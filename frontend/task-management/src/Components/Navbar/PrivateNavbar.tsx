@@ -224,7 +224,6 @@ const PrivateNavbar: React.FC = () => {
                 },
             );
             if (response.status === 200) {
-                console.log('Invitation accepted!');
                 window.location.reload();
             } else {
                 console.error(response.data);
@@ -458,7 +457,7 @@ const PrivateNavbar: React.FC = () => {
                             <CreateBoardModal />
                         </Suspense>
                         <li>
-                            <a className="dropdown-item" href="#">
+                            <a className="dropdown-item disabled" href="#">
                                 <p className="create-title">
                                     Start from a template
                                 </p>

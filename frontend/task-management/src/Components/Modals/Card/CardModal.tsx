@@ -129,7 +129,6 @@ const CardModal: React.FC<CardModalProps> = ({
         dueDate,
         label,
     }: updateCardParams = {}) => {
-        console.log('title sent:', title);
         if (socket.readyState === WebSocket.OPEN) {
             try {
                 socket.send(
