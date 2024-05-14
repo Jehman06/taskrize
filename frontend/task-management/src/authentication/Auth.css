@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap');
 
+.container {
+    border-radius: 1rem;
+}
+
 .auth-shadow {
     background: white !important;
     box-shadow:

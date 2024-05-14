@@ -80,9 +80,12 @@ CORS_ALLOW_HEADERS = [
 ]
 CORS_ALLOWED_ORIGINS = [
     'https://www.taskrize.com',
+    'http://127.0.0.1:3000',
+    'https://6d26-2600-8801-c81a-8200-e819-8123-3f7f-232.ngrok-free.app',
 ]
 CSRF_TRUSTED_ORIGINS = [
     'https://www.taskrize.com',
+    'https://6d26-2600-8801-c81a-8200-e819-8123-3f7f-232.ngrok-free.app',
 ]
 CSRF_COOKIE_DOMAIN = 'taskrize-2e3dd97a0d3e.herokuapp.com'
 CORS_ALLOW_CREDENTIALS = True
