@@ -46,6 +46,12 @@ const PrivateNavbar: React.FC = () => {
         undefined,
     );
 
+    const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+
+    const handleHamburgerClick = () => {
+        setIsSidebarOpen(!isSidebarOpen);
+    };
+
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -340,6 +346,7 @@ const PrivateNavbar: React.FC = () => {
                             })}
                     </ul>
                 </div>
+
                 <div className="dropdown">
                     <button
                         className="dropdown-btn dropdown-toggle"
@@ -415,7 +422,7 @@ const PrivateNavbar: React.FC = () => {
                             })}
                     </ul>
                 </div>
-                <div className="dropdown">
+                <div className="dropdown create">
                     <button
                         className="create-button dropdown-toggle no-arrow"
                         type="button"
