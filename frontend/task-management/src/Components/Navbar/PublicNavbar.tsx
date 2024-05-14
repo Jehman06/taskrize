@@ -11,7 +11,7 @@ const PublicNavbar: React.FC = () => {
 
     return (
         <nav
-            className="navbar navbar-expand-lg navbar-light justify-content-between align-items-center"
+            className="navbar navbar-expand-sm navbar-light justify-content-between align-items-center"
             style={{
                 backgroundColor: 'white',
                 position: 'relative',
@@ -24,7 +24,7 @@ const PublicNavbar: React.FC = () => {
                     <img
                         src={taskrize}
                         alt="logo"
-                        style={{ height: '60px', width: '150px' }}
+                        style={{ height: '60px', width: 'auto' }}
                     />
                 </Link>
                 {/* Right-aligned content */}

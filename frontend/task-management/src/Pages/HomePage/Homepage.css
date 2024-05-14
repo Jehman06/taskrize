@@ -176,3 +176,32 @@
     margin: 0;
     border-top: 1px solid black;
 }
+
+@media (max-width: 1000px) {
+    .main-content {
+        flex-direction: column;
+    }
+
+    .right-content {
+        margin-top: 5rem;
+    }
+}
+
+@media (max-width: 676px) {
+    .bottom-item {
+        max-width: 80vw;
+        padding: 5rem;
+    }
+
+    .bottom-item p {
+        font-size: 1.2rem;
+    }
+
+    .bottom-item h2 {
+        font-size: 1.6rem;
+    }
+
+    .bottom-icon {
+        font-size: 4rem;
+    }
+}
