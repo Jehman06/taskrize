@@ -113,7 +113,7 @@ const BoardPage: React.FC = () => {
             const accessToken = Cookies.get('access_token');
 
             const response = await axios.get(
-                `https://taskrize-f661faf78282.herokuapp.com/api/boards/${id}`,
+                `https://taskrize-2e3dd97a0d3e.herokuapp.com/api/boards/${id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,

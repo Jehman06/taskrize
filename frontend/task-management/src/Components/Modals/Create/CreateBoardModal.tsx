@@ -105,7 +105,7 @@ const CreateBoardModal: React.FC = () => {
         try {
             const accessToken = Cookies.get('access_token');
             const response = await axios.get(
-                'https://taskrize-f661faf78282.herokuapp.com/api/images/sample',
+                'https://taskrize-2e3dd97a0d3e.herokuapp.com/api/images/sample',
                 {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
@@ -124,7 +124,7 @@ const CreateBoardModal: React.FC = () => {
             const accessToken = Cookies.get('access_token');
 
             const response = await axios.get(
-                'https://taskrize-f661faf78282.herokuapp.com/api/images/all',
+                'https://taskrize-2e3dd97a0d3e.herokuapp.com/api/images/all',
                 {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
@@ -157,7 +157,7 @@ const CreateBoardModal: React.FC = () => {
             await verifyAccessToken();
             // Send POST request to Board API to create the board
             const response = await axios.post(
-                'https://taskrize-f661faf78282.herokuapp.com/api/boards/create',
+                'https://taskrize-2e3dd97a0d3e.herokuapp.com/api/boards/create',
                 boardFormData,
                 {
                     headers: {

@@ -26,7 +26,7 @@ const BoardNavbar: React.FC<BoardNavbarProps> = ({ board }) => {
             const accessToken = Cookies.get('access_token');
 
             const response = await axios.post(
-                `https://taskrize-f661faf78282.herokuapp.com/api/boards/toggle-favorite?board_id=${board?.id}`,
+                `https://taskrize-2e3dd97a0d3e.herokuapp.com/api/boards/toggle-favorite?board_id=${board?.id}`,
                 null,
                 {
                     headers: {
@@ -49,7 +49,7 @@ const BoardNavbar: React.FC<BoardNavbarProps> = ({ board }) => {
             const accessToken = Cookies.get('access_token');
 
             const response = await axios.delete(
-                'https://taskrize-f661faf78282.herokuapp.com/api/boards/delete',
+                'https://taskrize-2e3dd97a0d3e.herokuapp.com/api/boards/delete',
                 {
                     data: {
                         board_id: board?.id,

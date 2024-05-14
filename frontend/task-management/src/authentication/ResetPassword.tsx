@@ -123,7 +123,7 @@ const ResetPassword: React.FC = () => {
         dispatch(setLoading(true));
         try {
             const response = await axios.post(
-                `https://taskrize-f661faf78282.herokuapp.com/api/user/reset-password-confirm/${user_id}`,
+                `https://taskrize-2e3dd97a0d3e.herokuapp.com/api/user/reset-password-confirm/${user_id}`,
                 {
                     new_password: formData.password,
                 },

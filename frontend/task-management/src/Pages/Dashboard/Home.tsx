@@ -64,7 +64,7 @@ const Home: React.FC = () => {
 
             // Send a request to the backend to update the favorite status
             await axios.post(
-                `https://taskrize-f661faf78282.herokuapp.com/api/boards/toggle-favorite?board_id=${boardId}`, // Send boardId as a query parameter
+                `https://taskrize-2e3dd97a0d3e.herokuapp.com/api/boards/toggle-favorite?board_id=${boardId}`, // Send boardId as a query parameter
                 null, // No request body
                 {
                     headers: {

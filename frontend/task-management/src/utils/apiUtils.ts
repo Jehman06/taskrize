@@ -9,7 +9,7 @@ export const verifyAccessToken = async (): Promise<void> => {
     try {
         // Verify the access token
         await axios.post(
-            'https://taskrize-f661faf78282.herokuapp.com/api/token/verify/',
+            'https://taskrize-2e3dd97a0d3e.herokuapp.com/api/token/verify/',
             { token: accessToken },
             { headers: { 'Content-Type': 'application/json' } },
         );
@@ -20,7 +20,7 @@ export const verifyAccessToken = async (): Promise<void> => {
             try {
                 // If verification fails (status 401), refresh the access token
                 const refreshResponse = await axios.post(
-                    'https://taskrize-f661faf78282.herokuapp.com/api/token/refresh/',
+                    'https://taskrize-2e3dd97a0d3e.herokuapp.com/api/token/refresh/',
                     { refresh: refreshToken },
                     { headers: { 'Content-Type': 'application/json' } },
                 );

@@ -29,7 +29,7 @@ const UserQueryDropdown: React.FC<UserQueryDropdownProps> = ({ id }) => {
 
             // Send a GET request to search for users
             const response = await axios.get(
-                `https://taskrize-f661faf78282.herokuapp.com/api/user/profiles/?search=${inputValue}&workspace_id=${id}`,
+                `https://taskrize-2e3dd97a0d3e.herokuapp.com/api/user/profiles/?search=${inputValue}&workspace_id=${id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
@@ -82,7 +82,7 @@ const UserQueryDropdown: React.FC<UserQueryDropdownProps> = ({ id }) => {
 
             // Send a POST request to send invite and notifications to selected users
             const response = await axios.post(
-                'https://taskrize-f661faf78282.herokuapp.com/api/workspaces/members/invite',
+                'https://taskrize-2e3dd97a0d3e.herokuapp.com/api/workspaces/members/invite',
                 {
                     selected_user_ids: recipientIds,
                     workspace_id: workspaceId,

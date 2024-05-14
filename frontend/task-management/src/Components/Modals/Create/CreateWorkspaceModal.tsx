@@ -34,7 +34,7 @@ const CreateWorkspaceModal: React.FC = () => {
             const accessToken = Cookies.get('access_token');
             // Send POST request to workspace API
             const response: AxiosResponse = await axios.post(
-                'https://taskrize-f661faf78282.herokuapp.com/api/workspaces/create',
+                'https://taskrize-2e3dd97a0d3e.herokuapp.com/api/workspaces/create',
                 workspaceFormData,
                 {
                     headers: {

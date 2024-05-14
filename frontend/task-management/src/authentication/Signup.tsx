@@ -80,7 +80,7 @@ const SignupPage: React.FC = () => {
         dispatch(setLoading(true)); // Update loading state to indicate request in progress
         try {
             await axios.post(
-                'https://taskrize-f661faf78282.herokuapp.com/api/user/register',
+                'https://taskrize-2e3dd97a0d3e.herokuapp.com/api/user/register',
                 formData,
                 {
                     headers: { 'Content-Type': 'application/json' },

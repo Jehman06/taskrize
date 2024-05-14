@@ -76,7 +76,7 @@ const LoginPage: React.FC = () => {
         try {
             // Send login request to the backend API
             const response: AxiosResponse = await axios.post(
-                'https://taskrize-f661faf78282.herokuapp.com/api/user/login',
+                'https://taskrize-2e3dd97a0d3e.herokuapp.com/api/user/login',
                 formData,
             );
 

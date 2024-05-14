@@ -96,9 +96,9 @@ const PrivateNavbar: React.FC = () => {
     const getBoardsAndWorkspaces = useCallback(
         async (accessToken: string): Promise<void> => {
             const boardsUrl =
-                'https://taskrize-f661faf78282.herokuapp.com/api/boards/';
+                'https://taskrize-2e3dd97a0d3e.herokuapp.com/api/boards/';
             const workspacesUrl =
-                'https://taskrize-f661faf78282.herokuapp.com/api/workspaces/';
+                'https://taskrize-2e3dd97a0d3e.herokuapp.com/api/workspaces/';
 
             try {
                 const [boardsResponse, workspacesResponse] = await Promise.all([
@@ -182,7 +182,7 @@ const PrivateNavbar: React.FC = () => {
     const fetchNotifications = async (accessToken: string): Promise<void> => {
         try {
             const response = await axios.get(
-                'https://taskrize-f661faf78282.herokuapp.com/api/notifications',
+                'https://taskrize-2e3dd97a0d3e.herokuapp.com/api/notifications',
                 {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
@@ -212,7 +212,7 @@ const PrivateNavbar: React.FC = () => {
             const accessToken = Cookies.get('access_token');
 
             const response = await axios.put(
-                'https://taskrize-f661faf78282.herokuapp.com/api/workspaces/members/accept-invite',
+                'https://taskrize-2e3dd97a0d3e.herokuapp.com/api/workspaces/members/accept-invite',
                 {
                     invitation_id: invitationId,
                     notification_id: notificationId,
@@ -244,7 +244,7 @@ const PrivateNavbar: React.FC = () => {
             const accessToken = Cookies.get('access_token');
 
             const response = await axios.put(
-                'https://taskrize-f661faf78282.herokuapp.com/api/workspaces/members/reject-invite',
+                'https://taskrize-2e3dd97a0d3e.herokuapp.com/api/workspaces/members/reject-invite',
                 {
                     invitation_id: invitationId,
                     notification_id: notificationId,
@@ -274,7 +274,7 @@ const PrivateNavbar: React.FC = () => {
 
             // Once the token has been validated, log the user out
             await axios.post(
-                'https://taskrize-f661faf78282.herokuapp.com/api/user/logout',
+                'https://taskrize-2e3dd97a0d3e.herokuapp.com/api/user/logout',
                 {},
                 {
                     headers: { Authorization: `Bearer ${accessToken}` },

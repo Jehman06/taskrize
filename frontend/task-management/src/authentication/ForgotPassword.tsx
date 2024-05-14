@@ -61,7 +61,7 @@ const ForgotPassword: React.FC = () => {
                 user_id: string;
                 reset_code: string;
             }> = await axios.post(
-                'https://taskrize-f661faf78282.herokuapp.com/api/user/reset-password',
+                'https://taskrize-2e3dd97a0d3e.herokuapp.com/api/user/reset-password',
                 {
                     email: formData.email,
                 },
