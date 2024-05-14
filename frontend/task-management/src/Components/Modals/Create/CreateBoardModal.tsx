@@ -178,9 +178,7 @@ const CreateBoardModal: React.FC = () => {
 
     const handleWorkspaceSelect = (workspace: any) => {
         dispatch(setSelectedWorkspace(workspace));
-        dispatch(
-            setBoardFormData({ ...boardFormData, workspace: workspace.id }),
-        ); // Dispatch action to update workspace in board form data
+        dispatch(setBoardFormData({ ...boardFormData, workspace: workspace })); // Dispatch action to update workspace in board form data
     };
 
     const handleFormSubmit = (event: React.FormEvent) => {

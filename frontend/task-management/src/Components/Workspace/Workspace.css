@@ -9,6 +9,8 @@
     justify-content: flex-start;
     align-items: flex-start;
     width: 100%;
+    border-bottom: 1px solid #9fadbc;
+    margin-bottom: 1rem;
 }
 
 .workspace-title {

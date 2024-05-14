@@ -126,14 +126,10 @@
     font-size: 20px;
 }
 
-.workspaces > :not(:last-child, :first-child) {
-    border-bottom: 0.1px solid #9fadbc;
-    margin-bottom: 1rem;
-}
-
 .workspace {
     width: calc(100% - 20px); /* Adjust the width as needed */
     max-width: 70vw; /* Limit the maximum width */
+    margin-bottom: 1rem;
 }
 
 .workspace-settings {
@@ -172,4 +168,18 @@
 .board-content {
     display: flex;
     flex-wrap: wrap;
+}
+
+@media (max-width: 780px) {
+    .home-container {
+        align-content: center;
+    }
+
+    .home-sidebar {
+        display: none;
+    }
+
+    .home-content {
+        min-width: 100%;
+    }
 }
