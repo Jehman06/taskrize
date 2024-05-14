@@ -70,7 +70,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['taskrize-2e3dd97a0d3e.herokuapp.com']
 
 # CORS
 CORS_ALLOW_HEADERS = [
@@ -84,7 +84,7 @@ CORS_ALLOWED_ORIGINS = [
 CSRF_TRUSTED_ORIGINS = [
     'https://www.taskrize.com',
 ]
-CSRF_COOKIE_DOMAIN = '127.0.0.1'
+CSRF_COOKIE_DOMAIN = 'taskrize-2e3dd97a0d3e.herokuapp.com'
 CORS_ALLOW_CREDENTIALS = True
 SESSION_COOKIE_SAMESITE = None
 
