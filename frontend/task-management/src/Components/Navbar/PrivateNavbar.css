@@ -184,8 +184,9 @@
 
     .private-navbar {
         height: 45px !important;
-        justify-content: space-between !important; /* Add this */
-        align-items: center; /* Add this */
+        justify-content: space-between !important;
+        box-sizing: border-box;
+        max-width: 100%;
     }
 
     .dropdown {
@@ -200,6 +201,6 @@
         display: flex;
         max-height: 100%;
         padding: 0;
-        margin: 0;
+        margin: 0; /* Remove horizontal margins */
     }
 }

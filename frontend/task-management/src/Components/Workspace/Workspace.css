@@ -63,3 +63,9 @@
 .settings-dropdown-icons {
     margin-right: 0.4rem;
 }
+
+@media (max-width: 652px) {
+    button {
+        width: 7rem;
+    }
+}
