@@ -113,7 +113,10 @@ const ForgotPassword: React.FC = () => {
                 ) : (
                     ''
                 )}
-                <form onSubmit={handleEmailSubmit} className="col-md-6 mx-auto">
+                <form
+                    onSubmit={handleEmailSubmit}
+                    className="col-md-6 mx-auto form"
+                >
                     {errorMessage && (
                         <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
                             {errorMessage}

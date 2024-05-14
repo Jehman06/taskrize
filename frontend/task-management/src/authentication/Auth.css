@@ -54,3 +54,13 @@
     padding: 0 1rem 0 1rem;
     margin: 0 2rem 0 2rem;
 }
+
+@media (max-width: 780px) {
+    .container {
+        width: 90vw !important;
+    }
+
+    .form {
+        padding: 1rem;
+    }
+}

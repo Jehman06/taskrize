@@ -206,7 +206,7 @@ const ResetPassword: React.FC = () => {
                             </p>
                             <form
                                 onSubmit={handleResetCodeSubmit}
-                                className="col-md-6 mx-auto"
+                                className="col-md-6 mx-auto form"
                             >
                                 {errorMessage && (
                                     <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
@@ -278,7 +278,7 @@ const ResetPassword: React.FC = () => {
                             )}
                             <form
                                 onSubmit={handlePasswordSubmit}
-                                className="col-md-6 mx-auto"
+                                className="col-md-6 mx-auto form"
                             >
                                 {errorMessage && (
                                     <div className="p-1 text-danger bg-danger-subtle border border-danger rounded-3 w-100 mb-2">
