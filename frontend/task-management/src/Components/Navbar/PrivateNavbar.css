@@ -184,7 +184,8 @@
 
     .private-navbar {
         height: 45px !important;
-        justify-content: space-between !important;
+        justify-content: space-between;
+        align-items: center !important; /* Add this line */
         box-sizing: border-box;
         max-width: 100%;
     }
@@ -199,8 +200,9 @@
     .notifications,
     .profile {
         display: flex;
+        align-items: center; /* Add this line */
         max-height: 100%;
-        padding: 0;
-        margin: 0; /* Remove horizontal margins */
+        padding: 0 !important;
+        margin: 0 !important; /* Remove horizontal margins */
     }
 }
