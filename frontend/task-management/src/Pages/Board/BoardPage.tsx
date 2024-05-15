@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
@@ -46,6 +46,7 @@ const BoardPage: React.FC = () => {
     );
     const userId = useSelector((state: RootState) => state.auth.user.id);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     useEffect(() => {
         // Sort the lists by position after they are rehydrated from storage
@@ -261,6 +262,25 @@ const BoardPage: React.FC = () => {
             }
         }
     };
+
+    function isMobileDevice() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent,
+        );
+    }
+
+    if (isMobileDevice()) {
+        return (
+            <div className="boardpage-mobile">
+                <button onClick={() => navigate('/home')}>
+                    Back to Dashboard
+                </button>
+                <h1>
+                    For a better experience, please use this app on a Desktop.
+                </h1>
+            </div>
+        );
+    }
 
     return (
         <div className="board-page">

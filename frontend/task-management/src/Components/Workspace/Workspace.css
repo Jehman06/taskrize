@@ -68,5 +68,6 @@
 @media (max-width: 652px) {
     .workspace-buttons button {
         width: 7rem;
+        margin-bottom: 1rem;
     }
 }

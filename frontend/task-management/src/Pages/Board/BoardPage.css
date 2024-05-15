@@ -167,3 +167,39 @@
 .list-dropdown-menu {
     background-color: #272b2b !important;
 }
+
+.boardpage-mobile {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+    background: linear-gradient(
+        -45deg,
+        #ffffff,
+        #ffe4e9,
+        #fcc8e2,
+        #f6baed,
+        #efb0ff,
+        #d3a2ff,
+        #8eb8ff,
+        #91efff,
+        #d5f9ff
+    );
+    background-size: 400% 400%;
+    animation: gradient 9s ease infinite;
+}
+
+.boardpage-mobile p {
+    margin: 2rem;
+    padding: 2rem;
+}
+
+.boardpage-mobile button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: transparent;
+    border-radius: 0.4rem;
+    size: 8rem;
+}
