@@ -23,6 +23,10 @@ const UserQueryDropdown: React.FC<UserQueryDropdownProps> = ({ id }) => {
 
     // Function to query through the database to search members
     const loadOptions = async (inputValue: string) => {
+        if (!inputValue) {
+            return [];
+        }
+
         try {
             verifyAccessToken();
             const accessToken = Cookies.get('access_token');

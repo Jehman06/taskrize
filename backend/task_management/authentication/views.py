@@ -224,23 +224,24 @@ def get_profile(request):
 @authentication_classes([JWTAuthentication])
 def search_profiles(request):
     try:
-        search_query = request.GET.get('q', '') # Get the search query from the request query parameters
+        search_query = request.GET.get('q', None) # Get the search query from the request query parameters
         workspace_id = request.GET.get('workspace_id') # Get the workspace ID from the query parameters
 
         if not workspace_id:
             return Response({'error': 'Workspace ID required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check if the query is present in the cache
-        cached_results = cache.get(f'{search_query}_{workspace_id}')
-        if cached_results:
-            return Response(cached_results)
-        
-        # If not cached, perform the search and apply pagination
+        if not search_query:
+            return Response([])
+
+        # Perform the search
         profiles = UserProfile.objects.filter(
             Q(email__icontains=search_query) |
             Q(name__icontains=search_query) |
             Q(nickname__icontains=search_query)
         )
+
+        if not profiles:
+            return Response([])
 
         if workspace_id:
             # Filter out users who are already members of the workspace
@@ -250,9 +251,6 @@ def search_profiles(request):
         
         # Serialize the profiles data
         serializer = UserProfileSerializer(profiles, many=True)
-
-        # Cache the search results for future requests
-        cache.set(f'{search_query}_{workspace_id}', serializer.data)
 
         return Response(serializer.data)
     except Exception as e:
