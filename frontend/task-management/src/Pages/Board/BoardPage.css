@@ -202,4 +202,6 @@
     background-color: transparent;
     border-radius: 0.4rem;
     size: 8rem;
+    border: 1px solid black;
+    color: black;
 }
