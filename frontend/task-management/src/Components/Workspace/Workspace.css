@@ -11,6 +11,7 @@
     width: 100%;
     border-bottom: 1px solid #9fadbc;
     margin-bottom: 1rem;
+    flex-wrap: wrap;
 }
 
 .workspace-title {
@@ -64,8 +65,14 @@
     margin-right: 0.4rem;
 }
 
-@media (max-width: 652px) {
+@media (max-width: 760px) {
+    .workspace-settings {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
     button {
+        margin-bottom: 1rem;
         width: 7rem;
     }
 }
